@@ -61,6 +61,22 @@ export async function listIntakeRecords(): Promise<HubSpotObject[]> {
   return data.results;
 }
 
+// HubSpot owner properties store numeric IDs — resolve to display name
+export async function resolveOwnerName(ownerId: string): Promise<string | null> {
+  try {
+    const owner = await hubspotFetch<{
+      id: string;
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+    }>(`/crm/v3/owners/${ownerId}`);
+    const parts = [owner.firstName, owner.lastName].filter(Boolean);
+    return parts.length > 0 ? parts.join(" ") : owner.email || null;
+  } catch {
+    return null;
+  }
+}
+
 export interface IntakeField {
   key: string;
   label: string;
@@ -91,17 +107,15 @@ const FIELD_META: Record<string, { label: string; type: IntakeField["type"] }> =
   date_issued: { label: "Date Issued", type: "date" },
 };
 
-export function normalizeIntakeData(record: HubSpotObject): IntakeDisplayData {
+export async function normalizeIntakeData(record: HubSpotObject): Promise<IntakeDisplayData> {
   const fields: IntakeField[] = [];
 
   for (const [key, meta] of Object.entries(FIELD_META)) {
-    const raw = record.properties[key];
-    fields.push({
-      key,
-      label: meta.label,
-      value: raw || null,
-      type: meta.type,
-    });
+    let value = record.properties[key] || null;
+    if (key === "esm_solution_consultant" && value && /^\d+$/.test(value)) {
+      value = await resolveOwnerName(value) || value;
+    }
+    fields.push({ key, label: meta.label, value, type: meta.type });
   }
 
   return {

@@ -77,7 +77,7 @@ interface HubSpotRecord {
   properties: Record<string, string | null>;
 }
 
-function extractProjectData(record: HubSpotRecord) {
+async function extractProjectData(record: HubSpotRecord) {
   const customerName = record.properties.customer
     || record.properties.institution_legal_name
     || "Unknown Customer";
@@ -87,7 +87,12 @@ function extractProjectData(record: HubSpotRecord) {
   const products = modules
     ? modules.split(";").map((m) => m.trim()).filter(Boolean)
     : [];
-  const scName = record.properties.esm_solution_consultant || "";
+  const rawSc = record.properties.esm_solution_consultant || "";
+  let scName = rawSc;
+  if (rawSc && /^\d+$/.test(rawSc)) {
+    const { resolveOwnerName } = await import("./hubspot");
+    scName = await resolveOwnerName(rawSc) || rawSc;
+  }
   const goLiveDate = record.properties.target_golive || undefined;
   const projectTemplate = record.properties.project_template || undefined;
   const institutionLegalName = record.properties.institution_legal_name || undefined;
@@ -601,7 +606,7 @@ export async function linkSmartsheetSheets(projectId: string): Promise<LinkResul
 
 function buildProjectConfig(
   record: HubSpotRecord,
-  data: ReturnType<typeof extractProjectData>,
+  data: Awaited<ReturnType<typeof extractProjectData>>,
 ): ProjectConfig {
   return {
     customerName: data.customerName,
@@ -653,7 +658,7 @@ export async function syncFromHubSpot(): Promise<ProvisionResult> {
       continue;
     }
 
-    const data = extractProjectData(record);
+    const data = await extractProjectData(record);
     const projectId = pickProjectId(slugify(data.customerName), projects);
 
     const config = buildProjectConfig(record, data);
@@ -703,7 +708,7 @@ export async function provisionFromHubSpotRecord(recordId: string): Promise<Prov
     return { created: [], skipped: 1 };
   }
 
-  const data = extractProjectData(record);
+  const data = await extractProjectData(record);
   const projectId = pickProjectId(slugify(data.customerName), projects);
 
   const config = buildProjectConfig(record, data);

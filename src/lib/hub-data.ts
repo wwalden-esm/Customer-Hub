@@ -75,7 +75,7 @@ export async function getHubDashboardData(projectId: string): Promise<HubDashboa
     if (hubspotId) {
       const { getIntakeRecord, normalizeIntakeData } = await import("@/lib/hubspot");
       const record = await getIntakeRecord(hubspotId);
-      const data = normalizeIntakeData(record);
+      const data = await normalizeIntakeData(record);
       const filled = data.fields.filter((f) => f.value && f.value.trim().length > 0).length;
       intakePercent = data.fields.length > 0 ? Math.round((filled / data.fields.length) * 100) : 0;
     }

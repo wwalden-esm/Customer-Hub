@@ -80,7 +80,7 @@ export default async function IntakePage() {
   if (hubspotIntakeId) {
     try {
       const record = await getIntakeRecord(hubspotIntakeId);
-      intakeData = normalizeIntakeData(record);
+      intakeData = await normalizeIntakeData(record);
     } catch (e) {
       console.error("Failed to fetch HubSpot intake data:", e);
       error = "Unable to load intake data from HubSpot.";
