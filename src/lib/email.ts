@@ -1,0 +1,39 @@
+import { Resend } from "resend";
+
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
+
+function getFrom(): string {
+  return process.env.EMAIL_FROM || "ESM Customer Hub <hub@esmsolutions.com>";
+}
+
+export async function sendMagicLinkEmail(to: string, customerName: string, link: string) {
+  await getResend().emails.send({
+    from: getFrom(),
+    to,
+    subject: `Sign in to your ${customerName} implementation hub`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
+          <span style="color: white; font-weight: bold; font-size: 18px;">ESM Customer Hub</span>
+        </div>
+        <div style="background: #ffffff; padding: 24px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 8px 8px;">
+          <p>Click the link below to access the <strong>${customerName}</strong> implementation hub.</p>
+          <p style="margin: 24px 0;">
+            <a href="${link}" style="background: #F4333F; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
+              Sign in to your hub
+            </a>
+          </p>
+          <p style="color: #686468; font-size: 14px;">This link expires in 24 hours. If you didn't request this, you can ignore this email.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+export async function sendNotificationEmail(to: string, subject: string, html: string) {
+  await getResend().emails.send({ from: getFrom(), to, subject, html });
+}

@@ -1,0 +1,267 @@
+"use client";
+
+import { useState, useMemo } from "react";
+
+interface Meeting {
+  id: string;
+  week: string;
+  days: string;
+  phase: string;
+  milestone: string;
+  meetingDate: string | null;
+  status: "Upcoming" | "Scheduled" | "Complete" | "Skipped";
+  scPrepItems: string;
+  agendaSummary: string;
+  customerDeliverables: string;
+  notes: string;
+  actionItemsLogged: boolean;
+  recapSent: boolean;
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  Upcoming: "bg-blue-100 text-blue-700",
+  Scheduled: "bg-amber-100 text-amber-700",
+  Complete: "bg-green-100 text-green-700",
+  Skipped: "bg-slate-100 text-slate-500",
+};
+
+const PHASE_COLORS: Record<string, string> = {
+  "Phase 1 — Kickoff & Discovery": "bg-indigo-100 text-indigo-700",
+  "Phase 2 — Design / Config Training": "bg-violet-100 text-violet-700",
+  "Phase 3 — Production Build": "bg-sky-100 text-sky-700",
+  "Phase 4 — Validation Testing": "bg-amber-100 text-amber-700",
+  "Phase 5 — Cutover & Hypercare": "bg-emerald-100 text-emerald-700",
+};
+
+const STATUSES = ["All", "Upcoming", "Scheduled", "Complete", "Skipped"] as const;
+
+function fmtDate(d: string | null): string {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function shortPhase(phase: string): string {
+  const match = phase.match(/^Phase (\d)/);
+  return match ? `P${match[1]}` : phase;
+}
+
+export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[] }) {
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [phaseFilter, setPhaseFilter] = useState("All");
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  const phases = useMemo(() => {
+    const s = new Set(meetings.map((m) => m.phase).filter(Boolean));
+    return ["All", ...Array.from(s)];
+  }, [meetings]);
+
+  const filtered = useMemo(() => {
+    return meetings.filter((m) => {
+      if (statusFilter !== "All" && m.status !== statusFilter) return false;
+      if (phaseFilter !== "All" && m.phase !== phaseFilter) return false;
+      return true;
+    });
+  }, [meetings, statusFilter, phaseFilter]);
+
+  const counts = useMemo(() => {
+    const c = { total: meetings.length, complete: 0, upcoming: 0, scheduled: 0, skipped: 0 };
+    for (const m of meetings) {
+      const s = m.status.toLowerCase() as keyof typeof c;
+      if (s in c) (c[s] as number)++;
+    }
+    return c;
+  }, [meetings]);
+
+  const toggle = (id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  if (meetings.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-slate-200 px-6 py-8 text-center">
+        <svg className="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+        <p className="text-sm text-slate-500">No meetings scheduled yet.</p>
+        <p className="text-xs text-slate-400 mt-1">Weekly implementation meetings will appear here once scheduled.</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
+        <div className="bg-white rounded-lg border border-slate-200 px-4 py-3 text-center">
+          <p className="text-2xl font-semibold text-esm-black">{counts.total}</p>
+          <p className="text-xs text-slate-500">Total</p>
+        </div>
+        <button
+          onClick={() => setStatusFilter(statusFilter === "Complete" ? "All" : "Complete")}
+          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Complete" ? "border-green-400 bg-green-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
+        >
+          <p className="text-2xl font-semibold text-green-700">{counts.complete}</p>
+          <p className="text-xs text-slate-500">Complete</p>
+        </button>
+        <button
+          onClick={() => setStatusFilter(statusFilter === "Scheduled" ? "All" : "Scheduled")}
+          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Scheduled" ? "border-amber-400 bg-amber-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
+        >
+          <p className="text-2xl font-semibold text-amber-700">{counts.scheduled}</p>
+          <p className="text-xs text-slate-500">Scheduled</p>
+        </button>
+        <button
+          onClick={() => setStatusFilter(statusFilter === "Upcoming" ? "All" : "Upcoming")}
+          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Upcoming" ? "border-blue-400 bg-blue-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
+        >
+          <p className="text-2xl font-semibold text-blue-700">{counts.upcoming}</p>
+          <p className="text-xs text-slate-500">Upcoming</p>
+        </button>
+        <button
+          onClick={() => setStatusFilter(statusFilter === "Skipped" ? "All" : "Skipped")}
+          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Skipped" ? "border-slate-400 bg-slate-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
+        >
+          <p className="text-2xl font-semibold text-slate-500">{counts.skipped}</p>
+          <p className="text-xs text-slate-500">Skipped</p>
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Status</span>
+          <div className="flex gap-1">
+            {STATUSES.map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
+                  statusFilter === s
+                    ? "bg-esm-black text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+        {phases.length > 2 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Phase</span>
+            <select
+              value={phaseFilter}
+              onChange={(e) => setPhaseFilter(e.target.value)}
+              className="text-xs border border-slate-200 rounded px-2 py-1 text-slate-700"
+            >
+              {phases.map((p) => (
+                <option key={p} value={p}>{p === "All" ? "All Phases" : shortPhase(p)}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Meeting list */}
+      <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+        {filtered.length === 0 ? (
+          <div className="px-5 py-6 text-center text-sm text-slate-500">
+            No meetings match the selected filters.
+          </div>
+        ) : (
+          filtered.map((meeting) => {
+            const isExpanded = expanded.has(meeting.id);
+            const isPast = meeting.meetingDate && new Date(meeting.meetingDate) < new Date();
+            const isNext = !isPast && meeting.status !== "Skipped" && meeting.status !== "Complete";
+
+            return (
+              <div key={meeting.id} className={`px-5 py-4 ${isNext && !isExpanded ? "bg-blue-50/30" : ""}`}>
+                <button
+                  onClick={() => toggle(meeting.id)}
+                  className="w-full text-left flex items-start gap-3"
+                >
+                  <svg
+                    className={`w-4 h-4 text-slate-400 mt-0.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-esm-black">{meeting.week}</span>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[meeting.status]}`}>
+                        {meeting.status}
+                      </span>
+                      {meeting.phase && (
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${PHASE_COLORS[meeting.phase] ?? "bg-slate-100 text-slate-600"}`}>
+                          {shortPhase(meeting.phase)}
+                        </span>
+                      )}
+                      {meeting.actionItemsLogged && (
+                        <span className="text-green-600" title="Action items logged">
+                          <svg className="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                        </span>
+                      )}
+                      {meeting.recapSent && (
+                        <span className="text-blue-600" title="Recap sent">
+                          <svg className="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-4 mt-1 text-xs text-slate-500">
+                      <span>{fmtDate(meeting.meetingDate)}</span>
+                      {meeting.days && <span>{meeting.days}</span>}
+                      {meeting.milestone && <span className="truncate max-w-[200px]">{meeting.milestone}</span>}
+                    </div>
+                  </div>
+                </button>
+
+                {isExpanded && (
+                  <div className="ml-7 mt-3 space-y-3">
+                    {meeting.agendaSummary && (
+                      <div className="pl-4 border-l-2 border-slate-200">
+                        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Agenda</p>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.agendaSummary}</p>
+                      </div>
+                    )}
+                    {meeting.scPrepItems && (
+                      <div className="pl-4 border-l-2 border-amber-200">
+                        <p className="text-xs font-medium text-amber-600 uppercase tracking-wider mb-1">SC Prep Items</p>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.scPrepItems}</p>
+                      </div>
+                    )}
+                    {meeting.customerDeliverables && (
+                      <div className="pl-4 border-l-2 border-blue-200">
+                        <p className="text-xs font-medium text-blue-600 uppercase tracking-wider mb-1">Customer Deliverables Due</p>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.customerDeliverables}</p>
+                      </div>
+                    )}
+                    {meeting.notes && (
+                      <div className="pl-4 border-l-2 border-red-200">
+                        <p className="text-xs font-medium text-red-600 uppercase tracking-wider mb-1">Watch-Out / Notes</p>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.notes}</p>
+                      </div>
+                    )}
+                    <div className="flex gap-4 text-xs text-slate-500 pt-1">
+                      <span>Action Items: {meeting.actionItemsLogged ? "Logged" : "Pending"}</span>
+                      <span>Recap: {meeting.recapSent ? "Sent" : "Pending"}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <p className="text-xs text-slate-400 mt-3">
+        Showing {filtered.length} of {meetings.length} meetings
+      </p>
+    </>
+  );
+}

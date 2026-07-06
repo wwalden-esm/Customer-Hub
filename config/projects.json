@@ -1,0 +1,64 @@
+{
+  "demo-project": {
+    "customerName": "Northwind University",
+    "projectName": "ESM eProcurement Implementation",
+    "products": [
+      "eProcurement",
+      "Contracts"
+    ],
+    "scName": "Demo SC",
+    "scEmail": "sc@esmsolutions.com",
+    "pmName": "Demo PM",
+    "pmEmail": "pm@esmsolutions.com",
+    "startDate": "2026-06-01",
+    "goLiveDate": "2026-12-01",
+    "currentPhase": "intake",
+    "status": "ON_TRACK",
+    "branding": {
+      "accentColor": "#1E3A5F"
+    },
+    "hubspotIntakeId": "",
+    "smartsheetConfig": {},
+    "sectionVisibility": {},
+    "password": "NorthwindDemo2026"
+  },
+  "rob-smith-consulting": {
+    "customerName": "Rob Smith Consulting",
+    "projectName": "Rob's Testing Project",
+    "products": [
+      "ESM Purchase",
+      "ESM Consumer Role"
+    ],
+    "scName": "644595491",
+    "scEmail": "",
+    "startDate": "2026-07-06",
+    "goLiveDate": "2026-12-25",
+    "currentPhase": "intake",
+    "status": "ON_TRACK",
+    "branding": {
+      "accentColor": "#1E3A5F"
+    },
+    "hubspotIntakeId": "57934330647",
+    "smartsheetConfig": {
+      "customerFolderId": "7777917095700356",
+      "metricsSheetId": "7285767297519492",
+      "projectInfoSheetId": "3128866020216708",
+      "integrationTrackerSheetId": "1856035819048836",
+      "meetingTrackerSheetId": "6553594022023044",
+      "documentSheetId": "8500287948935044",
+      "projectPlanSheetId": "4620497961570180",
+      "raidLogSheetId": "2775502417776516"
+    },
+    "sectionVisibility": {},
+    "password": "RobSmithCons2966",
+    "institutionLegalName": "Rob Smith Consulting",
+    "institutionType": "Private",
+    "customerProjectLead": "Rob Smith",
+    "primaryMailingAddress": "robsmithconsult@outlook.com",
+    "erpSystem": "Banner",
+    "erpVersion": "2.5",
+    "erpHosting": "Private Cloud",
+    "projectTemplate": "Standard Template",
+    "dateDueInitialDraft": "2026-07-31"
+  }
+}

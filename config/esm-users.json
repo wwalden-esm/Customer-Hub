@@ -1,0 +1,20 @@
+[
+  {
+    "email": "sc@esmsolutions.com",
+    "name": "Demo SC",
+    "role": "SC",
+    "password": "ePjyE25YM2We"
+  },
+  {
+    "email": "pm@esmsolutions.com",
+    "name": "Demo PM",
+    "role": "PM",
+    "password": "7UQbMf3dQHjj"
+  },
+  {
+    "email": "admin@esmsolutions.com",
+    "name": "Demo Admin",
+    "role": "ADMIN",
+    "password": "DDyxaMx9ULtT"
+  }
+]

@@ -4,24 +4,20 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #2D2826;
+  --hub-accent: #F4333F;
+  --hub-accent-light: #FEF2F2;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.hub-nav-link:hover {
+  border-bottom-color: var(--hub-accent);
+}
+
+.hub-accent-border-top {
+  border-top: 3px solid var(--hub-accent);
 }
