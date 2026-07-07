@@ -10,7 +10,7 @@ function healthSummary(data: HubDashboardData): string {
       })
     : "TBD";
   const days = data.daysToGoLive;
-  const phase = data.milestones.find((m) => m.status === "current")?.phase || "the next phase";
+  const phase = data.project.currentPhase || "the next phase";
 
   if (data.project.status === "ON_TRACK") {
     return `Your implementation is on track for a ${goLive} go-live${days !== null ? `, with ${days} days remaining` : ""}. The team is currently in ${phase} — no escalations are open, and the project is progressing as planned.`;
@@ -47,6 +47,18 @@ export default function HealthBanner({ data }: { data: HubDashboardData }) {
         </span>
       </div>
       <p className="text-base leading-[1.7] text-esm-black">{healthSummary(data)}</p>
+      <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-xs text-esm-grey">
+        {(() => {
+          const completed = data.milestones.filter((m) => m.status === "complete").length;
+          const inProgress = data.milestones.filter((m) => m.status === "in-progress").length;
+          const openItems = data.actionItems.length;
+          const overdue = data.actionItems.filter((a) => a.isOverdue).length;
+          const parts: string[] = [];
+          if (data.milestones.length > 0) parts.push(`${completed} of ${data.milestones.length} milestones complete${inProgress > 0 ? `, ${inProgress} in progress` : ""}`);
+          if (openItems > 0) parts.push(`${openItems} open action item${openItems !== 1 ? "s" : ""}${overdue > 0 ? `, ${overdue} overdue` : ""}`);
+          return parts.map((p, i) => <span key={i}>{p}</span>);
+        })()}
+      </div>
     </section>
   );
 }

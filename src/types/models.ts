@@ -38,6 +38,7 @@ export interface Project {
   smartsheetConfig: SmartsheetConfig;
   sectionVisibility: Record<string, boolean>;
   documentTypes?: string[];
+  contacts?: CustomerContact[];
   links?: ProjectLink[];
   sharepointFolderUrl?: string;
   sharepointFolderId?: string;
@@ -53,6 +54,8 @@ export interface Milestone {
   phase?: string;
   percentComplete?: number;
   level?: 1 | 2;
+  isMilestone?: boolean;
+  health?: "Green" | "Yellow" | "Red" | "Blue";
 }
 
 export interface ActionItem {
@@ -120,6 +123,7 @@ export interface ProjectLink {
 
 export interface CustomerContact {
   email: string;
-  name?: string;
+  name: string;
   role?: string;
+  addedAt?: string;
 }

@@ -99,7 +99,7 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
             style={typeFilter === t ? { borderColor: "var(--hub-accent)" } : undefined}
           >
             <p className="text-2xl font-semibold text-esm-black">{counts[t]}</p>
-            <p className="text-xs text-esm-grey">{t}s</p>
+            <p className="text-xs text-esm-grey">{counts[t] === 1 ? t : `${t}s`}</p>
           </button>
         ))}
       </div>

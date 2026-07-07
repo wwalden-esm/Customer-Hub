@@ -14,6 +14,7 @@ interface ProjectRow {
   status: string;
   currentPhase: string;
   hasSheets: boolean;
+  daysToGoLive?: number | null;
 }
 
 const STATUS_BADGE: Record<string, { bg: string; text: string; label: string }> = {
@@ -266,7 +267,16 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
                     </td>
                     <td className="px-4 py-3">{p.scName}</td>
                     <td className="px-4 py-3">{p.pmName || "—"}</td>
-                    <td className="px-4 py-3">{fmtDate(p.goLiveDate)}</td>
+                    <td className="px-4 py-3">
+                      <span>{fmtDate(p.goLiveDate)}</span>
+                      {p.daysToGoLive != null && (
+                        <span className={`block text-[10px] font-medium ${
+                          p.daysToGoLive <= 30 ? "text-red-600" : p.daysToGoLive <= 60 ? "text-amber-600" : "text-emerald-600"
+                        }`}>
+                          {p.daysToGoLive > 0 ? `${p.daysToGoLive}d remaining` : p.daysToGoLive === 0 ? "Today" : `${Math.abs(p.daysToGoLive)}d overdue`}
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${badge.bg} ${badge.text}`}>
                         {badge.label}

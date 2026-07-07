@@ -1,10 +1,11 @@
-import type { Project, Milestone, ActionItem, Metric, DocumentInfo, RaidLogItem, Meeting } from "@/types/models";
+import type { Project, Milestone, ActionItem, Metric, DocumentInfo, RaidLogItem, Meeting, CustomerContact } from "@/types/models";
 import type { SmartsheetConfig } from "@/types/models";
 import {
   getSheet,
   columnIdMap,
   cellValue,
   listSheetAttachments,
+  getSheetPermalink,
 } from "@/lib/smartsheet";
 import projectsJson from "../../config/projects.json";
 
@@ -31,9 +32,27 @@ export function getProjectList(): Project[] {
   });
 }
 
+export function getProjectContacts(id: string): CustomerContact[] {
+  const p = projects[id] as (typeof projects)[string] & { contacts?: CustomerContact[] };
+  return p?.contacts ?? [];
+}
+
 export function getSmartsheetConfig(id: string): SmartsheetConfig {
   const p = projects[id];
   return (p?.smartsheetConfig ?? {}) as SmartsheetConfig;
+}
+
+export function getSheetPermalinks(config: SmartsheetConfig): Record<string, string | undefined> {
+  const result: Record<string, string | undefined> = {};
+  const keys = [
+    "projectPlanSheetId", "raidLogSheetId", "integrationTrackerSheetId",
+    "meetingTrackerSheetId", "documentSheetId", "metricsSheetId",
+  ] as const;
+  for (const key of keys) {
+    const id = config[key];
+    if (id) result[key] = getSheetPermalink(id);
+  }
+  return result;
 }
 
 export async function getProjectMilestones(projectPlanSheetId: string): Promise<Milestone[]> {
@@ -44,7 +63,11 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
     const startCol = cols.get("Start Date");
     const endCol = cols.get("End Date");
     const statusCol = cols.get("Status");
+    const effStatusCol = cols.get("Effective Status");
     const pctCol = cols.get("% Complete");
+    const milestoneCol = cols.get("Milestone");
+    const healthCol = cols.get("Health");
+    const rowLevelCol = cols.get("Row Level");
 
     if (!nameCol) return [];
 
@@ -55,49 +78,92 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
     const rootRowId = detailedSheet.rows[0]?.id;
     if (!rootRowId) return [];
 
-    // Build set of row IDs that are parents (have at least one child)
+    // Build parent-child maps
     const parentRowIds = new Set<number>();
     for (const row of detailedSheet.rows) {
       if (row.parentId) parentRowIds.add(row.parentId);
     }
 
-    // Level-1: direct children of root (e.g. "Project Initiation", "ESM Purchase")
+    // Map row IDs to their names for phase lookup
+    const rowNameMap = new Map<number, string>();
+    for (const row of detailedSheet.rows) {
+      const nc = row.cells.find((c) => c.columnId === nameCol);
+      rowNameMap.set(row.id, String(nc?.displayValue ?? nc?.value ?? ""));
+    }
+
+    // Level-1 row IDs (direct children of root)
     const level1Ids = new Set<number>();
     for (const row of detailedSheet.rows) {
       if (row.parentId === rootRowId) level1Ids.add(row.id);
     }
 
-    // Milestone rows = level-1 parent rows + level-2 parent rows (children of level-1 that also have children)
-    const milestoneRows = detailedSheet.rows.filter((r) =>
-      (r.parentId === rootRowId || (r.parentId && level1Ids.has(r.parentId)))
-      && parentRowIds.has(r.id),
-    );
+    const getCellVal = (row: (typeof detailedSheet.rows)[number], colId: number | undefined) => {
+      if (!colId) return null;
+      const cell = row.cells.find((c) => c.columnId === colId);
+      return cell?.displayValue ?? cell?.value ?? null;
+    };
 
-    const extractMilestone = (row: (typeof detailedSheet.rows)[number]) => {
-      const nameCell = row.cells.find((c) => c.columnId === nameCol);
-      const startCell = startCol ? row.cells.find((c) => c.columnId === startCol) : null;
-      const endCell = endCol ? row.cells.find((c) => c.columnId === endCol) : null;
-      const statusCell = statusCol ? row.cells.find((c) => c.columnId === statusCol) : null;
-      const pctCell = pctCol ? row.cells.find((c) => c.columnId === pctCol) : null;
+    // Include rows that are level-1 products, level-2 phases (with children), or milestone-flagged
+    const milestoneRows = detailedSheet.rows.filter((r) => {
+      if (r.id === rootRowId) return false;
 
-      const name = String(nameCell?.displayValue ?? nameCell?.value ?? "");
-      const startRaw = startCell?.value ?? startCell?.displayValue;
-      const endRaw = endCell?.value ?? endCell?.displayValue;
+      const effStatus = getCellVal(r, effStatusCol);
+      if (effStatus && String(effStatus).toLowerCase() === "not applicable") return false;
+      const status = getCellVal(r, statusCol);
+      if (status && String(status).toLowerCase() === "cancelled") return false;
+
+      const isMilestoneChecked = getCellVal(r, milestoneCol);
+      const isLevel1 = r.parentId === rootRowId && parentRowIds.has(r.id);
+      const isLevel2Parent = r.parentId != null && level1Ids.has(r.parentId) && parentRowIds.has(r.id);
+
+      return isLevel1 || isLevel2Parent || isMilestoneChecked === true || isMilestoneChecked === "True" || isMilestoneChecked === "true";
+    });
+
+    const extractMilestone = (row: (typeof detailedSheet.rows)[number]): Milestone => {
+      const name = String(getCellVal(row, nameCol) ?? "");
+      const startRaw = getCellVal(row, startCol);
+      const endRaw = getCellVal(row, endCol);
       const startDate = startRaw ? String(startRaw).split("T")[0] : undefined;
       const endDate = endRaw ? String(endRaw).split("T")[0] : undefined;
       const date = endDate ?? startDate;
-      const status = statusCell?.displayValue ?? statusCell?.value;
-      const pctRaw = pctCell?.value;
+      const status = getCellVal(row, statusCol);
+      const pctRaw = getCellVal(row, pctCol);
       const percentComplete = pctRaw != null ? Number(pctRaw) : undefined;
+      const healthRaw = getCellVal(row, healthCol);
+      const health = healthRaw ? String(healthRaw) as Milestone["health"] : undefined;
+      const isMilestoneChecked = getCellVal(row, milestoneCol);
+      const isMilestone = isMilestoneChecked === true || isMilestoneChecked === "True" || isMilestoneChecked === "true";
 
       let milestoneStatus = "upcoming";
       if (status) {
         const s = String(status).toLowerCase();
         if (s === "complete" || s === "completed") milestoneStatus = "complete";
         else if (s.includes("progress")) milestoneStatus = "in-progress";
+        else if (s === "on hold") milestoneStatus = "on-hold";
       }
 
-      const level = row.parentId === rootRowId ? 1 : 2;
+      // Determine level: use Row Level formula if available, else infer from parentId
+      const rowLevelRaw = getCellVal(row, rowLevelCol);
+      let level: 1 | 2;
+      if (rowLevelRaw != null && Number(rowLevelRaw) > 0) {
+        level = Number(rowLevelRaw) <= 1 ? 1 : 2;
+      } else {
+        level = row.parentId === rootRowId ? 1 : 2;
+      }
+
+      // Phase = level-1 ancestor name (the product this milestone belongs to)
+      let phase: string | undefined;
+      if (row.parentId && row.parentId !== rootRowId) {
+        if (level1Ids.has(row.parentId)) {
+          phase = rowNameMap.get(row.parentId);
+        } else {
+          // Walk up to find level-1 ancestor
+          const parentRow = detailedSheet.rows.find((r) => r.id === row.parentId);
+          if (parentRow?.parentId && level1Ids.has(parentRow.parentId)) {
+            phase = rowNameMap.get(parentRow.parentId);
+          }
+        }
+      }
 
       return {
         id: String(row.id),
@@ -107,7 +173,10 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
         endDate,
         status: milestoneStatus,
         percentComplete,
-        level: level as 1 | 2,
+        level,
+        phase,
+        isMilestone,
+        health,
       };
     };
 
@@ -300,7 +369,7 @@ export async function getProjectActivity(config: SmartsheetConfig): Promise<Acti
           type: "raid",
           title: `${item.type} logged: ${item.item}`,
           detail: `Status: ${item.status} | Priority: ${item.priority}`,
-          timestamp: item.targetDate ?? new Date().toISOString(),
+          timestamp: item.targetDate || "",
           actor: item.assigned || null,
         });
       }
@@ -336,8 +405,9 @@ export async function getProjectActivity(config: SmartsheetConfig): Promise<Acti
     }
   } catch { /* skip */ }
 
-  events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  return events;
+  const dated = events.filter((e) => e.timestamp.length > 0);
+  dated.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  return dated;
 }
 
 export async function getProjectMeetings(meetingTrackerSheetId: string): Promise<Meeting[]> {
@@ -377,6 +447,51 @@ export async function getProjectMeetings(meetingTrackerSheetId: string): Promise
         actionItemsLogged: actionCol ? cellValue(row, actionCol) === "true" : false,
         recapSent: recapCol ? cellValue(row, recapCol) === "true" : false,
       }));
+  } catch {
+    return [];
+  }
+}
+
+export interface IntegrationRow {
+  id: string;
+  name: string;
+  status: string;
+}
+
+export async function getProjectIntegrations(integrationTrackerSheetId: string): Promise<IntegrationRow[]> {
+  try {
+    const sheet = await getSheet(integrationTrackerSheetId);
+    const cols = columnIdMap(sheet);
+    const integCol = cols.get("Integration") ?? cols.get("Integration Name");
+    const statusCol = cols.get("Status") ?? cols.get("Integration Status");
+    if (!integCol) return [];
+
+    // Group checklist items by integration name and roll up status
+    const groups = new Map<string, { total: number; complete: number; inProgress: number; blocked: number }>();
+    for (const row of sheet.rows) {
+      const name = integCol ? cellValue(row, integCol) : null;
+      if (!name || !String(name).trim()) continue;
+      const key = String(name).trim();
+      const s = (statusCol ? cellValue(row, statusCol) ?? "" : "").toLowerCase();
+      if (s === "n/a") continue;
+
+      if (!groups.has(key)) groups.set(key, { total: 0, complete: 0, inProgress: 0, blocked: 0 });
+      const g = groups.get(key)!;
+      g.total++;
+      if (s === "complete") g.complete++;
+      else if (s === "in progress") g.inProgress++;
+      else if (s === "blocked") g.blocked++;
+    }
+
+    return Array.from(groups.entries()).map(([name, g]) => {
+      let status: string;
+      if (g.complete === g.total) status = "Complete";
+      else if (g.blocked > 0) status = `Blocked (${g.complete}/${g.total})`;
+      else if (g.inProgress > 0 || g.complete > 0) status = `In Progress (${g.complete}/${g.total})`;
+      else status = "Not Started";
+
+      return { id: name, name, status };
+    });
   } catch {
     return [];
   }

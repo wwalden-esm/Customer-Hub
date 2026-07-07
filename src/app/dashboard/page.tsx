@@ -19,11 +19,17 @@ export default async function DashboardPage() {
     ? allProjects
     : allProjects.filter((p) => p.scEmail === userEmail || p.pmEmail === userEmail);
 
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
   const projectRows = await Promise.all(projects.map(async (p) => {
     const cfg = getSmartsheetConfig(p.id);
     const milestones = cfg.projectPlanSheetId
       ? await getProjectMilestones(cfg.projectPlanSheetId)
       : [];
+    const daysToGoLive = p.goLiveDate
+      ? Math.ceil((new Date(p.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      : null;
     return {
       id: p.id,
       customerName: p.customerName,
@@ -34,6 +40,7 @@ export default async function DashboardPage() {
       status: p.status,
       currentPhase: deriveCurrentPhase(milestones, p.currentPhase),
       hasSheets: !!cfg.workspaceId,
+      daysToGoLive,
     };
   }));
 

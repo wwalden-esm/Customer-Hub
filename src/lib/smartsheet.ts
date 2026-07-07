@@ -53,6 +53,7 @@ export interface SsColumn {
 export interface SsSheet {
   id: number;
   name: string;
+  permalink?: string;
   columns: SsColumn[];
   rows: SsRow[];
 }
@@ -77,8 +78,16 @@ export async function getFolder(folderId: string | number): Promise<SsFolder> {
   return ssFetch<SsFolder>(`/folders/${folderId}`);
 }
 
+const permalinkCache = new Map<string, string>();
+
 export async function getSheet(sheetId: string | number): Promise<SsSheet> {
-  return ssFetch<SsSheet>(`/sheets/${sheetId}`);
+  const sheet = await ssFetch<SsSheet>(`/sheets/${sheetId}`);
+  if (sheet.permalink) permalinkCache.set(String(sheetId), sheet.permalink);
+  return sheet;
+}
+
+export function getSheetPermalink(sheetId: string | number): string | undefined {
+  return permalinkCache.get(String(sheetId));
 }
 
 export function findCustomerFolder(parent: SsFolder, customerName: string): SsFolderChild | null {

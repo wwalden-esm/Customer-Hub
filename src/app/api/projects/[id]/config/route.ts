@@ -40,6 +40,9 @@ export async function PUT(req: NextRequest) {
   if (body.links !== undefined) {
     projects[projectId].links = body.links;
   }
+  if (body.contacts !== undefined) {
+    projects[projectId].contacts = body.contacts;
+  }
 
   fs.writeFileSync(configPath, JSON.stringify(projects, null, 2));
 

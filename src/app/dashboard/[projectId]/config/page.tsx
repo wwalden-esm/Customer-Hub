@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProjectById, getProjectPassword } from "@/lib/smartsheet-data";
+import { getProjectById, getProjectPassword, getProjectContacts } from "@/lib/smartsheet-data";
 import ProjectConfigForm from "@/components/dashboard/ProjectConfigForm";
 
 export default async function ProjectConfigPage({ params }: { params: { projectId: string } }) {
@@ -31,7 +31,9 @@ export default async function ProjectConfigPage({ params }: { params: { projectI
             branding: project.branding,
             password: getProjectPassword(project.id) ?? undefined,
             sectionVisibility: project.sectionVisibility,
+            documentTypes: project.documentTypes,
             links: project.links,
+            contacts: getProjectContacts(project.id),
             smartsheetConfig: Object.fromEntries(
               Object.entries(project.smartsheetConfig).filter(([, v]) => v !== undefined) as [string, string][]
             ),

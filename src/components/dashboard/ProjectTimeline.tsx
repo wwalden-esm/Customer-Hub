@@ -23,6 +23,7 @@ const STATUS_COLORS: Record<string, { bar: string; bg: string; text: string }> =
   upcoming: { bar: "bg-slate-300", bg: "bg-slate-50", text: "text-slate-500" },
   current: { bar: "bg-blue-500", bg: "bg-blue-50", text: "text-blue-700" },
   overdue: { bar: "bg-red-500", bg: "bg-red-50", text: "text-red-700" },
+  "on-hold": { bar: "bg-amber-400", bg: "bg-amber-50", text: "text-amber-700" },
 };
 
 function parseDate(d: string): Date {
