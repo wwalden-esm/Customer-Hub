@@ -17,6 +17,7 @@ import OpenItems from "@/components/hub/OpenItems";
 import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import QuickLinks from "@/components/hub/QuickLinks";
+import RefreshButton from "@/components/hub/RefreshButton";
 
 export default async function HubDashboard() {
   const session = await getCustomerSession();
@@ -37,11 +38,14 @@ export default async function HubDashboard() {
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-esm-black">{project.projectName}</h1>
-        <p className="text-sm text-esm-grey mt-1">
-          {project.products.join(" + ")} — {project.scName}
-        </p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-esm-black">{project.projectName}</h1>
+          <p className="text-sm text-esm-grey mt-1">
+            {project.products.join(" + ")} — {project.scName}
+          </p>
+        </div>
+        <RefreshButton />
       </div>
 
       <HealthBanner data={data} />

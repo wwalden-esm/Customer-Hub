@@ -6,6 +6,7 @@ import {
   getProjectMilestones,
   getProjectActionItems,
   getProjectActivity,
+  deriveCurrentPhase,
 } from "@/lib/smartsheet-data";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
@@ -75,7 +76,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Project Details</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <InfoRow label="Go-Live" value={fmtDate(project.goLiveDate)} />
-              <InfoRow label="Phase" value={project.currentPhase} />
+              <InfoRow label="Phase" value={deriveCurrentPhase(milestones, project.currentPhase)} />
               <InfoRow label="Products" value={project.products.join(", ") || "—"} />
               <InfoRow label="SC" value={`${project.scName} (${project.scEmail})`} />
               <InfoRow label="PM" value={project.pmName || "—"} />

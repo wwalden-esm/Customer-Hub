@@ -1,18 +1,15 @@
 import { auth, signOut } from "@/lib/auth";
-import { getProjectList, getSmartsheetConfig } from "@/lib/smartsheet-data";
-import { getGlobalLinks } from "@/lib/settings";
+import { getProjectList, getSmartsheetConfig, getProjectMilestones, deriveCurrentPhase } from "@/lib/smartsheet-data";
 import SyncHubSpotButton from "@/components/dashboard/SyncHubSpotButton";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 // LinkSheetsButton imported by ProjectTable directly
 import ProjectTable from "@/components/dashboard/ProjectTable";
-import GlobalLinksEditor from "@/components/dashboard/GlobalLinksEditor";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const session = await auth();
   const allProjects = getProjectList();
-  const globalLinks = getGlobalLinks();
   const dataTimestamp = new Date().toISOString();
 
   const userEmail = session?.user?.email || "";
@@ -22,16 +19,22 @@ export default async function DashboardPage() {
     ? allProjects
     : allProjects.filter((p) => p.scEmail === userEmail || p.pmEmail === userEmail);
 
-  const projectRows = projects.map((p) => ({
-    id: p.id,
-    customerName: p.customerName,
-    projectName: p.projectName,
-    scName: p.scName,
-    pmName: p.pmName,
-    goLiveDate: p.goLiveDate,
-    status: p.status,
-    currentPhase: p.currentPhase,
-    hasSheets: !!getSmartsheetConfig(p.id).workspaceId,
+  const projectRows = await Promise.all(projects.map(async (p) => {
+    const cfg = getSmartsheetConfig(p.id);
+    const milestones = cfg.projectPlanSheetId
+      ? await getProjectMilestones(cfg.projectPlanSheetId)
+      : [];
+    return {
+      id: p.id,
+      customerName: p.customerName,
+      projectName: p.projectName,
+      scName: p.scName,
+      pmName: p.pmName,
+      goLiveDate: p.goLiveDate,
+      status: p.status,
+      currentPhase: deriveCurrentPhase(milestones, p.currentPhase),
+      hasSheets: !!cfg.workspaceId,
+    };
   }));
 
   return (
@@ -50,6 +53,9 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <a href="/dashboard/settings" className="text-sm text-esm-grey hover:text-esm-black">
+              Settings
+            </a>
             <a href="/dashboard/users" className="text-sm text-esm-grey hover:text-esm-black">
               Manage Users
             </a>
@@ -73,10 +79,6 @@ export default async function DashboardPage() {
           <SyncStatusBar dataTimestamp={dataTimestamp} />
         </div>
         <ProjectTable projects={projectRows} />
-
-        <div className="mt-6">
-          <GlobalLinksEditor initialLinks={globalLinks} />
-        </div>
       </div>
     </main>
   );

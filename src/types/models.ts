@@ -52,6 +52,7 @@ export interface Milestone {
   status: string;
   phase?: string;
   percentComplete?: number;
+  level?: 1 | 2;
 }
 
 export interface ActionItem {

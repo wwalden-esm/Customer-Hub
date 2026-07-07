@@ -97,6 +97,8 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
         else if (s.includes("progress")) milestoneStatus = "in-progress";
       }
 
+      const level = row.parentId === rootRowId ? 1 : 2;
+
       return {
         id: String(row.id),
         name,
@@ -105,6 +107,7 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
         endDate,
         status: milestoneStatus,
         percentComplete,
+        level: level as 1 | 2,
       };
     };
 
@@ -113,6 +116,16 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
     console.error("Failed to fetch milestones from project plan:", e);
     return [];
   }
+}
+
+export function deriveCurrentPhase(milestones: Milestone[], fallback: string): string {
+  const phases = milestones.filter((m) => m.level === 1);
+  if (phases.length === 0) return fallback;
+  const inProgress = phases.find((m) => m.status === "in-progress");
+  if (inProgress) return inProgress.name;
+  const firstIncomplete = phases.find((m) => m.status !== "complete");
+  if (firstIncomplete) return firstIncomplete.name;
+  return "Complete";
 }
 
 export async function getProjectActionItems(actionItemSheetId: string): Promise<ActionItem[]> {

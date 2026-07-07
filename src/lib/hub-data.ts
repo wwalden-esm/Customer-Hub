@@ -8,6 +8,7 @@ import {
   getProjectMetrics as fetchMetrics,
   getProjectActivity,
   getProjectMeetings as fetchMeetings,
+  deriveCurrentPhase,
 } from "@/lib/smartsheet-data";
 
 export async function getHubDashboardData(projectId: string): Promise<HubDashboardData | null> {
@@ -134,7 +135,7 @@ export async function getHubDashboardData(projectId: string): Promise<HubDashboa
       scName: project.scName,
       scEmail: project.scEmail,
       goLiveDate: project.goLiveDate ?? null,
-      currentPhase: project.currentPhase,
+      currentPhase: deriveCurrentPhase(rawMilestones, project.currentPhase),
       status: project.status,
       branding: project.branding,
     },
