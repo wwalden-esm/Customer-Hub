@@ -1,15 +1,18 @@
 import { auth, signOut } from "@/lib/auth";
 import { getProjectList, getSmartsheetConfig } from "@/lib/smartsheet-data";
+import { getGlobalLinks } from "@/lib/settings";
 import SyncHubSpotButton from "@/components/dashboard/SyncHubSpotButton";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 // LinkSheetsButton imported by ProjectTable directly
 import ProjectTable from "@/components/dashboard/ProjectTable";
+import GlobalLinksEditor from "@/components/dashboard/GlobalLinksEditor";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const session = await auth();
   const allProjects = getProjectList();
+  const globalLinks = getGlobalLinks();
   const dataTimestamp = new Date().toISOString();
 
   const userEmail = session?.user?.email || "";
@@ -46,16 +49,21 @@ export default async function DashboardPage() {
               </p>
             </div>
           </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
-            <button type="submit" className="text-sm text-esm-grey hover:text-esm-black">
-              Sign out
-            </button>
-          </form>
+          <div className="flex items-center gap-4">
+            <a href="/dashboard/users" className="text-sm text-esm-grey hover:text-esm-black">
+              Manage Users
+            </a>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
+            >
+              <button type="submit" className="text-sm text-esm-grey hover:text-esm-black">
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
@@ -65,6 +73,10 @@ export default async function DashboardPage() {
           <SyncStatusBar dataTimestamp={dataTimestamp} />
         </div>
         <ProjectTable projects={projectRows} />
+
+        <div className="mt-6">
+          <GlobalLinksEditor initialLinks={globalLinks} />
+        </div>
       </div>
     </main>
   );

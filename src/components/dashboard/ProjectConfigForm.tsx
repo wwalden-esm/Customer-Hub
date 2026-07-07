@@ -3,6 +3,12 @@
 import { useState } from "react";
 import { ALL_DOC_TYPES } from "./EsmDocumentsClient";
 
+interface ProjectLink {
+  label: string;
+  url: string;
+  icon?: string;
+}
+
 interface Project {
   id: string;
   customerName: string;
@@ -11,6 +17,7 @@ interface Project {
   password?: string;
   sectionVisibility?: Record<string, boolean>;
   documentTypes?: string[];
+  links?: ProjectLink[];
   smartsheetConfig?: Record<string, string | undefined>;
 }
 
@@ -36,6 +43,8 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
     }
     return result;
   });
+  const [links, setLinks] = useState<ProjectLink[]>(project.links ?? []);
+
   const [docTypes, setDocTypes] = useState<Record<string, boolean>>(() => {
     const enabled = project.documentTypes;
     const result: Record<string, boolean> = {};
@@ -65,6 +74,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
           password,
           sectionVisibility,
           documentTypes: ALL_DOC_TYPES.filter((dt) => docTypes[dt.key]).map((dt) => dt.key),
+          links: links.filter((l) => l.label.trim() && l.url.trim()),
         }),
       });
       if (res.ok) setSaved(true);
@@ -172,6 +182,84 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
               </div>
             </label>
           ))}
+        </div>
+      </section>
+
+      {/* Customer Links */}
+      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Customer Links</h2>
+        <p className="text-xs text-esm-grey mb-3">Add links that will appear in the customer portal sidebar (e.g. training resources, SharePoint, Smartsheet views).</p>
+        <div className="space-y-3">
+          {links.map((link, i) => (
+            <div key={i} className="flex items-start gap-2 p-3 bg-slate-50 rounded border border-gray-100">
+              <div className="flex-1 space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={link.label}
+                    onChange={(e) => {
+                      const updated = [...links];
+                      updated[i] = { ...updated[i], label: e.target.value };
+                      setLinks(updated);
+                    }}
+                    placeholder="Label"
+                    className="flex-1 border border-[#E2E0E1] rounded px-3 py-1.5 text-sm"
+                    aria-label={`Link ${i + 1} label`}
+                  />
+                  <select
+                    value={link.icon || "link"}
+                    onChange={(e) => {
+                      const updated = [...links];
+                      updated[i] = { ...updated[i], icon: e.target.value };
+                      setLinks(updated);
+                    }}
+                    className="border border-[#E2E0E1] rounded px-2 py-1.5 text-sm w-32"
+                    aria-label={`Link ${i + 1} icon`}
+                  >
+                    <option value="link">Link</option>
+                    <option value="smartsheet">Smartsheet</option>
+                    <option value="sharepoint">SharePoint</option>
+                    <option value="document">Document</option>
+                    <option value="video">Video</option>
+                    <option value="calendar">Calendar</option>
+                    <option value="training">Training</option>
+                  </select>
+                </div>
+                <input
+                  type="url"
+                  value={link.url}
+                  onChange={(e) => {
+                    const updated = [...links];
+                    updated[i] = { ...updated[i], url: e.target.value };
+                    setLinks(updated);
+                  }}
+                  placeholder="https://..."
+                  className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm font-mono"
+                  aria-label={`Link ${i + 1} URL`}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setLinks(links.filter((_, j) => j !== i))}
+                className="mt-1 p-1.5 text-slate-400 hover:text-esm-red transition-colors rounded hover:bg-red-50"
+                aria-label={`Remove link ${i + 1}`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => setLinks([...links, { label: "", url: "", icon: "link" }])}
+            className="flex items-center gap-2 text-sm font-medium text-esm-red hover:opacity-80 transition-opacity py-1"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Link
+          </button>
         </div>
       </section>
 

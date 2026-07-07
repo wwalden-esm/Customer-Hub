@@ -54,7 +54,7 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
             </thead>
             <tbody>
               {items.map((item, i) => {
-                const pm = PRI_META[item.priority];
+                const pm = PRI_META[(item.priority ?? "medium").toLowerCase() as keyof typeof PRI_META] ?? PRI_META.medium;
                 const days = item.dueDate ? daysUntil(item.dueDate) : null;
                 const urgent = days !== null && days <= 3 && days >= 0;
                 const overdue = days !== null && days < 0;

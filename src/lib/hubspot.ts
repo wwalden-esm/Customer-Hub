@@ -77,6 +77,15 @@ export async function resolveOwnerName(ownerId: string): Promise<string | null> 
   }
 }
 
+export async function resolveOwnerEmail(ownerId: string): Promise<string | null> {
+  try {
+    const owner = await hubspotFetch<{ email?: string }>(`/crm/v3/owners/${ownerId}`);
+    return owner.email || null;
+  } catch {
+    return null;
+  }
+}
+
 export interface IntakeField {
   key: string;
   label: string;

@@ -37,6 +37,9 @@ export async function PUT(req: NextRequest) {
   if (body.documentTypes !== undefined) {
     projects[projectId].documentTypes = body.documentTypes;
   }
+  if (body.links !== undefined) {
+    projects[projectId].links = body.links;
+  }
 
   fs.writeFileSync(configPath, JSON.stringify(projects, null, 2));
 

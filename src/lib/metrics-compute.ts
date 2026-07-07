@@ -198,7 +198,7 @@ export async function writeMetricsToSheet(
   const sheet = await getSheet(metricsSheetId);
   const cols = columnIdMap(sheet);
 
-  const typeCol = cols.get("Metric Type") ?? cols.get("Type");
+  const typeCol = cols.get("Metric Type") ?? cols.get("Metric type") ?? cols.get("Type");
   const currentCol = cols.get("Current");
   const totalCol = cols.get("Total");
   const labelCol = cols.get("Label");

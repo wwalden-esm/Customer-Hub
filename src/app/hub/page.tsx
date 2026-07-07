@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCustomerSession } from "@/lib/magic-link";
-import { getProjectById } from "@/lib/smartsheet-data";
+import { getProjectById, getSmartsheetConfig } from "@/lib/smartsheet-data";
 import { getHubDashboardData } from "@/lib/hub-data";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -16,6 +16,7 @@ import MilestoneLine from "@/components/hub/MilestoneLine";
 import OpenItems from "@/components/hub/OpenItems";
 import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
+import QuickLinks from "@/components/hub/QuickLinks";
 
 export default async function HubDashboard() {
   const session = await getCustomerSession();
@@ -25,9 +26,14 @@ export default async function HubDashboard() {
   if (!data) redirect("/hub/login");
 
   const { metrics, daysToGoLive, intakePercent, project, upcomingMeetings } = data;
-  const uatMetric = metrics.find((m) => m.metricType === "uat");
+  const milestoneMetric = metrics.find((m) => m.metricType === "milestone");
   const integMetric = metrics.find((m) => m.metricType === "integration");
-  const wfMetric = metrics.find((m) => m.metricType === "workflow");
+  const meetingsMetric = metrics.find((m) => m.metricType === "meetings");
+  const raidMetric = metrics.find((m) => m.metricType === "raid");
+  const docsMetric = metrics.find((m) => m.metricType === "documents");
+
+  const ssConfig = getSmartsheetConfig(session.projectId);
+  const ssUrl = (id?: string) => id ? `https://app.smartsheet.com/sheets/${id}` : undefined;
 
   return (
     <>
@@ -48,28 +54,39 @@ export default async function HubDashboard() {
           sub={project.goLiveDate ? new Date(project.goLiveDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Not set"}
           color={daysToGoLive !== null && daysToGoLive <= 30 ? "#F4333F" : undefined}
         />
-        {uatMetric && (
+        {milestoneMetric && (
           <MetricCard
-            label="UAT Progress"
-            value={`${uatMetric.percent}%`}
-            sub={`${uatMetric.current} of ${uatMetric.total} passed`}
-            percent={uatMetric.percent}
+            label="Milestones"
+            value={`${milestoneMetric.percent}%`}
+            sub={`${milestoneMetric.current} of ${milestoneMetric.total} complete`}
+            percent={milestoneMetric.percent}
+            href={ssUrl(ssConfig.projectPlanSheetId)}
           />
         )}
         {integMetric && (
           <MetricCard
-            label="Integration"
+            label="Integrations"
             value={`${integMetric.percent}%`}
             sub={`${integMetric.current} of ${integMetric.total} complete`}
             percent={integMetric.percent}
+            href={ssUrl(ssConfig.integrationTrackerSheetId)}
           />
         )}
-        {wfMetric && (
+        {meetingsMetric && (
           <MetricCard
-            label="Workflows"
-            value={`${wfMetric.percent}%`}
-            sub={`${wfMetric.current} of ${wfMetric.total} configured`}
-            percent={wfMetric.percent}
+            label="Meetings"
+            value={`${meetingsMetric.current}`}
+            sub={`${meetingsMetric.current} of ${meetingsMetric.total} held`}
+            href={ssUrl(ssConfig.meetingTrackerSheetId)}
+          />
+        )}
+        {raidMetric && raidMetric.total > 0 && (
+          <MetricCard
+            label="RAID Items"
+            value={`${raidMetric.total - raidMetric.current}`}
+            sub={`${raidMetric.total - raidMetric.current} open of ${raidMetric.total}`}
+            color={raidMetric.total - raidMetric.current > 5 ? "#F4333F" : undefined}
+            href={ssUrl(ssConfig.raidLogSheetId)}
           />
         )}
         <MetricCard
@@ -101,6 +118,7 @@ export default async function HubDashboard() {
           <OpenItems items={data.actionItems} />
         </div>
         <div className="space-y-5">
+          <QuickLinks links={data.links} />
           {/* Contact SC */}
           <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="sc-heading">
             <h2 id="sc-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">

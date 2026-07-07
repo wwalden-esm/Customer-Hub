@@ -89,9 +89,11 @@ async function extractProjectData(record: HubSpotRecord) {
     : [];
   const rawSc = record.properties.esm_solution_consultant || "";
   let scName = rawSc;
+  let scEmail = "";
   if (rawSc && /^\d+$/.test(rawSc)) {
-    const { resolveOwnerName } = await import("./hubspot");
+    const { resolveOwnerName, resolveOwnerEmail } = await import("./hubspot");
     scName = await resolveOwnerName(rawSc) || rawSc;
+    scEmail = await resolveOwnerEmail(rawSc) || "";
   }
   const goLiveDate = record.properties.target_golive || undefined;
   const projectTemplate = record.properties.project_template || undefined;
@@ -105,7 +107,7 @@ async function extractProjectData(record: HubSpotRecord) {
   const dateDueInitialDraft = record.properties.date_due_initial_draft || undefined;
 
   return {
-    customerName, projectName, products, scName, goLiveDate, projectTemplate,
+    customerName, projectName, products, scName, scEmail, goLiveDate, projectTemplate,
     institutionLegalName, institutionType, customerProjectLead, primaryMailingAddress,
     erpSystem, erpVersion, erpHosting, dateDueInitialDraft,
   };
@@ -613,7 +615,7 @@ function buildProjectConfig(
     projectName: data.projectName,
     products: data.products,
     scName: data.scName,
-    scEmail: "",
+    scEmail: data.scEmail || "",
     startDate: new Date().toISOString().slice(0, 10),
     goLiveDate: data.goLiveDate,
     currentPhase: "intake",

@@ -45,6 +45,12 @@ export interface HubUpcomingMeeting {
   agendaSummary: string;
 }
 
+export interface HubLink {
+  label: string;
+  url: string;
+  icon?: string;
+}
+
 export interface HubDashboardData {
   project: {
     id: string;
@@ -65,4 +71,5 @@ export interface HubDashboardData {
   daysToGoLive: number | null;
   activity: ActivityEvent[];
   upcomingMeetings: HubUpcomingMeeting[];
+  links: HubLink[];
 }

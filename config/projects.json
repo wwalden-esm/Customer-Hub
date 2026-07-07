@@ -1,27 +1,4 @@
 {
-  "demo-project": {
-    "customerName": "Northwind University",
-    "projectName": "ESM eProcurement Implementation",
-    "products": [
-      "eProcurement",
-      "Contracts"
-    ],
-    "scName": "Demo SC",
-    "scEmail": "sc@esmsolutions.com",
-    "pmName": "Demo PM",
-    "pmEmail": "pm@esmsolutions.com",
-    "startDate": "2026-06-01",
-    "goLiveDate": "2026-12-01",
-    "currentPhase": "intake",
-    "status": "ON_TRACK",
-    "branding": {
-      "accentColor": "#1E3A5F"
-    },
-    "hubspotIntakeId": "",
-    "smartsheetConfig": {},
-    "sectionVisibility": {},
-    "password": "NorthwindDemo2026"
-  },
   "rob-smith-consulting": {
     "customerName": "Rob Smith Consulting",
     "projectName": "Rob's Testing Project",
@@ -30,8 +7,8 @@
       "ESM Consumer Role"
     ],
     "scName": "Whitney Walden",
-    "scEmail": "",
-    "startDate": "2026-07-06",
+    "scEmail": "wwalden@esmsolutions.com",
+    "startDate": "2026-07-07",
     "goLiveDate": "2026-12-25",
     "currentPhase": "intake",
     "status": "ON_TRACK",
@@ -40,17 +17,22 @@
     },
     "hubspotIntakeId": "57934330647",
     "smartsheetConfig": {
-      "customerFolderId": "7777917095700356",
-      "metricsSheetId": "7285767297519492",
-      "projectInfoSheetId": "3128866020216708",
-      "integrationTrackerSheetId": "1856035819048836",
-      "meetingTrackerSheetId": "6553594022023044",
-      "documentSheetId": "8500287948935044",
-      "projectPlanSheetId": "4620497961570180",
-      "raidLogSheetId": "2775502417776516"
+      "customerFolderId": "5251488483174276",
+      "metricsSheetId": "4624782594101124",
+      "projectInfoSheetId": "8951463928614788",
+      "integrationTrackerSheetId": "5113240634740612",
+      "meetingTrackerSheetId": "239062639136644",
+      "documentSheetId": "2507054479527812",
+      "projectPlanSheetId": "7010654106898308",
+      "raidLogSheetId": "2861440821055364"
     },
+    "links": [
+      { "label": "Project Plan", "url": "https://app.smartsheet.com/sheets/7010654106898308", "icon": "smartsheet" },
+      { "label": "Training Materials", "url": "https://esmsolutions.com/training", "icon": "training" },
+      { "label": "SharePoint Folder", "url": "https://esmsolutions.sharepoint.com/sites/rob-smith", "icon": "sharepoint" }
+    ],
     "sectionVisibility": {},
-    "password": "RobSmithCons2966",
+    "password": "RobSmithCons1246",
     "institutionLegalName": "Rob Smith Consulting",
     "institutionType": "Private",
     "customerProjectLead": "Rob Smith",

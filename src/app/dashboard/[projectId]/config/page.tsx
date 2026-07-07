@@ -31,6 +31,7 @@ export default async function ProjectConfigPage({ params }: { params: { projectI
             branding: project.branding,
             password: getProjectPassword(project.id) ?? undefined,
             sectionVisibility: project.sectionVisibility,
+            links: project.links,
             smartsheetConfig: Object.fromEntries(
               Object.entries(project.smartsheetConfig).filter(([, v]) => v !== undefined) as [string, string][]
             ),

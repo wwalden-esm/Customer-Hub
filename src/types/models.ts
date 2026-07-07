@@ -38,6 +38,7 @@ export interface Project {
   smartsheetConfig: SmartsheetConfig;
   sectionVisibility: Record<string, boolean>;
   documentTypes?: string[];
+  links?: ProjectLink[];
   sharepointFolderUrl?: string;
   sharepointFolderId?: string;
 }
@@ -108,6 +109,12 @@ export interface Meeting {
   notes: string;
   actionItemsLogged: boolean;
   recapSent: boolean;
+}
+
+export interface ProjectLink {
+  label: string;
+  url: string;
+  icon?: "link" | "smartsheet" | "sharepoint" | "document" | "video" | "calendar" | "training";
 }
 
 export interface CustomerContact {

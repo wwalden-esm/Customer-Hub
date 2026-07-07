@@ -1,7 +1,8 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { readFileSync } from "fs";
+import { join } from "path";
 import type { EsmRole } from "@/types/enums";
-import usersJson from "../../config/esm-users.json";
 
 declare module "next-auth" {
   interface Session {
@@ -29,7 +30,11 @@ interface EsmUserConfig {
   password: string;
 }
 
-const users = usersJson as EsmUserConfig[];
+function loadUsers(): EsmUserConfig[] {
+  const filePath = join(process.cwd(), "config", "esm-users.json");
+  const raw = readFileSync(filePath, "utf-8");
+  return JSON.parse(raw) as EsmUserConfig[];
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
@@ -44,6 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = String(credentials?.email ?? "").trim().toLowerCase();
         const password = String(credentials?.password ?? "");
         if (!email || !password) return null;
+        const users = loadUsers();
         const user = users.find((u) => u.email.toLowerCase() === email);
         if (!user) return null;
         if (password !== user.password) return null;

@@ -81,8 +81,10 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
       const pctCell = pctCol ? row.cells.find((c) => c.columnId === pctCol) : null;
 
       const name = String(nameCell?.displayValue ?? nameCell?.value ?? "");
-      const startDate = startCell?.value ? String(startCell.value) : undefined;
-      const endDate = endCell?.value ? String(endCell.value) : undefined;
+      const startRaw = startCell?.value ?? startCell?.displayValue;
+      const endRaw = endCell?.value ?? endCell?.displayValue;
+      const startDate = startRaw ? String(startRaw).split("T")[0] : undefined;
+      const endDate = endRaw ? String(endRaw).split("T")[0] : undefined;
       const date = endDate ?? startDate;
       const status = statusCell?.displayValue ?? statusCell?.value;
       const pctRaw = pctCell?.value;
@@ -117,20 +119,25 @@ export async function getProjectActionItems(actionItemSheetId: string): Promise<
   try {
     const sheet = await getSheet(actionItemSheetId);
     const cols = columnIdMap(sheet);
-    const descCol = cols.get("Description") ?? cols.get("Action Item");
-    const ownerCol = cols.get("Owner");
-    const dueCol = cols.get("Due Date");
+    const descCol = cols.get("Description") ?? cols.get("Action Item") ?? cols.get("Item");
+    const ownerCol = cols.get("Owner") ?? cols.get("Assigned");
+    const dueCol = cols.get("Due Date") ?? cols.get("Target Date");
     const priorityCol = cols.get("Priority");
     const statusCol = cols.get("Status");
 
-    return sheet.rows.map((row) => ({
-      id: String(row.id),
-      description: descCol ? cellValue(row, descCol) ?? "" : "",
-      owner: ownerCol ? cellValue(row, ownerCol) ?? undefined : undefined,
-      dueDate: dueCol ? cellValue(row, dueCol) ?? undefined : undefined,
-      priority: priorityCol ? cellValue(row, priorityCol) ?? "medium" : "medium",
-      status: statusCol ? cellValue(row, statusCol) ?? "open" : "open",
-    }));
+    return sheet.rows
+      .filter((row) => {
+        const desc = descCol ? cellValue(row, descCol) : null;
+        return desc && String(desc).trim().length > 0;
+      })
+      .map((row) => ({
+        id: String(row.id),
+        description: descCol ? cellValue(row, descCol) ?? "" : "",
+        owner: ownerCol ? cellValue(row, ownerCol) ?? undefined : undefined,
+        dueDate: dueCol ? cellValue(row, dueCol) ?? undefined : undefined,
+        priority: priorityCol ? cellValue(row, priorityCol) ?? "medium" : "medium",
+        status: statusCol ? cellValue(row, statusCol) ?? "open" : "open",
+      }));
   } catch {
     return [];
   }
@@ -140,7 +147,7 @@ export async function getProjectMetrics(metricsSheetId: string): Promise<Metric[
   try {
     const sheet = await getSheet(metricsSheetId);
     const cols = columnIdMap(sheet);
-    const typeCol = cols.get("Metric Type") ?? cols.get("Type");
+    const typeCol = cols.get("Metric Type") ?? cols.get("Metric type") ?? cols.get("Type");
     const currentCol = cols.get("Current");
     const totalCol = cols.get("Total");
     const labelCol = cols.get("Label");

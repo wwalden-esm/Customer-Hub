@@ -1,0 +1,29 @@
+{
+  "globalLinks": [
+    {
+      "label": "ESM Support Portal",
+      "url": "https://support.esmsolutions.com",
+      "icon": "link"
+    },
+    {
+      "label": "ESM Knowledge Base",
+      "url": "https://kb.esmsolutions.com",
+      "icon": "link"
+    },
+    {
+      "label": "Creating a Support Account",
+      "url": "https://support.esmsolutions.com/hc/en-us/articles/5089751101339-Creating-a-Support-Account",
+      "icon": "link"
+    },
+    {
+      "label": "Tracking a Support Ticket",
+      "url": "https://support.esmsolutions.com/hc/en-us/articles/5090874661019-Tracking-a-Support-Ticket",
+      "icon": "link"
+    },
+    {
+      "label": "Release Notes",
+      "url": "https://support.esmsolutions.com/hc/en-us/categories/202616697-Release-Notes",
+      "icon": "link"
+    }
+  ]
+}

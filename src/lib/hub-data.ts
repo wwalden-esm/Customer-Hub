@@ -1,4 +1,5 @@
 import type { HubDashboardData, HubMilestone, HubActionItem, HubMetric, HubUpcomingMeeting, ActivityEvent } from "@/types/hub";
+import { getGlobalLinks } from "@/lib/settings";
 import {
   getProjectById,
   getSmartsheetConfig,
@@ -37,12 +38,16 @@ export async function getHubDashboardData(projectId: string): Promise<HubDashboa
     percentComplete: m.percentComplete ?? null,
   }));
 
-  const rawActions = config.actionItemSheetId
-    ? await fetchActions(config.actionItemSheetId)
+  const actionSheetId = config.actionItemSheetId || config.raidLogSheetId;
+  const rawActions = actionSheetId
+    ? await fetchActions(actionSheetId)
     : [];
 
   const actionItems: HubActionItem[] = rawActions
-    .filter((a) => a.status !== "done")
+    .filter((a) => {
+      const s = (a.status ?? "").toLowerCase();
+      return s !== "done" && s !== "complete" && s !== "closed";
+    })
     .map((a) => {
       const isOverdue = a.dueDate ? new Date(a.dueDate) < now : false;
       return {
@@ -50,8 +55,13 @@ export async function getHubDashboardData(projectId: string): Promise<HubDashboa
         description: a.description,
         owner: a.owner ?? null,
         dueDate: a.dueDate ?? null,
-        priority: (a.priority as HubActionItem["priority"]) || "medium",
-        status: (a.status as HubActionItem["status"]) || "open",
+        priority: (a.priority?.toLowerCase() as HubActionItem["priority"]) || "medium",
+        status: (() => {
+          const s = (a.status ?? "").toLowerCase();
+          if (s.includes("progress")) return "in-progress" as const;
+          if (s === "complete" || s === "done" || s === "closed") return "done" as const;
+          return "open" as const;
+        })(),
         isOverdue,
       };
     });
@@ -108,6 +118,13 @@ export async function getHubDashboardData(projectId: string): Promise<HubDashboa
     } catch { /* meetings unavailable */ }
   }
 
+  const globalLinks = getGlobalLinks();
+  const projectLinks = project.links ?? [];
+  const links = [
+    ...globalLinks.map((l) => ({ label: l.label, url: l.url, icon: l.icon })),
+    ...projectLinks.map((l) => ({ label: l.label, url: l.url, icon: l.icon })),
+  ];
+
   return {
     project: {
       id: project.id,
@@ -128,5 +145,6 @@ export async function getHubDashboardData(projectId: string): Promise<HubDashboa
     daysToGoLive,
     activity,
     upcomingMeetings,
+    links,
   };
 }
