@@ -58,16 +58,27 @@ export default function CustomerUploader({ projectId, onUploaded }: CustomerUplo
     if (inputRef.current) inputRef.current.value = "";
   }, [uploadFile]);
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if ((e.key === "Enter" || e.key === " ") && phase !== "uploading") {
+      e.preventDefault();
+      inputRef.current?.click();
+    }
+  }, [phase]);
+
   return (
     <div className="space-y-3">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload a document. Drop a file here or press Enter to browse."
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => phase !== "uploading" && inputRef.current?.click()}
+        onKeyDown={handleKeyDown}
         className={`
-          border-2 border-dashed rounded-lg px-5 py-4 text-center cursor-pointer transition-colors
-          ${dragOver ? "border-esm-red bg-red-50" : "border-slate-300 hover:border-slate-400"}
+          border-2 border-dashed rounded-sm px-5 py-4 text-center cursor-pointer transition-colors
+          ${dragOver ? "border-[var(--hub-accent)] bg-red-50" : "border-[#E2E0E1] hover:border-slate-400"}
           ${phase === "uploading" ? "opacity-50 pointer-events-none" : ""}
         `}
       >
@@ -76,24 +87,26 @@ export default function CustomerUploader({ projectId, onUploaded }: CustomerUplo
           type="file"
           className="hidden"
           onChange={handleFileSelect}
+          aria-label="Choose file to upload"
+          tabIndex={-1}
         />
         {phase === "uploading" ? (
-          <p className="text-sm text-slate-500">Uploading...</p>
+          <p className="text-sm text-esm-grey" aria-live="polite">Uploading...</p>
         ) : (
           <>
-            <p className="text-sm font-medium text-slate-700">
+            <p className="text-sm font-medium text-esm-black">
               Drop a file here or click to browse
             </p>
-            <p className="text-xs text-slate-400 mt-1">Max 25MB</p>
+            <p className="text-xs text-[#9E9B9E] mt-1">Max 25MB</p>
           </>
         )}
       </div>
 
-      {error && <p className="text-sm text-esm-red">{error}</p>}
+      {error && <p role="alert" className="text-sm" style={{ color: "var(--hub-accent)" }}>{error}</p>}
 
       {uploadedName && phase === "done" && (
-        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center gap-2">
-          <svg className="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div role="status" className="bg-green-50 border border-green-200 rounded-sm px-4 py-3 flex items-center gap-2">
+          <svg className="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
           <span className="text-sm text-green-700">{uploadedName} uploaded successfully</span>

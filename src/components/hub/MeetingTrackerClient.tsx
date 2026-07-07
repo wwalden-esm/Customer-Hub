@@ -83,12 +83,12 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
 
   if (meetings.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-slate-200 px-6 py-8 text-center">
-        <svg className="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-8 text-center">
+        <svg className="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
         </svg>
         <p className="text-sm text-slate-500">No meetings scheduled yet.</p>
-        <p className="text-xs text-slate-400 mt-1">Weekly implementation meetings will appear here once scheduled.</p>
+        <p className="text-xs text-[#9E9B9E] mt-1">Weekly implementation meetings will appear here once scheduled.</p>
       </div>
     );
   }
@@ -96,68 +96,64 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
   return (
     <>
       {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
-        <div className="bg-white rounded-lg border border-slate-200 px-4 py-3 text-center">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5" role="group" aria-label="Meeting summary">
+        <div className="bg-white rounded-sm border border-[#E2E0E1] px-4 py-3 text-center">
           <p className="text-2xl font-semibold text-esm-black">{counts.total}</p>
-          <p className="text-xs text-slate-500">Total</p>
+          <p className="text-xs text-esm-grey">Total</p>
         </div>
-        <button
-          onClick={() => setStatusFilter(statusFilter === "Complete" ? "All" : "Complete")}
-          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Complete" ? "border-green-400 bg-green-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
-        >
-          <p className="text-2xl font-semibold text-green-700">{counts.complete}</p>
-          <p className="text-xs text-slate-500">Complete</p>
-        </button>
-        <button
-          onClick={() => setStatusFilter(statusFilter === "Scheduled" ? "All" : "Scheduled")}
-          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Scheduled" ? "border-amber-400 bg-amber-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
-        >
-          <p className="text-2xl font-semibold text-amber-700">{counts.scheduled}</p>
-          <p className="text-xs text-slate-500">Scheduled</p>
-        </button>
-        <button
-          onClick={() => setStatusFilter(statusFilter === "Upcoming" ? "All" : "Upcoming")}
-          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Upcoming" ? "border-blue-400 bg-blue-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
-        >
-          <p className="text-2xl font-semibold text-blue-700">{counts.upcoming}</p>
-          <p className="text-xs text-slate-500">Upcoming</p>
-        </button>
-        <button
-          onClick={() => setStatusFilter(statusFilter === "Skipped" ? "All" : "Skipped")}
-          className={`rounded-lg border px-4 py-3 text-center transition-colors ${statusFilter === "Skipped" ? "border-slate-400 bg-slate-50" : "border-slate-200 bg-white hover:border-slate-300"}`}
-        >
-          <p className="text-2xl font-semibold text-slate-500">{counts.skipped}</p>
-          <p className="text-xs text-slate-500">Skipped</p>
-        </button>
+        {(["Complete", "Scheduled", "Upcoming", "Skipped"] as const).map((s) => {
+          const colorMap: Record<string, { active: string; count: string }> = {
+            Complete: { active: "border-green-400 bg-green-50", count: "text-green-700" },
+            Scheduled: { active: "border-amber-400 bg-amber-50", count: "text-amber-700" },
+            Upcoming: { active: "border-blue-400 bg-blue-50", count: "text-blue-700" },
+            Skipped: { active: "border-slate-400 bg-slate-50", count: "text-slate-500" },
+          };
+          const c = colorMap[s];
+          return (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(statusFilter === s ? "All" : s)}
+              aria-pressed={statusFilter === s}
+              className={`rounded-sm border px-4 py-3 text-center transition-colors ${
+                statusFilter === s ? c.active : "border-[#E2E0E1] bg-white hover:border-slate-300"
+              }`}
+            >
+              <p className={`text-2xl font-semibold ${c.count}`}>{counts[s.toLowerCase() as keyof typeof counts]}</p>
+              <p className="text-xs text-esm-grey">{s}</p>
+            </button>
+          );
+        })}
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Status</span>
-          <div className="flex gap-1">
+      <div className="flex flex-wrap gap-4 mb-4" role="group" aria-label="Filters">
+        <fieldset className="flex items-center gap-2">
+          <legend className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">Status</legend>
+          <div className="flex gap-1" role="radiogroup" aria-label="Filter by status">
             {STATUSES.map((s) => (
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
+                aria-pressed={statusFilter === s}
                 className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
                   statusFilter === s
                     ? "bg-esm-black text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    : "bg-gray-100 text-esm-grey hover:bg-gray-200"
                 }`}
               >
                 {s}
               </button>
             ))}
           </div>
-        </div>
+        </fieldset>
         {phases.length > 2 && (
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Phase</span>
+            <label htmlFor="phase-filter" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">Phase</label>
             <select
+              id="phase-filter"
               value={phaseFilter}
               onChange={(e) => setPhaseFilter(e.target.value)}
-              className="text-xs border border-slate-200 rounded px-2 py-1 text-slate-700"
+              className="text-xs border border-[#E2E0E1] rounded-sm px-2 py-1 text-esm-black"
             >
               {phases.map((p) => (
                 <option key={p} value={p}>{p === "All" ? "All Phases" : shortPhase(p)}</option>
@@ -168,7 +164,7 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
       </div>
 
       {/* Meeting list */}
-      <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+      <div className="bg-white rounded-sm border border-[#E2E0E1] divide-y divide-[#E2E0E1]">
         {filtered.length === 0 ? (
           <div className="px-5 py-6 text-center text-sm text-slate-500">
             No meetings match the selected filters.
@@ -178,16 +174,20 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
             const isExpanded = expanded.has(meeting.id);
             const isPast = meeting.meetingDate && new Date(meeting.meetingDate) < new Date();
             const isNext = !isPast && meeting.status !== "Skipped" && meeting.status !== "Complete";
+            const contentId = `meeting-detail-${meeting.id}`;
+            const hasDetails = !!(meeting.agendaSummary || meeting.scPrepItems || meeting.customerDeliverables || meeting.notes);
 
             return (
               <div key={meeting.id} className={`px-5 py-4 ${isNext && !isExpanded ? "bg-blue-50/30" : ""}`}>
                 <button
                   onClick={() => toggle(meeting.id)}
+                  aria-expanded={isExpanded}
+                  aria-controls={hasDetails ? contentId : undefined}
                   className="w-full text-left flex items-start gap-3"
                 >
                   <svg
-                    className={`w-4 h-4 text-slate-400 mt-0.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    className={`w-4 h-4 text-[#9E9B9E] mt-0.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -198,22 +198,22 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
                         {meeting.status}
                       </span>
                       {meeting.phase && (
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${PHASE_COLORS[meeting.phase] ?? "bg-slate-100 text-slate-600"}`}>
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${PHASE_COLORS[meeting.phase] ?? "bg-slate-100 text-esm-grey"}`}>
                           {shortPhase(meeting.phase)}
                         </span>
                       )}
                       {meeting.actionItemsLogged && (
-                        <span className="text-green-600" title="Action items logged">
-                          <svg className="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                        <span className="text-green-600" aria-label="Action items logged">
+                          <svg className="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                         </span>
                       )}
                       {meeting.recapSent && (
-                        <span className="text-blue-600" title="Recap sent">
-                          <svg className="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        <span className="text-blue-600" aria-label="Recap sent">
+                          <svg className="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         </span>
                       )}
                     </div>
-                    <div className="flex gap-4 mt-1 text-xs text-slate-500">
+                    <div className="flex gap-4 mt-1 text-xs text-esm-grey">
                       <span>{fmtDate(meeting.meetingDate)}</span>
                       {meeting.days && <span>{meeting.days}</span>}
                       {meeting.milestone && <span className="truncate max-w-[200px]">{meeting.milestone}</span>}
@@ -222,32 +222,32 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
                 </button>
 
                 {isExpanded && (
-                  <div className="ml-7 mt-3 space-y-3">
+                  <div id={contentId} className="ml-7 mt-3 space-y-3">
                     {meeting.agendaSummary && (
-                      <div className="pl-4 border-l-2 border-slate-200">
-                        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Agenda</p>
-                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.agendaSummary}</p>
+                      <div className="pl-4 border-l-2 border-[#E2E0E1]">
+                        <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Agenda</p>
+                        <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.agendaSummary}</p>
                       </div>
                     )}
                     {meeting.scPrepItems && (
                       <div className="pl-4 border-l-2 border-amber-200">
-                        <p className="text-xs font-medium text-amber-600 uppercase tracking-wider mb-1">SC Prep Items</p>
-                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.scPrepItems}</p>
+                        <p className="text-[10px] font-extrabold text-amber-600 tracking-[0.09em] uppercase mb-1">SC Prep Items</p>
+                        <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.scPrepItems}</p>
                       </div>
                     )}
                     {meeting.customerDeliverables && (
                       <div className="pl-4 border-l-2 border-blue-200">
-                        <p className="text-xs font-medium text-blue-600 uppercase tracking-wider mb-1">Customer Deliverables Due</p>
-                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.customerDeliverables}</p>
+                        <p className="text-[10px] font-extrabold text-blue-600 tracking-[0.09em] uppercase mb-1">Customer Deliverables Due</p>
+                        <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.customerDeliverables}</p>
                       </div>
                     )}
                     {meeting.notes && (
                       <div className="pl-4 border-l-2 border-red-200">
-                        <p className="text-xs font-medium text-red-600 uppercase tracking-wider mb-1">Watch-Out / Notes</p>
-                        <p className="text-sm text-slate-700 whitespace-pre-wrap">{meeting.notes}</p>
+                        <p className="text-[10px] font-extrabold text-red-600 tracking-[0.09em] uppercase mb-1">Watch-Out / Notes</p>
+                        <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.notes}</p>
                       </div>
                     )}
-                    <div className="flex gap-4 text-xs text-slate-500 pt-1">
+                    <div className="flex gap-4 text-xs text-esm-grey pt-1">
                       <span>Action Items: {meeting.actionItemsLogged ? "Logged" : "Pending"}</span>
                       <span>Recap: {meeting.recapSent ? "Sent" : "Pending"}</span>
                     </div>
@@ -259,7 +259,7 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
         )}
       </div>
 
-      <p className="text-xs text-slate-400 mt-3">
+      <p className="text-xs text-[#9E9B9E] mt-3" aria-live="polite">
         Showing {filtered.length} of {meetings.length} meetings
       </p>
     </>

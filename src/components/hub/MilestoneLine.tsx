@@ -9,18 +9,19 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
   const railPct = milestones.length > 1 ? (completed / (milestones.length - 1)) * 100 : 0;
 
   return (
-    <div className="bg-white border border-[#E2E0E1] rounded-sm px-6 pt-6 pb-7 mb-5">
-      <div className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-7">
+    <section className="bg-white border border-[#E2E0E1] rounded-sm px-6 pt-6 pb-7 mb-5" aria-labelledby="milestones-heading">
+      <h2 id="milestones-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-7">
         Project Milestones
-      </div>
-      <div className="overflow-x-auto pb-1">
+      </h2>
+      <div className="overflow-x-auto pb-1" role="list" aria-label={`${completed} of ${milestones.length} milestones complete`}>
         <div className="flex items-start min-w-max relative">
           {/* Rail background */}
-          <div className="absolute top-[7px] left-5 right-5 h-0.5 bg-[#E2E0E1] z-0" />
+          <div className="absolute top-[7px] left-5 right-5 h-0.5 bg-[#E2E0E1] z-0" aria-hidden="true" />
           {/* Rail progress */}
           <div
             className="absolute top-[7px] left-5 h-0.5 z-[1] transition-[width] duration-500"
             style={{ width: `calc(${railPct}% - 20px)`, backgroundColor: "var(--hub-accent)" }}
+            aria-hidden="true"
           />
           {milestones.map((m) => {
             const isC = m.status === "complete";
@@ -40,15 +41,16 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
 
             const cardCls = !isC && !isI ? "bg-gray-50 border-[#E2E0E1]" : "";
 
+            const statusText = isC ? "Complete" : isI ? "Active" : "Upcoming";
             const label = isC ? "✓ Done" : isI ? "Active" : "Upcoming";
             const labelStyle: React.CSSProperties = isC || isI ? { color: "var(--hub-accent)" } : {};
             const labelCls = isC || isI ? "" : "text-[#9E9B9E]";
 
             return (
-              <div key={m.id} className="flex flex-col items-center w-[140px] shrink-0">
+              <div key={m.id} className="flex flex-col items-center w-[140px] shrink-0" role="listitem" aria-label={`${m.name}: ${statusText}${m.date ? `, ${fmtShort(m.date)}` : ""}`}>
                 <div className="flex items-center w-full mb-3 relative z-[2]">
                   <div className="flex-1" />
-                  <div className="w-3.5 h-3.5 rounded-full border-2 shrink-0" style={dotStyle} />
+                  <div className="w-3.5 h-3.5 rounded-full border-2 shrink-0" style={dotStyle} aria-hidden="true" />
                   <div className="flex-1" />
                 </div>
                 <div className={`border rounded-sm p-2.5 w-[118px] text-center ${cardCls}`} style={cardStyle}>
@@ -68,6 +70,6 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
           })}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

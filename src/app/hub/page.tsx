@@ -41,7 +41,7 @@ export default async function HubDashboard() {
       <HealthBanner data={data} />
 
       {/* Metric cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-5">
+      <section aria-label="Key metrics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-5">
         <MetricCard
           label="Days to Go-Live"
           value={daysToGoLive !== null ? String(daysToGoLive) : "TBD"}
@@ -77,7 +77,7 @@ export default async function HubDashboard() {
           value={project.currentPhase}
           sub={`Intake ${intakePercent}% complete`}
         />
-      </div>
+      </section>
 
       <MilestoneLine milestones={data.milestones} />
 
@@ -102,33 +102,34 @@ export default async function HubDashboard() {
         </div>
         <div className="space-y-5">
           {/* Contact SC */}
-          <div className="bg-white border border-[#E2E0E1] rounded-sm p-5">
-            <div className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+          <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="sc-heading">
+            <h2 id="sc-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
               Your Solutions Consultant
-            </div>
+            </h2>
             <p className="text-sm font-medium text-esm-black">{project.scName}</p>
             {project.scEmail && (
               <a
                 href={`mailto:${project.scEmail}`}
+                aria-label={`Email ${project.scName}`}
                 className="inline-flex items-center gap-2 mt-3 px-4 py-2 text-sm font-medium rounded transition-colors"
                 style={{ backgroundColor: "var(--hub-accent)", color: "#fff" }}
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 Contact SC
               </a>
             )}
-          </div>
+          </section>
           {/* Upcoming Meetings */}
           {upcomingMeetings.length > 0 && (
-            <div className="bg-white border border-[#E2E0E1] rounded-sm p-5">
-              <div className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+            <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="upcoming-meetings-heading">
+              <h2 id="upcoming-meetings-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
                 Upcoming Meetings
-              </div>
-              <div className="space-y-3">
+              </h2>
+              <ul className="space-y-3">
                 {upcomingMeetings.map((m) => (
-                  <div key={m.id} className="border-l-2 pl-3" style={{ borderColor: "var(--hub-accent, #F4333F)" }}>
+                  <li key={m.id} className="border-l-2 pl-3" style={{ borderColor: "var(--hub-accent, #F4333F)" }}>
                     <p className="text-sm font-medium text-esm-black">{m.week}</p>
                     {m.milestone && (
                       <p className="text-xs text-esm-grey mt-0.5">{m.milestone}</p>
@@ -138,13 +139,13 @@ export default async function HubDashboard() {
                         {new Date(m.meetingDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                       </p>
                     )}
-                  </div>
+                  </li>
                 ))}
-              </div>
-              <a href="/hub/meetings" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--hub-accent, #F4333F)" }}>
+              </ul>
+              <a href="/hub/meetings" aria-label="View all meetings" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--hub-accent, #F4333F)" }}>
                 View all meetings →
               </a>
-            </div>
+            </section>
           )}
           <ActivityFeed events={data.activity} />
         </div>

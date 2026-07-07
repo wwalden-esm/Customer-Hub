@@ -85,10 +85,10 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
 
   if (items.length === 0) {
     return (
-      <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Project Timeline</h2>
+      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5" aria-labelledby="timeline-heading-empty">
+        <h2 id="timeline-heading-empty" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-4">Project Timeline</h2>
         <p className="text-sm text-slate-500 text-center py-6">No milestone dates available for timeline view.</p>
-      </div>
+      </section>
     );
   }
 
@@ -100,20 +100,20 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
   })();
 
   return (
-    <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
-      <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Project Timeline</h2>
+    <section className="bg-white rounded-sm border border-[#E2E0E1] p-5" aria-labelledby="timeline-heading">
+      <h2 id="timeline-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-4">Project Timeline</h2>
 
       <div className="overflow-x-auto">
         <div className="min-w-[700px]">
           {/* Month headers */}
-          <div className="relative h-6 border-b border-slate-200 mb-2">
+          <div className="relative h-6 border-b border-[#E2E0E1] mb-2">
             {months.map((m, i) => {
               const leftPct = ((m.getTime() - rangeStart.getTime()) / (rangeEnd.getTime() - rangeStart.getTime())) * 100;
               if (leftPct < 0 || leftPct > 100) return null;
               return (
                 <div
                   key={i}
-                  className="absolute text-[10px] font-medium text-slate-400 uppercase tracking-wider"
+                  className="absolute text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider"
                   style={{ left: `${leftPct}%` }}
                 >
                   {m.toLocaleDateString("en-US", { month: "short", year: "2-digit" })}
@@ -123,7 +123,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
           </div>
 
           {/* Grid lines + today marker */}
-          <div className="relative">
+          <div className="relative" role="img" aria-label={`Project timeline with ${items.length} milestones`}>
             {/* Vertical month grid lines */}
             {months.map((m, i) => {
               const leftPct = ((m.getTime() - rangeStart.getTime()) / (rangeEnd.getTime() - rangeStart.getTime())) * 100;
@@ -131,8 +131,9 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
               return (
                 <div
                   key={i}
-                  className="absolute top-0 bottom-0 w-px bg-slate-100"
+                  className="absolute top-0 bottom-0 w-px bg-gray-100"
                   style={{ left: `${leftPct}%`, height: `${items.length * 40 + 8}px` }}
+                  aria-hidden="true"
                 />
               );
             })}
@@ -142,8 +143,9 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
               <div
                 className="absolute top-0 w-px bg-red-400 z-10"
                 style={{ left: `${todayPct}%`, height: `${items.length * 40 + 8}px` }}
+                aria-hidden="true"
               >
-                <div className="absolute -top-5 -translate-x-1/2 text-[9px] font-bold text-red-500 bg-red-50 px-1 rounded">
+                <div className="absolute -top-5 -translate-x-1/2 text-[9px] font-bold text-red-500 bg-red-50 px-1 rounded-sm">
                   TODAY
                 </div>
               </div>
@@ -182,7 +184,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
                   {/* Tooltip */}
                   {isHovered && (
                     <div
-                      className="absolute z-20 bg-slate-900 text-white text-xs rounded px-3 py-2 shadow-lg pointer-events-none whitespace-nowrap"
+                      className="absolute z-20 bg-esm-black text-white text-xs rounded-sm px-3 py-2 shadow-lg pointer-events-none whitespace-nowrap"
                       style={{
                         left: `${Math.min(item.leftPct + item.widthPct / 2, 80)}%`,
                         top: "-44px",
@@ -190,7 +192,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
                       }}
                     >
                       <div className="font-medium">{item.name}</div>
-                      <div className="text-slate-300">
+                      <div className="text-white/70">
                         {item.startDate && fmtShort(item.startDate)}
                         {item.startDate && item.endDate && " → "}
                         {item.endDate && fmtShort(item.endDate)}
@@ -204,26 +206,26 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
           </div>
 
           {/* Legend */}
-          <div className="flex gap-4 mt-4 pt-3 border-t border-slate-100">
+          <div className="flex gap-4 mt-4 pt-3 border-t border-[#E2E0E1]">
             {[
               { label: "Complete", color: "bg-emerald-500" },
               { label: "In Progress", color: "bg-blue-500" },
               { label: "Upcoming", color: "bg-slate-300" },
             ].map((l) => (
-              <div key={l.label} className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                <div className={`w-3 h-2 rounded-sm ${l.color}`} />
+              <div key={l.label} className="flex items-center gap-1.5 text-[10px] text-esm-grey">
+                <div className={`w-3 h-2 rounded-sm ${l.color}`} aria-hidden="true" />
                 {l.label}
               </div>
             ))}
             {todayPct !== null && (
-              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                <div className="w-3 h-px bg-red-400" />
+              <div className="flex items-center gap-1.5 text-[10px] text-esm-grey">
+                <div className="w-3 h-px bg-red-400" aria-hidden="true" />
                 Today
               </div>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

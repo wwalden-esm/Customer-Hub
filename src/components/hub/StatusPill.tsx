@@ -8,8 +8,8 @@ const META: Record<Status, { label: string; className: string; dotClass: string 
   },
   AT_RISK: {
     label: "At Risk",
-    className: "bg-red-50 text-esm-grey border-esm-grey/25",
-    dotClass: "bg-esm-grey",
+    className: "bg-red-50 text-esm-black border-esm-black/25",
+    dotClass: "bg-amber-500",
   },
   OFF_TRACK: {
     label: "Off Track",
@@ -23,8 +23,9 @@ export default function StatusPill({ status }: { status: Status }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-sm border ${m.className}`}
+      role="status"
     >
-      <span className={`w-[5px] h-[5px] rounded-full shrink-0 ${m.dotClass}`} />
+      <span className={`w-[5px] h-[5px] rounded-full shrink-0 ${m.dotClass}`} aria-hidden="true" />
       {m.label}
     </span>
   );

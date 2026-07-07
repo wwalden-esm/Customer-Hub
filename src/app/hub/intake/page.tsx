@@ -39,7 +39,7 @@ function formatMultiselect(value: string): string[] {
 
 function FieldDisplay({ field }: { field: IntakeField }) {
   if (!field.value) {
-    return <span className="text-slate-400 italic">Not provided</span>;
+    return <span className="text-[#9E9B9E] italic">Not provided</span>;
   }
 
   if (field.type === "date") {
@@ -95,13 +95,13 @@ export default async function IntakePage() {
         <h1 className="text-2xl font-semibold text-esm-black">Customer Intake</h1>
         <div className="mt-2 flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             Sourced from HubSpot
           </span>
           {intakeData && (
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-[#9E9B9E]">
               Last updated: {new Date(intakeData.updatedAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
@@ -115,16 +115,16 @@ export default async function IntakePage() {
       </div>
 
       {error && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+        <div role="alert" className="bg-amber-50 border border-amber-200 rounded-sm p-4 text-sm text-amber-800">
           {error}
         </div>
       )}
 
       {intakeData && (
-        <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+        <div className="bg-white rounded-sm border border-[#E2E0E1] divide-y divide-[#E2E0E1]">
           {intakeData.fields.map((field) => (
             <div key={field.key} className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
-              <dt className="text-sm font-medium text-slate-500 sm:w-56 shrink-0">
+              <dt className="text-sm font-medium text-esm-grey sm:w-56 shrink-0">
                 {field.label}
               </dt>
               <dd className="text-sm flex-1">

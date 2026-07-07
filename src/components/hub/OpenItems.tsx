@@ -18,17 +18,18 @@ const PRI_META = {
 
 export default function OpenItems({ items }: { items: HubActionItem[] }) {
   return (
-    <div className="bg-white border border-[#E2E0E1] rounded-sm overflow-hidden">
+    <section className="bg-white border border-[#E2E0E1] rounded-sm overflow-hidden" aria-labelledby="open-items-heading">
       <div className="flex justify-between items-center px-5 py-3.5 border-b border-[#E2E0E1]">
-        <div className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
+        <h2 id="open-items-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
           Open Action Items
-        </div>
+        </h2>
         <div
           className={`text-[11px] font-bold px-2.5 py-0.5 rounded-sm border ${
             items.length > 0
               ? "bg-red-50 text-esm-red border-esm-red/25"
               : "bg-gray-50 text-esm-grey border-[#E2E0E1]"
           }`}
+          aria-label={`${items.length} open items`}
         >
           {items.length} open
         </div>
@@ -43,6 +44,7 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
                 {["Action Item", "Owner", "Due Date", "Priority"].map((h) => (
                   <th
                     key={h}
+                    scope="col"
                     className="px-[18px] py-2.5 text-[10px] font-extrabold text-esm-grey tracking-wider uppercase text-left border-b border-[#E2E0E1]"
                   >
                     {h}
@@ -53,25 +55,32 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
             <tbody>
               {items.map((item, i) => {
                 const pm = PRI_META[item.priority];
-                const urgent = item.dueDate ? daysUntil(item.dueDate) <= 3 : false;
+                const days = item.dueDate ? daysUntil(item.dueDate) : null;
+                const urgent = days !== null && days <= 3 && days >= 0;
+                const overdue = days !== null && days < 0;
                 return (
                   <tr
                     key={item.id}
                     className={`${i < items.length - 1 ? "border-b border-[#E2E0E1]" : ""} ${
-                      urgent ? "bg-red-50/30" : ""
+                      urgent || overdue ? "bg-red-50/30" : ""
                     }`}
                   >
                     <td className="px-[18px] py-3 text-sm text-esm-black leading-snug">
                       {item.description}
                     </td>
                     <td className="px-[18px] py-3 text-sm text-esm-grey whitespace-nowrap">
-                      {item.owner || "—"}
+                      {item.owner || <span aria-label="Not assigned">—</span>}
                     </td>
                     <td className="px-[18px] py-3 whitespace-nowrap">
-                      <span className={`text-sm ${urgent ? "text-esm-red" : "text-esm-black"}`}>
-                        {item.dueDate ? fmt(item.dueDate) : "—"}
-                        {urgent && (
-                          <span className="ml-1.5 text-[9px] font-extrabold text-esm-red tracking-wide">
+                      <span className={`text-sm ${urgent || overdue ? "text-esm-red" : "text-esm-black"}`}>
+                        {item.dueDate ? fmt(item.dueDate) : <span aria-label="No due date">—</span>}
+                        {overdue && (
+                          <span className="ml-1.5 text-[9px] font-extrabold text-esm-red tracking-wide" aria-label="Overdue">
+                            OVERDUE
+                          </span>
+                        )}
+                        {urgent && !overdue && (
+                          <span className="ml-1.5 text-[9px] font-extrabold text-esm-red tracking-wide" aria-label="Due soon">
                             SOON
                           </span>
                         )}
@@ -91,6 +100,6 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
           </table>
         </div>
       )}
-    </div>
+    </section>
   );
 }

@@ -38,34 +38,39 @@ export default async function HubLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-esm-grey-light" style={cssVars}>
-      {/* Header */}
-      <header className="bg-esm-black text-white">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
+      <header className="bg-esm-black text-white" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-            <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold shrink-0" aria-hidden="true">
               ESM
             </div>
             {branding.logoUrl && (
               <>
-                <div className="w-px h-6 bg-white/20 hidden sm:block" />
+                <div className="w-px h-6 bg-white/20 hidden sm:block" aria-hidden="true" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={branding.logoUrl} alt="" className="h-8 max-w-[120px] object-contain hidden sm:block" />
+                <img src={branding.logoUrl} alt={`${project.customerName} logo`} className="h-8 max-w-[120px] object-contain hidden sm:block" />
               </>
             )}
             <span className="text-sm font-medium truncate">{project.customerName}</span>
           </div>
           <div className="flex items-center gap-3 sm:gap-4 text-sm flex-wrap">
             {project.scEmail ? (
-              <a href={`mailto:${project.scEmail}`} className="text-white/60 hover:text-white transition-colors" title="Email your Solutions Consultant">
+              <a href={`mailto:${project.scEmail}`} className="text-white/80 hover:text-white transition-colors">
                 SC: {project.scName}
               </a>
             ) : (
-              <span className="text-white/60">SC: {project.scName}</span>
+              <span className="text-white/80">SC: {project.scName}</span>
             )}
-            <span className="text-white/40">|</span>
+            <span className="text-white/40" aria-hidden="true">|</span>
             <NotificationBell projectId={session.projectId} />
-            <span className="text-white/80 truncate max-w-[150px]">{session.name || session.email}</span>
-            <span className="text-white/40">|</span>
+            <span className="text-white/80 truncate max-w-[150px]" aria-label={`Logged in as ${session.name || session.email}`}>
+              {session.name || session.email}
+            </span>
+            <span className="text-white/40" aria-hidden="true">|</span>
             <LogoutButton />
           </div>
         </div>
@@ -74,8 +79,9 @@ export default async function HubLayout({ children }: { children: React.ReactNod
       <HubNav items={navItems} />
       <Breadcrumbs items={navItems} />
 
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">{children}</main>
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        {children}
+      </main>
       <SessionGuard />
     </div>
   );

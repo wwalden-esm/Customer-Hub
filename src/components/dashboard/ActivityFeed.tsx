@@ -61,18 +61,19 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
   const hasMore = filtered.length > limit;
 
   return (
-    <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+    <section className="bg-white rounded-sm border border-[#E2E0E1] p-5" aria-labelledby="activity-heading">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider">Activity</h2>
-        <div className="flex gap-1">
+        <h2 id="activity-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">Activity</h2>
+        <div className="flex gap-1" role="group" aria-label="Filter activity">
           {Object.entries(FILTER_LABELS).map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setFilter(key); setLimit(15); }}
+              aria-pressed={filter === key}
               className={`px-2 py-0.5 text-[10px] font-medium rounded-full transition-colors ${
                 filter === key
                   ? "bg-esm-black text-white"
-                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                  : "bg-gray-100 text-esm-grey hover:bg-gray-200"
               }`}
             >
               {label}
@@ -82,46 +83,46 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
       </div>
 
       {visible.length === 0 ? (
-        <p className="text-sm text-slate-400 text-center py-6">No activity recorded yet.</p>
+        <p className="text-sm text-[#9E9B9E] text-center py-6">No activity recorded yet.</p>
       ) : (
         <div className="space-y-4">
           {Array.from(grouped.entries()).map(([dateLabel, items]) => (
             <div key={dateLabel}>
-              <div className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2">
+              <div className="text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider mb-2">
                 {dateLabel}
               </div>
-              <div className="space-y-0.5">
+              <ul className="space-y-0.5">
                 {items.map((event) => {
                   const style = TYPE_ICONS[event.type] || TYPE_ICONS.system;
                   return (
-                    <div
+                    <li
                       key={event.id}
-                      className="flex items-start gap-3 py-2 px-2 rounded hover:bg-slate-50 transition-colors group"
+                      className="flex items-start gap-3 py-2 px-2 rounded-sm hover:bg-slate-50 transition-colors group"
                     >
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 ${style.bg} ${style.color}`}>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 ${style.bg} ${style.color}`} aria-hidden="true">
                         {style.icon}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-esm-black leading-snug">{event.title}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           {event.detail && (
-                            <span className="text-xs text-slate-400">{event.detail}</span>
+                            <span className="text-xs text-[#9E9B9E]">{event.detail}</span>
                           )}
                           {event.actor && (
                             <>
-                              <span className="text-slate-300">·</span>
-                              <span className="text-xs text-slate-400">{event.actor}</span>
+                              <span className="text-[#E2E0E1]" aria-hidden="true">·</span>
+                              <span className="text-xs text-[#9E9B9E]">{event.actor}</span>
                             </>
                           )}
                         </div>
                       </div>
-                      <span className="text-[10px] text-slate-400 shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[10px] text-[#9E9B9E] shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {relativeTime(event.timestamp)}
                       </span>
-                    </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </div>
           ))}
         </div>
@@ -130,15 +131,15 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
       {hasMore && (
         <button
           onClick={() => setLimit((l) => l + 15)}
-          className="w-full mt-3 py-1.5 text-xs text-slate-500 hover:text-esm-black border border-slate-200 rounded hover:bg-slate-50 transition-colors"
+          className="w-full mt-3 py-1.5 text-xs text-esm-grey hover:text-esm-black border border-[#E2E0E1] rounded-sm hover:bg-slate-50 transition-colors"
         >
           Show more ({filtered.length - limit} remaining)
         </button>
       )}
 
-      <div className="mt-3 pt-2 border-t border-slate-100 text-[10px] text-slate-400">
+      <div className="mt-3 pt-2 border-t border-[#E2E0E1] text-[10px] text-[#9E9B9E]">
         {filtered.length} event{filtered.length !== 1 ? "s" : ""}
       </div>
-    </div>
+    </section>
   );
 }

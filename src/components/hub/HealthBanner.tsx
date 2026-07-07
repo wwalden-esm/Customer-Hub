@@ -29,11 +29,13 @@ const BORDER_COLOR: Record<string, string> = {
 
 export default function HealthBanner({ data }: { data: HubDashboardData }) {
   return (
-    <div
+    <section
       className="bg-white rounded-sm border border-[#E2E0E1] p-6 mb-5"
       style={{ borderLeftWidth: "4px", borderLeftColor: BORDER_COLOR[data.project.status] }}
+      aria-labelledby="health-heading"
     >
       <div className="flex items-center gap-3 mb-3">
+        <h2 id="health-heading" className="sr-only">Project Health</h2>
         <StatusPill status={data.project.status} />
         <span className="text-xs text-[#9E9B9E]">
           Updated{" "}
@@ -45,6 +47,6 @@ export default function HealthBanner({ data }: { data: HubDashboardData }) {
         </span>
       </div>
       <p className="text-base leading-[1.7] text-esm-black">{healthSummary(data)}</p>
-    </div>
+    </section>
   );
 }
