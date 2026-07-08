@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { HubDeadline } from "@/types/hub";
 
 const SOURCE_LABELS: Record<string, { label: string; className: string }> = {
@@ -12,6 +13,35 @@ function dueLabel(d: HubDeadline): string {
   if (d.daysUntil === 0) return "Today";
   if (d.daysUntil === 1) return "Tomorrow";
   return `${d.daysUntil}d`;
+}
+
+function DeadlineRow({ d }: { d: HubDeadline }) {
+  const src = SOURCE_LABELS[d.source] ?? SOURCE_LABELS.action;
+  const isOverdue = d.daysUntil < 0;
+
+  const content = (
+    <>
+      <span className={`text-xs font-bold tabular-nums w-16 shrink-0 ${isOverdue ? "text-esm-red" : d.daysUntil <= 1 ? "text-amber-600" : "text-esm-grey"}`}>
+        {dueLabel(d)}
+      </span>
+      <span className="text-sm text-esm-black flex-1 min-w-0 truncate">{d.name}</span>
+      <span className={`text-[9px] font-bold tracking-wide uppercase px-1.5 py-0.5 rounded-sm border shrink-0 ${src.className}`}>
+        {src.label}
+      </span>
+    </>
+  );
+
+  const className = `flex items-center gap-2 px-3 py-2 rounded-sm transition-colors ${isOverdue ? "bg-red-50/50" : ""} ${d.href ? "hover:bg-slate-50 cursor-pointer" : ""}`;
+
+  if (d.href) {
+    return (
+      <li>
+        <Link href={d.href} className={className}>{content}</Link>
+      </li>
+    );
+  }
+
+  return <li className={className}>{content}</li>;
 }
 
 export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadline[] }) {
@@ -30,21 +60,7 @@ export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadlin
         <div className="mb-3">
           <p className="text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider mb-1.5">This Week</p>
           <ul className="space-y-1.5">
-            {thisWeek.map((d) => {
-              const src = SOURCE_LABELS[d.source] ?? SOURCE_LABELS.action;
-              const isOverdue = d.daysUntil < 0;
-              return (
-                <li key={d.id} className={`flex items-center gap-2 px-3 py-2 rounded-sm ${isOverdue ? "bg-red-50/50" : "hover:bg-slate-50"} transition-colors`}>
-                  <span className={`text-xs font-bold tabular-nums w-16 shrink-0 ${isOverdue ? "text-esm-red" : d.daysUntil <= 1 ? "text-amber-600" : "text-esm-grey"}`}>
-                    {dueLabel(d)}
-                  </span>
-                  <span className="text-sm text-esm-black flex-1 min-w-0 truncate">{d.name}</span>
-                  <span className={`text-[9px] font-bold tracking-wide uppercase px-1.5 py-0.5 rounded-sm border shrink-0 ${src.className}`}>
-                    {src.label}
-                  </span>
-                </li>
-              );
-            })}
+            {thisWeek.map((d) => <DeadlineRow key={d.id} d={d} />)}
           </ul>
         </div>
       )}
@@ -53,18 +69,7 @@ export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadlin
         <div>
           <p className="text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider mb-1.5">Next Week</p>
           <ul className="space-y-1.5">
-            {nextWeek.map((d) => {
-              const src = SOURCE_LABELS[d.source] ?? SOURCE_LABELS.action;
-              return (
-                <li key={d.id} className="flex items-center gap-2 px-3 py-2 rounded-sm hover:bg-slate-50 transition-colors">
-                  <span className="text-xs font-bold tabular-nums w-16 shrink-0 text-[#9E9B9E]">{dueLabel(d)}</span>
-                  <span className="text-sm text-esm-black flex-1 min-w-0 truncate">{d.name}</span>
-                  <span className={`text-[9px] font-bold tracking-wide uppercase px-1.5 py-0.5 rounded-sm border shrink-0 ${src.className}`}>
-                    {src.label}
-                  </span>
-                </li>
-              );
-            })}
+            {nextWeek.map((d) => <DeadlineRow key={d.id} d={d} />)}
           </ul>
         </div>
       )}

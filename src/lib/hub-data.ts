@@ -201,7 +201,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
     const due = new Date(a.dueDate);
     const daysUntil = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     if (daysUntil >= -7 && daysUntil <= 14) {
-      deadlines.push({ id: `action-${a.id}`, name: a.description, dueDate: a.dueDate, source: "action", owner: a.owner, daysUntil });
+      deadlines.push({ id: `action-${a.id}`, name: a.description, dueDate: a.dueDate, source: "action", owner: a.owner, daysUntil, href: "/hub/raid-log" });
     }
   }
 
@@ -219,7 +219,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
       const due = new Date(mtg.meetingDate);
       const daysUntil = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       if (daysUntil >= -7 && daysUntil <= 14) {
-        deadlines.push({ id: `deliv-${mtg.id}`, name: mtg.customerDeliverables, dueDate: mtg.meetingDate, source: "deliverable", owner: null, daysUntil });
+        deadlines.push({ id: `deliv-${mtg.id}`, name: mtg.customerDeliverables, dueDate: mtg.meetingDate, source: "deliverable", owner: null, daysUntil, href: "/hub/meetings" });
       }
     }
   }
@@ -239,6 +239,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
       label: "Intake Complete",
       done: intakePercent >= 100,
       detail: intakePercent > 0 ? `${intakePercent}% complete` : null,
+      href: "/hub/intake",
     },
     {
       label: "All Milestones Complete",
@@ -254,11 +255,13 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
       label: "All Meetings Held",
       done: totalMeetings > 0 && completedMeetings.length === totalMeetings,
       detail: totalMeetings > 0 ? `${completedMeetings.length} of ${totalMeetings}` : null,
+      href: "/hub/meetings",
     },
     {
       label: "No Open RAID Items",
       done: allRaidItems.length > 0 && allRaidItems.filter((r) => r.status !== "Complete").length === 0,
       detail: allRaidItems.length > 0 ? `${allRaidItems.filter((r) => r.status !== "Complete").length} open` : null,
+      href: "/hub/raid-log",
     },
     {
       label: "UAT Sign-Off",

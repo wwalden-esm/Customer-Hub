@@ -1,4 +1,47 @@
+import Link from "next/link";
 import type { GoLiveReadinessItem } from "@/types/hub";
+
+function ReadinessRow({ item }: { item: GoLiveReadinessItem }) {
+  const content = (
+    <>
+      <div
+        className={`rounded-full flex items-center justify-center shrink-0 ${
+          item.done ? "bg-emerald-500" : "border-2 border-[#E2E0E1]"
+        }`}
+        style={{ width: 18, height: 18 }}
+      >
+        {item.done && (
+          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+      </div>
+      <span className={`text-sm ${item.done ? "text-[#9E9B9E] line-through" : "text-esm-black"}`}>
+        {item.label}
+      </span>
+      {item.detail && !item.done && (
+        <span className="text-[10px] text-[#9E9B9E] ml-auto shrink-0">{item.detail}</span>
+      )}
+      {item.href && !item.done && (
+        <svg className="w-3.5 h-3.5 text-[#9E9B9E] ml-auto shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      )}
+    </>
+  );
+
+  if (item.href && !item.done) {
+    return (
+      <li>
+        <Link href={item.href} className="flex items-center gap-2.5 py-1 px-1 -mx-1 rounded hover:bg-slate-50 transition-colors">
+          {content}
+        </Link>
+      </li>
+    );
+  }
+
+  return <li className="flex items-center gap-2.5">{content}</li>;
+}
 
 export default function GoLiveReadiness({ items, daysToGoLive }: { items: GoLiveReadinessItem[]; daysToGoLive: number | null }) {
   const done = items.filter((i) => i.done).length;
@@ -34,28 +77,7 @@ export default function GoLiveReadiness({ items, daysToGoLive }: { items: GoLive
       </div>
 
       <ul className="space-y-2">
-        {items.map((item, i) => (
-          <li key={i} className="flex items-center gap-2.5">
-            <div
-              className={`w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 ${
-                item.done ? "bg-emerald-500" : "border-2 border-[#E2E0E1]"
-              }`}
-              style={{ width: 18, height: 18 }}
-            >
-              {item.done && (
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </div>
-            <span className={`text-sm ${item.done ? "text-[#9E9B9E] line-through" : "text-esm-black"}`}>
-              {item.label}
-            </span>
-            {item.detail && !item.done && (
-              <span className="text-[10px] text-[#9E9B9E] ml-auto shrink-0">{item.detail}</span>
-            )}
-          </li>
-        ))}
+        {items.map((item, i) => <ReadinessRow key={i} item={item} />)}
       </ul>
     </section>
   );

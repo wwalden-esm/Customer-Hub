@@ -82,12 +82,14 @@ export interface HubDeadline {
   source: "action" | "milestone" | "meeting" | "deliverable";
   owner: string | null;
   daysUntil: number;
+  href?: string;
 }
 
 export interface GoLiveReadinessItem {
   label: string;
   done: boolean;
   detail: string | null;
+  href?: string;
 }
 
 export interface HubDashboardData {

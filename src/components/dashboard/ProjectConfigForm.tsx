@@ -54,6 +54,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
   const [links, setLinks] = useState<ProjectLink[]>(project.links ?? []);
   const [contacts, setContacts] = useState<ContactEntry[]>(project.contacts ?? []);
   const [newContact, setNewContact] = useState({ name: "", email: "", role: "" });
+  const [contactError, setContactError] = useState<string | null>(null);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [inviteLoading, setInviteLoading] = useState<string | null>(null);
 
@@ -259,14 +260,23 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             type="button"
             disabled={!newContact.name.trim() || !newContact.email.trim()}
             onClick={() => {
+              const email = newContact.email.trim().toLowerCase();
+              if (contacts.some((c) => c.email.toLowerCase() === email)) {
+                setContactError("A contact with this email already exists.");
+                return;
+              }
               setContacts([...contacts, { name: newContact.name.trim(), email: newContact.email.trim(), role: newContact.role.trim() || undefined, addedAt: new Date().toISOString() }]);
               setNewContact({ name: "", email: "", role: "" });
+              setContactError(null);
             }}
             className="shrink-0 px-4 py-1.5 text-sm font-medium text-white bg-esm-red rounded hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             Add
           </button>
         </div>
+        {contactError && (
+          <p className="text-sm text-red-600 mt-2">{contactError}</p>
+        )}
       </section>
 
       {/* Hub Sections */}

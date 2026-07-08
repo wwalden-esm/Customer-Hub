@@ -42,9 +42,12 @@ export default async function HubDashboard() {
   const timelinePercent = totalDays && totalDays > 0 ? Math.min(100, Math.round((daysElapsed! / totalDays) * 100)) : null;
 
   const pl = data.sheetPermalinks;
+  const hasDeadlines = data.deadlines.length > 0;
+  const hasMeetings = upcomingMeetings.length > 0;
 
   return (
     <>
+      {/* ── Header ── */}
       <div className="mb-6 flex items-start justify-between">
         <div>
           {data.contactName && data.contactName !== "Customer" && (
@@ -65,7 +68,7 @@ export default async function HubDashboard() {
         <RefreshButton />
       </div>
 
-      {/* Timeline elapsed bar */}
+      {/* ── Timeline bar ── */}
       {timelinePercent !== null && totalDays !== null && daysElapsed !== null && (
         <section className="bg-white border border-[#E2E0E1] rounded-sm p-4 mb-5" aria-label="Implementation timeline progress">
           <div className="flex items-center justify-between mb-2">
@@ -89,9 +92,9 @@ export default async function HubDashboard() {
         </section>
       )}
 
+      {/* ── Health + Metrics ── */}
       <HealthBanner data={data} />
 
-      {/* Metric cards */}
       <section aria-label="Key metrics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-5">
         <MetricCard
           label="Days to Go-Live"
@@ -158,13 +161,59 @@ export default async function HubDashboard() {
         />
       </section>
 
-      {/* Customer action items — prominent callout */}
+      {/* ══════════════════════════════════════════════
+          ZONE 1 — What needs your attention now
+          ══════════════════════════════════════════════ */}
+
       <CustomerActionItems items={data.customerActionItems} contactName={data.contactName} />
       {data.customerActionItems.length > 0 && <div className="mb-5" />}
 
+      {(hasDeadlines || hasMeetings) && (
+        <div className={`grid grid-cols-1 ${hasDeadlines && hasMeetings ? "lg:grid-cols-2" : ""} gap-5 mb-5`}>
+          {hasDeadlines && <UpcomingDeadlines deadlines={data.deadlines} />}
+          {hasMeetings && (
+            <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="upcoming-meetings-heading">
+              <h2 id="upcoming-meetings-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+                Upcoming Meetings
+              </h2>
+              <ul className="space-y-4">
+                {upcomingMeetings.map((m) => (
+                  <li key={m.id} className="border-l-2 pl-3" style={{ borderColor: "var(--hub-accent, #F4333F)" }}>
+                    <p className="text-sm font-medium text-esm-black">{m.week}</p>
+                    {m.milestone && (
+                      <p className="text-xs text-esm-grey mt-0.5">{m.milestone}</p>
+                    )}
+                    {m.meetingDate && (
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {new Date(m.meetingDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                      </p>
+                    )}
+                    {m.agendaSummary && (
+                      <p className="text-xs text-esm-grey mt-1 leading-relaxed line-clamp-2">{m.agendaSummary}</p>
+                    )}
+                    {m.customerDeliverables && (
+                      <div className="mt-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-sm">
+                        <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Due from you</p>
+                        <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">{m.customerDeliverables}</p>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <a href="/hub/meetings" aria-label="View all meetings" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--hub-accent, #F4333F)" }}>
+                View all meetings →
+              </a>
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          ZONE 2 — Project progress
+          ══════════════════════════════════════════════ */}
+
       <MilestoneLine milestones={data.milestones.filter((m) => m.isMilestone || m.level === 1)} />
 
-      {/* Timeline / Gantt */}
       <div className="mb-5">
         <ProjectTimeline
           milestones={data.milestones
@@ -181,7 +230,7 @@ export default async function HubDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
         <div className="lg:col-span-2 space-y-5">
           <OpenItems items={data.actionItems.slice(0, 5)} />
           {data.actionItems.length > 5 && (
@@ -194,7 +243,6 @@ export default async function HubDashboard() {
             </a>
           )}
 
-          {/* Integration Status */}
           {data.integrations.length > 0 && (
             <section className="bg-white border border-[#E2E0E1] rounded-sm overflow-hidden" aria-labelledby="integrations-heading">
               <div className="flex justify-between items-center px-5 py-3.5 border-b border-[#E2E0E1]">
@@ -239,125 +287,82 @@ export default async function HubDashboard() {
               </div>
             </section>
           )}
-
-          {/* Decision Log */}
-          <DecisionLog decisions={data.decisions} raidLogUrl={pl.raidLogSheetId} />
         </div>
         <div className="space-y-5">
-          {/* Upcoming Deadlines */}
-          <UpcomingDeadlines deadlines={data.deadlines} />
-
-          {/* Go-Live Readiness */}
           <GoLiveReadiness items={data.goLiveReadiness} daysToGoLive={daysToGoLive} />
-
-          <QuickLinks links={data.links} />
-
-          {/* Your Team — with contact actions */}
-          <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="team-heading">
-            <h2 id="team-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
-              Your Implementation Team
-            </h2>
-            <ul className="space-y-3">
-              {data.team.map((member) => (
-                <li key={member.role} className="flex items-start gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
-                    aria-hidden="true"
-                  >
-                    {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-esm-black">{member.name}</p>
-                    <p className="text-xs text-esm-grey">{member.role}</p>
-                    {member.email && (
-                      <div className="flex items-center gap-2 mt-1">
-                        <a
-                          href={`mailto:${member.email}`}
-                          className="text-xs hover:underline"
-                          style={{ color: "var(--hub-accent, #F4333F)" }}
-                        >
-                          {member.email}
-                        </a>
-                        <span className="text-[#E2E0E1]" aria-hidden="true">&middot;</span>
-                        <a
-                          href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
-                          className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-sm border border-[#E2E0E1] hover:bg-slate-50 transition-colors text-esm-grey"
-                        >
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                          Send message
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            {data.team.length > 0 && data.team[0].email && (
-              <a
-                href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Request Meeting`)}`}
-                className="flex items-center justify-center gap-2 mt-4 py-2 border border-[#E2E0E1] rounded-sm text-xs font-medium hover:bg-slate-50 transition-colors"
-                style={{ color: "var(--hub-accent, #F4333F)" }}
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Request a meeting
-              </a>
-            )}
-          </section>
-
-          {/* Upcoming Meetings */}
-          {upcomingMeetings.length > 0 && (
-            <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="upcoming-meetings-heading">
-              <h2 id="upcoming-meetings-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
-                Upcoming Meetings
-              </h2>
-              <ul className="space-y-4">
-                {upcomingMeetings.map((m) => (
-                  <li key={m.id} className="border-l-2 pl-3" style={{ borderColor: "var(--hub-accent, #F4333F)" }}>
-                    <p className="text-sm font-medium text-esm-black">{m.week}</p>
-                    {m.milestone && (
-                      <p className="text-xs text-esm-grey mt-0.5">{m.milestone}</p>
-                    )}
-                    {m.meetingDate && (
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {new Date(m.meetingDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                      </p>
-                    )}
-                    {m.agendaSummary && (
-                      <p className="text-xs text-esm-grey mt-1 leading-relaxed line-clamp-2">{m.agendaSummary}</p>
-                    )}
-                    {m.customerDeliverables && (
-                      <div className="mt-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-sm">
-                        <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Due from you</p>
-                        <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">{m.customerDeliverables}</p>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <a href="/hub/meetings" aria-label="View all meetings" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--hub-accent, #F4333F)" }}>
-                View all meetings →
-              </a>
-            </section>
-          )}
-
-          {/* Training Progress */}
           {data.trainingProgress && (
             <TrainingProgress completed={data.trainingProgress.completed} total={data.trainingProgress.total} />
           )}
-
-          {/* Health Trend */}
-          <HealthTrend history={data.healthHistory} currentStatus={project.status} />
-
-          {/* Document Generation Shortcuts */}
-          <DocShortcuts projectId={project.id} documentTypes={data.documentTypes} />
-
-          <ActivityFeed events={data.activity} />
+          <DecisionLog decisions={data.decisions} raidLogUrl={pl.raidLogSheetId} />
         </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          ZONE 3 — Resources & team
+          ══════════════════════════════════════════════ */}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
+        {/* Your Team */}
+        <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="team-heading">
+          <h2 id="team-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+            Your Implementation Team
+          </h2>
+          <ul className="space-y-3">
+            {data.team.map((member) => (
+              <li key={member.role} className="flex items-start gap-3">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                  style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+                  aria-hidden="true"
+                >
+                  {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-esm-black">{member.name}</p>
+                  <p className="text-xs text-esm-grey">{member.role}</p>
+                  {member.email && (
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <a
+                        href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
+                        className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-sm border border-[#E2E0E1] hover:bg-slate-50 transition-colors text-esm-grey"
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Send message
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+          {data.team.length > 0 && data.team[0].email && (
+            <a
+              href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Request Meeting`)}`}
+              className="flex items-center justify-center gap-2 mt-4 py-2 border border-[#E2E0E1] rounded-sm text-xs font-medium hover:bg-slate-50 transition-colors"
+              style={{ color: "var(--hub-accent, #F4333F)" }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Request a meeting
+            </a>
+          )}
+        </section>
+
+        <QuickLinks links={data.links} />
+
+        <DocShortcuts projectId={project.id} documentTypes={data.documentTypes} />
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          ZONE 4 — History & trends (lower priority)
+          ══════════════════════════════════════════════ */}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <ActivityFeed events={data.activity} />
+        <HealthTrend history={data.healthHistory} currentStatus={project.status} />
       </div>
     </>
   );
