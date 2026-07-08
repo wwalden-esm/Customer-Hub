@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { parseLocalDate } from "@/lib/date-utils";
 
 interface SharePointFile {
   id: string;
@@ -15,7 +16,7 @@ interface SharePointFile {
 
 function fmtDate(d: string | null): string {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-US", {
+  return parseLocalDate(d).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",

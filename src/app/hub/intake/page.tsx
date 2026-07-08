@@ -4,6 +4,7 @@ import { getCustomerSession } from "@/lib/magic-link";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { getIntakeRecord, normalizeIntakeData } from "@/lib/hubspot";
 import type { IntakeField } from "@/lib/hubspot";
+import { parseLocalDate } from "@/lib/date-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ function getHubspotIntakeId(projectId: string): string | null {
 
 function formatDate(value: string): string {
   try {
-    return new Date(value).toLocaleDateString("en-US", {
+    return parseLocalDate(value).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -102,7 +103,7 @@ export default async function IntakePage() {
           </span>
           {intakeData && (
             <span className="text-xs text-[#9E9B9E]">
-              Last updated: {new Date(intakeData.updatedAt).toLocaleDateString("en-US", {
+              Last updated: {parseLocalDate(intakeData.updatedAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",

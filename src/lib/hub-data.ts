@@ -1,4 +1,5 @@
 import type { HubDashboardData, HubMilestone, HubActionItem, HubMetric, HubUpcomingMeeting, HubIntegration, ActivityEvent, HubDecision, HubDeadline, GoLiveReadinessItem } from "@/types/hub";
+import { parseLocalDate } from "@/lib/date-utils";
 import { getGlobalLinks } from "@/lib/settings";
 import {
   getProjectById,
@@ -24,7 +25,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
   now.setHours(0, 0, 0, 0);
 
   const daysToGoLive = project.goLiveDate
-    ? Math.ceil((new Date(project.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    ? Math.ceil((parseLocalDate(project.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
   const rawMilestones = config.projectPlanSheetId
@@ -56,7 +57,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
       return s !== "done" && s !== "complete" && s !== "closed";
     })
     .map((a) => {
-      const isOverdue = a.dueDate ? new Date(a.dueDate) < now : false;
+      const isOverdue = a.dueDate ? parseLocalDate(a.dueDate) < now : false;
       return {
         id: a.id,
         description: a.description,
@@ -138,10 +139,8 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
   let daysElapsed: number | null = null;
   let totalDays: number | null = null;
   if (startDate && project.goLiveDate) {
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(project.goLiveDate);
-    end.setHours(0, 0, 0, 0);
+    const start = parseLocalDate(startDate);
+    const end = parseLocalDate(project.goLiveDate);
     totalDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     daysElapsed = Math.max(0, Math.ceil((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
   }
@@ -198,7 +197,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
 
   for (const a of actionItems) {
     if (!a.dueDate) continue;
-    const due = new Date(a.dueDate);
+    const due = parseLocalDate(a.dueDate);
     const daysUntil = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     if (daysUntil >= -7 && daysUntil <= 14) {
       deadlines.push({ id: `action-${a.id}`, name: a.description, dueDate: a.dueDate, source: "action", owner: a.owner, daysUntil, href: "/hub/raid-log" });
@@ -207,7 +206,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
 
   for (const m of milestones) {
     if (!m.endDate || m.status === "complete") continue;
-    const due = new Date(m.endDate);
+    const due = parseLocalDate(m.endDate);
     const daysUntil = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     if (daysUntil >= -7 && daysUntil <= 14) {
       deadlines.push({ id: `ms-${m.id}`, name: m.name, dueDate: m.endDate, source: "milestone", owner: null, daysUntil });
@@ -216,7 +215,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
 
   for (const mtg of upcomingMeetings) {
     if (mtg.customerDeliverables && mtg.meetingDate) {
-      const due = new Date(mtg.meetingDate);
+      const due = parseLocalDate(mtg.meetingDate);
       const daysUntil = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       if (daysUntil >= -7 && daysUntil <= 14) {
         deadlines.push({ id: `deliv-${mtg.id}`, name: mtg.customerDeliverables, dueDate: mtg.meetingDate, source: "deliverable", owner: null, daysUntil, href: "/hub/meetings" });
@@ -284,8 +283,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
   // --- Health history (derive from current status — in a real system this would be stored over time) ---
   const healthHistory: Array<{ week: string; status: "ON_TRACK" | "AT_RISK" | "OFF_TRACK" }> = [];
   if (startDate) {
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
+    const start = parseLocalDate(startDate);
     const weeksCounted = Math.min(8, Math.max(0, Math.ceil((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000))));
     for (let i = weeksCounted; i >= 1; i--) {
       const weekDate = new Date(now);

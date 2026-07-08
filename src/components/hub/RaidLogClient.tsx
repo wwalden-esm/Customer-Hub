@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { parseLocalDate } from "@/lib/date-utils";
 
 interface RaidItem {
   id: string;
@@ -156,7 +157,7 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
           filtered.map((item) => {
             const isExpanded = expanded.has(item.id);
             const isOverdue = item.targetDate && item.status !== "Complete"
-              && new Date(item.targetDate) < new Date();
+              && parseLocalDate(item.targetDate) < new Date();
             const contentId = `raid-detail-${item.id}`;
 
             return (
@@ -195,7 +196,7 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
                       {item.assigned && <span>Assigned: {item.assigned}</span>}
                       {item.targetDate && (
                         <span className={isOverdue ? "text-red-600 font-medium" : ""}>
-                          Due: {new Date(item.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          Due: {parseLocalDate(item.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </span>
                       )}
                       {item.itemId && <span>ID: {item.itemId}</span>}

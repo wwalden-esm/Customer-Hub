@@ -12,6 +12,7 @@ import {
   getProjectDocuments,
   deriveCurrentPhase,
 } from "@/lib/smartsheet-data";
+import { parseLocalDate } from "@/lib/date-utils";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
@@ -19,7 +20,7 @@ import RefreshMetricsButton from "@/components/dashboard/RefreshMetricsButton";
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  return parseLocalDate(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
 const STATUS_BADGE: Record<string, { bg: string; text: string; label: string }> = {
@@ -69,7 +70,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   const daysToGoLive = project.goLiveDate
-    ? Math.ceil((new Date(project.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    ? Math.ceil((parseLocalDate(project.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
   const badge = STATUS_BADGE[project.status] || STATUS_BADGE.ON_TRACK;
@@ -211,7 +212,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
                       {m.week}
                       {m.meetingDate && (
                         <span className="text-amber-600 ml-1">
-                          ({new Date(m.meetingDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })})
+                          ({parseLocalDate(m.meetingDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })})
                         </span>
                       )}
                     </span>

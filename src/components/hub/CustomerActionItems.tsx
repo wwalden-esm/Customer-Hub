@@ -1,13 +1,14 @@
 import type { HubActionItem } from "@/types/hub";
+import { parseLocalDate } from "@/lib/date-utils";
 
 function fmt(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function daysUntil(d: string): number {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  return Math.ceil((new Date(d).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.ceil((parseLocalDate(d).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 export default function CustomerActionItems({ items, contactName }: { items: HubActionItem[]; contactName?: string | null }) {

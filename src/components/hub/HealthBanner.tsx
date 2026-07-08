@@ -1,9 +1,10 @@
 import StatusPill from "./StatusPill";
 import type { HubDashboardData } from "@/types/hub";
+import { parseLocalDate } from "@/lib/date-utils";
 
 function healthSummary(data: HubDashboardData): string {
   const goLive = data.project.goLiveDate
-    ? new Date(data.project.goLiveDate).toLocaleDateString("en-US", {
+    ? parseLocalDate(data.project.goLiveDate).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",

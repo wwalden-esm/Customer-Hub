@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { SectionKey, SectionStatus, DataSource } from "@/types/enums";
 import { SECTION_LABELS, SECTION_ORDER, WORKSHOP_SECTIONS, DATA_SOURCE_FOR_SECTION } from "@/types";
+import { parseLocalDate } from "@/lib/date-utils";
 import { SectionNav } from "./SectionNav";
 import { WorkshopSection } from "./sections/WorkshopSection";
 import { CustomerProfileSection } from "./sections/CustomerProfileSection";
@@ -128,7 +129,7 @@ export function IntakeShell({ initialProject, initialSections, visibleSections }
             <div>
               Go-Live:{" "}
               <span className="font-medium text-esm-black">
-                {new Date(project.goLiveDate).toLocaleDateString("en-US", {
+                {parseLocalDate(project.goLiveDate).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",

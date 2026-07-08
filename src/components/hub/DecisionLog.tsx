@@ -1,7 +1,8 @@
 import type { HubDecision } from "@/types/hub";
+import { parseLocalDate } from "@/lib/date-utils";
 
 function fmt(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubDecision[]; raidLogUrl?: string }) {

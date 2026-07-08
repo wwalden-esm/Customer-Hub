@@ -1,7 +1,8 @@
 import type { HubMilestone } from "@/types/hub";
+import { parseLocalDate } from "@/lib/date-utils";
 
 function fmtShort(d: string) {
-  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 export default function MilestoneLine({ milestones }: { milestones: HubMilestone[] }) {

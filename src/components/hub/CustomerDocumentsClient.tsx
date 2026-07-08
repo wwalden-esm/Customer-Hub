@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { parseLocalDate } from "@/lib/date-utils";
 import CustomerUploader from "./CustomerUploader";
 
 interface DocInfo {
@@ -131,7 +132,7 @@ export default function CustomerDocumentsClient({
                   <span className="inline-block bg-gray-100 text-esm-grey rounded-sm px-1.5 py-px mr-2 text-[10px] font-medium uppercase">
                     {docType(doc.name)}
                   </span>
-                  {doc.generatedAt && new Date(doc.generatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  {doc.generatedAt && parseLocalDate(doc.generatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   {doc.fileSize && <> · {(doc.fileSize / 1024).toFixed(0)} KB</>}
                 </p>
               </div>

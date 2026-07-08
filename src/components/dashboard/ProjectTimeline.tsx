@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { parseLocalDate } from "@/lib/date-utils";
 
 interface TimelineMilestone {
   id: string;
@@ -27,11 +28,11 @@ const STATUS_COLORS: Record<string, { bar: string; bg: string; text: string }> =
 };
 
 function parseDate(d: string): Date {
-  return new Date(d + "T00:00:00");
+  return parseLocalDate(d);
 }
 
 function fmtShort(d: string): string {
-  return new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function monthsBetween(start: Date, end: Date): Date[] {

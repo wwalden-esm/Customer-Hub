@@ -1,4 +1,5 @@
 import { auth, signOut } from "@/lib/auth";
+import { parseLocalDate } from "@/lib/date-utils";
 import { getProjectList, getSmartsheetConfig, getProjectMilestones, deriveCurrentPhase } from "@/lib/smartsheet-data";
 import SyncHubSpotButton from "@/components/dashboard/SyncHubSpotButton";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
@@ -28,7 +29,7 @@ export default async function DashboardPage() {
       ? await getProjectMilestones(cfg.projectPlanSheetId)
       : [];
     const daysToGoLive = p.goLiveDate
-      ? Math.ceil((new Date(p.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.ceil((parseLocalDate(p.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
       : null;
     return {
       id: p.id,

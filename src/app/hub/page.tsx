@@ -10,6 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const project = getProjectById(session.projectId);
   return { title: project ? `${project.customerName} — Dashboard` : "Dashboard" };
 }
+import { parseLocalDate } from "@/lib/date-utils";
 import HealthBanner from "@/components/hub/HealthBanner";
 import MetricCard from "@/components/hub/MetricCard";
 import MilestoneLine from "@/components/hub/MilestoneLine";
@@ -48,25 +49,70 @@ export default async function HubDashboard() {
   return (
     <>
       {/* ── Header ── */}
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-4 flex items-start justify-between">
         <div>
           {data.contactName && data.contactName !== "Customer" && (
             <p className="text-sm text-esm-grey mb-0.5">Welcome back, {data.contactName.split(" ")[0]}</p>
           )}
           <h1 className="text-xl font-bold text-esm-black">{project.projectName}</h1>
           <p className="text-sm text-esm-grey mt-1">
-            {project.products.join(" + ")} — {project.scName}
+            {project.products.join(" + ")}
           </p>
           {project.startDate && project.goLiveDate && (
             <p className="text-xs text-[#9E9B9E] mt-1">
-              {new Date(project.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {parseLocalDate(project.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               {" → "}
-              {new Date(project.goLiveDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {parseLocalDate(project.goLiveDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           )}
         </div>
         <RefreshButton />
       </div>
+
+      {/* ── Team contact strip ── */}
+      {data.team.length > 0 && (
+        <div className="bg-white border border-[#E2E0E1] rounded-sm px-5 py-3 mb-5 flex flex-wrap items-center gap-x-6 gap-y-2">
+          {data.team.map((member) => (
+            <div key={member.role} className="flex items-center gap-2.5">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+                aria-hidden="true"
+              >
+                {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+              </div>
+              <div className="text-sm">
+                <span className="font-medium text-esm-black">{member.name}</span>
+                <span className="text-esm-grey">{" · "}{member.role}</span>
+              </div>
+              {member.email && (
+                <a
+                  href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
+                  className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-sm border border-[#E2E0E1] hover:bg-slate-50 transition-colors text-esm-grey"
+                  aria-label={`Email ${member.name}`}
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  Email
+                </a>
+              )}
+            </div>
+          ))}
+          {data.team.length > 0 && data.team[0].email && (
+            <a
+              href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Request Meeting`)}`}
+              className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-sm border hover:bg-slate-50 transition-colors"
+              style={{ color: "var(--hub-accent, #F4333F)", borderColor: "var(--hub-accent, #F4333F)" }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Request a meeting
+            </a>
+          )}
+        </div>
+      )}
 
       {/* ── Timeline bar ── */}
       {timelinePercent !== null && totalDays !== null && daysElapsed !== null && (
@@ -99,7 +145,7 @@ export default async function HubDashboard() {
         <MetricCard
           label="Days to Go-Live"
           value={daysToGoLive !== null ? String(daysToGoLive) : "TBD"}
-          sub={project.goLiveDate ? new Date(project.goLiveDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Not set"}
+          sub={project.goLiveDate ? parseLocalDate(project.goLiveDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Not set"}
           color={daysToGoLive !== null && daysToGoLive <= 30 ? "#F4333F" : undefined}
         />
         {milestoneMetric && (
@@ -185,7 +231,7 @@ export default async function HubDashboard() {
                     )}
                     {m.meetingDate && (
                       <p className="text-xs text-slate-500 mt-0.5">
-                        {new Date(m.meetingDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                        {parseLocalDate(m.meetingDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                       </p>
                     )}
                     {m.agendaSummary && (
@@ -301,58 +347,8 @@ export default async function HubDashboard() {
           ZONE 3 — Resources & team
           ══════════════════════════════════════════════ */}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
-        {/* Your Team */}
-        <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="team-heading">
-          <h2 id="team-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
-            Your Implementation Team
-          </h2>
-          <ul className="space-y-3">
-            {data.team.map((member) => (
-              <li key={member.role} className="flex items-start gap-3">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                  style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
-                  aria-hidden="true"
-                >
-                  {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-esm-black">{member.name}</p>
-                  <p className="text-xs text-esm-grey">{member.role}</p>
-                  {member.email && (
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <a
-                        href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
-                        className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-sm border border-[#E2E0E1] hover:bg-slate-50 transition-colors text-esm-grey"
-                      >
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        Send message
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-          {data.team.length > 0 && data.team[0].email && (
-            <a
-              href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Request Meeting`)}`}
-              className="flex items-center justify-center gap-2 mt-4 py-2 border border-[#E2E0E1] rounded-sm text-xs font-medium hover:bg-slate-50 transition-colors"
-              style={{ color: "var(--hub-accent, #F4333F)" }}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              Request a meeting
-            </a>
-          )}
-        </section>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
         <QuickLinks links={data.links} />
-
         <DocShortcuts projectId={project.id} documentTypes={data.documentTypes} />
       </div>
 

@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import LinkSheetsButton from "./LinkSheetsButton";
+import { parseLocalDate } from "@/lib/date-utils";
 
 interface ProjectRow {
   id: string;
@@ -25,7 +26,7 @@ const STATUS_BADGE: Record<string, { bg: string; text: string; label: string }> 
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  return parseLocalDate(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
 type SortKey = "customerName" | "scName" | "goLiveDate" | "status" | "currentPhase";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { parseLocalDate } from "@/lib/date-utils";
 
 interface Meeting {
   id: string;
@@ -37,7 +38,7 @@ const STATUSES = ["All", "Upcoming", "Scheduled", "Complete", "Skipped"] as cons
 
 function fmtDate(d: string | null): string {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 function shortPhase(phase: string): string {

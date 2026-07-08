@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { parseLocalDate } from "@/lib/date-utils";
 import FileUploader from "@/components/hub/FileUploader";
 
 interface DocRecord {
@@ -107,7 +108,7 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
                   {latest && (
                     <p className="text-xs text-slate-500 mt-0.5">
                       {latest.downloads} downloads
-                      {latest.generatedAt && <> · {new Date(latest.generatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</>}
+                      {latest.generatedAt && <> · {parseLocalDate(latest.generatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</>}
                     </p>
                   )}
                 </div>
