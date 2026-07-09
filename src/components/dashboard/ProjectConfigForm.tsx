@@ -42,6 +42,8 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
   const [saved, setSaved] = useState(false);
   const [accentColor, setAccentColor] = useState(project.branding?.accentColor || "#1E3A5F");
   const [logoUrl, setLogoUrl] = useState(project.branding?.logoUrl || "");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
   const [password, setPassword] = useState(project.password || "");
   const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>(() => {
     const vis = project.sectionVisibility ?? {};
@@ -125,16 +127,85 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             <p className="text-xs text-esm-grey mt-1">Applied to the customer portal nav, milestones, and metric cards.</p>
           </div>
           <div>
-            <label htmlFor="logo-url" className="block text-sm font-medium text-esm-black mb-1">Logo URL</label>
-            <input
-              id="logo-url"
-              type="text"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              placeholder="https://example.com/logo.png"
-              className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm"
-            />
-            <p className="text-xs text-esm-grey mt-1">Shown alongside the ESM logo in the customer portal header.</p>
+            <label className="block text-sm font-medium text-esm-black mb-1">Customer Logo</label>
+            <p className="text-xs text-esm-grey mb-2">Shown alongside the ESM logo in the customer portal header. Stored in the Document Repository sheet in Smartsheet.</p>
+            {logoUrl && (
+              <div className="flex items-center gap-3 mb-3 p-3 bg-slate-50 rounded border border-gray-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoUrl}
+                  alt="Current logo"
+                  className="h-10 max-w-[140px] object-contain bg-white rounded border border-gray-200 p-1"
+                />
+                <span className="text-xs text-esm-grey flex-1">Current logo</span>
+                <button
+                  type="button"
+                  disabled={logoUploading}
+                  onClick={async () => {
+                    setLogoUploading(true);
+                    try {
+                      const res = await fetch(`/api/projects/${project.id}/logo`, { method: "DELETE" });
+                      if (res.ok) setLogoUrl("");
+                    } finally {
+                      setLogoUploading(false);
+                    }
+                  }}
+                  className="shrink-0 px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded hover:bg-red-50 transition-colors disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+            <label
+              className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded cursor-pointer transition-colors ${
+                logoUploading ? "border-gray-200 bg-gray-50" : "border-[#E2E0E1] hover:border-esm-red/40 hover:bg-red-50/30"
+              }`}
+            >
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
+                className="hidden"
+                disabled={logoUploading}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setLogoError(null);
+                  setLogoUploading(true);
+                  try {
+                    const form = new FormData();
+                    form.append("file", file);
+                    const res = await fetch(`/api/projects/${project.id}/logo`, {
+                      method: "POST",
+                      body: form,
+                    });
+                    if (res.ok) {
+                      const data = await res.json();
+                      setLogoUrl(data.logoUrl);
+                    } else {
+                      const data = await res.json().catch(() => ({ error: "Upload failed" }));
+                      setLogoError(data.error || "Upload failed");
+                    }
+                  } catch {
+                    setLogoError("Upload failed");
+                  } finally {
+                    setLogoUploading(false);
+                    e.target.value = "";
+                  }
+                }}
+              />
+              {logoUploading ? (
+                <span className="text-sm text-esm-grey">Uploading...</span>
+              ) : (
+                <>
+                  <svg className="w-6 h-6 text-slate-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                  </svg>
+                  <span className="text-sm text-esm-grey">{logoUrl ? "Replace logo" : "Upload logo"}</span>
+                  <span className="text-xs text-slate-400">PNG, JPEG, SVG, WebP, or GIF (max 5 MB)</span>
+                </>
+              )}
+            </label>
+            {logoError && <p className="text-sm text-red-600 mt-2">{logoError}</p>}
           </div>
         </div>
       </section>

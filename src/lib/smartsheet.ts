@@ -287,6 +287,32 @@ export async function getAttachmentUrl(attachmentId: string | number): Promise<{
   return ssFetch<{ url: string; name: string }>(`/attachments/${attachmentId}`);
 }
 
+export async function attachFileToRow(
+  sheetId: string | number,
+  rowId: string | number,
+  fileName: string,
+  contentType: string,
+  buffer: Buffer | ArrayBuffer | Uint8Array,
+): Promise<{ id: number; name: string }> {
+  const body = buffer instanceof Uint8Array || buffer instanceof ArrayBuffer ? buffer : new Uint8Array(buffer);
+  const res = await fetch(`${BASE}/sheets/${sheetId}/rows/${rowId}/attachments`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token()}`,
+      "Content-Type": contentType,
+      "Content-Disposition": `attachment; filename="${fileName.replace(/"/g, "")}"`,
+      "Content-Length": String((body as Uint8Array).byteLength),
+    },
+    body: body as BodyInit,
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`Smartsheet attach to row ${rowId} on sheet ${sheetId} failed: ${res.status} ${t}`);
+  }
+  const json = (await res.json()) as { result: { id: number; name: string } };
+  return json.result;
+}
+
 export async function deleteAttachment(attachmentId: string | number): Promise<void> {
   await fetch(`${BASE}/attachments/${attachmentId}`, {
     method: "DELETE",

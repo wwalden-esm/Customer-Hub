@@ -302,7 +302,7 @@
   <div class="exec-summary">
     <div class="es-label">Executive summary</div>
     <p>The Customer Hub consolidates data from Smartsheet, HubSpot, and AI-powered document generation into a single branded portal for customers and a management dashboard for ESM staff. This document compares what the custom application delivers against what SharePoint and Smartsheet can realistically provide using their native capabilities.</p>
-    <p>SharePoint and Smartsheet are strong tools for their intended purposes, but neither can replicate the hub's core differentiators: AI document generation, cross-platform data unification, magic link authentication, or automatic provisioning from HubSpot. A SharePoint or Smartsheet version would require significant manual effort per customer and would not deliver the same experience.</p>
+    <p>SharePoint and Smartsheet are strong tools for their intended purposes, but neither can replicate the hub's core differentiators: AI document generation, cross-platform data unification, magic link authentication, automatic provisioning from HubSpot, or Outlook email logging against intake records. A SharePoint or Smartsheet version would require significant manual effort per customer and would not deliver the same experience.</p>
     <p>The application is already built and functional. The decision is not whether to invest in building it, but whether to deploy what already exists. At current team size, the hub saves an estimated 5&ndash;8 hours of SC/PM time per project through automated document generation and provisioning &mdash; time that compounds as the customer portfolio grows.</p>
   </div>
 
@@ -438,6 +438,7 @@
         <tr><td class="feat-label">Customer file upload + AI extraction</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
         <tr><td class="feat-label">Magic link login<span class="feat-detail">No customer accounts needed</span></td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span><span class="feat-detail">Needs Azure AD B2C</span></td><td><span class="chip chip-no">No</span><span class="feat-detail">Viewer license required</span></td></tr>
         <tr><td class="feat-label">Auto-provision from HubSpot</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">Outlook email logging<span class="feat-detail">Log emails to intake record via Outlook plug-in</span></td><td><span class="chip chip-yes">Yes</span><span class="feat-detail">HubSpot Outlook add-in</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
         <tr><td class="feat-label">Team contacts with booking links</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-partial">Partial</span><span class="feat-detail">People web part</span></td><td><span class="chip chip-no">No</span></td></tr>
         <tr><td class="feat-label">Meeting recordings library</td><td><span class="chip chip-no">No</span><span class="feat-detail">Links to SharePoint</span></td><td><span class="chip chip-yes">Yes</span><span class="feat-detail">Native storage</span></td><td><span class="chip chip-no">No</span></td></tr>
         <tr><td class="feat-label">ESM multi-project dashboard</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-partial">Partial</span><span class="feat-detail">Portfolio view</span></td></tr>
@@ -496,6 +497,27 @@
     <div class="risk-card"><div class="risk-label">API cost variability</div><div class="risk-body">Anthropic API costs are usage-based. High document generation volume or complex extractions could push costs above the $50/month estimate.</div><div class="risk-mitigation">Mitigation: Usage can be monitored in the Anthropic Console. Cost caps can be set. Switching to a lighter model reduces costs further.</div></div>
   </div>
 
+  <h2>Security and data residency</h2>
+  <p>The Customer Hub does not introduce a new data store. All customer data remains in the systems ESM already manages.</p>
+
+  <div class="matrix-wrap">
+    <table class="matrix-table">
+      <thead><tr><th style="width:30%">Concern</th><th style="width:70%">How the Customer Hub handles it</th></tr></thead>
+      <tbody>
+        <tr><td class="feat-label">Customer data storage</td><td>No database. All project data lives in Smartsheet and HubSpot. The hub reads it on demand and does not persist copies.</td></tr>
+        <tr><td class="feat-label">Uploaded files</td><td>Customer uploads are processed in memory and stored as Smartsheet attachments. No files are retained on the application server.</td></tr>
+        <tr><td class="feat-label">Generated documents</td><td>AI-generated documents are uploaded to the customer's Smartsheet workspace and served via temporary download URLs. Nothing is stored locally.</td></tr>
+        <tr><td class="feat-label">Authentication (ESM staff)</td><td>NextAuth with JWT sessions. Passwords stored as bcrypt hashes in a config file on the server. Can be migrated to Azure AD/SSO in a future phase.</td></tr>
+        <tr><td class="feat-label">Authentication (customers)</td><td>Magic link tokens sent via email. One-time use, 24-hour expiry. Sessions are signed JWTs with 30-day expiry. No customer passwords or credentials stored.</td></tr>
+        <tr><td class="feat-label">Data in transit</td><td>All connections are HTTPS &mdash; browser to app, app to external APIs. TLS terminated at the Azure App Service or reverse proxy layer.</td></tr>
+        <tr><td class="feat-label">AI processing</td><td>Document content is sent to Anthropic&rsquo;s Claude API for generation. Anthropic does not train on API inputs and deletes them within 30 days per their data policy.</td></tr>
+        <tr><td class="feat-label">API credentials</td><td>Stored as environment variables on the Azure App Service, not in code or version control. Rotatable without code changes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:13px;color:var(--muted)">The application is stateless by design. If the server is lost or rebuilt, no customer data is affected &mdash; only the server configuration (environment variables and a small JSON config file) needs to be restored.</p>
+
   <h2>Current readiness</h2>
   <p>The Customer Hub is not a proposal &mdash; it is a working application. The core features are built, tested, and functional.</p>
 
@@ -511,6 +533,24 @@
   </div>
 
   <p>To go live, the remaining steps are: provision an Azure App Service instance (~1 hour), configure environment variables with production API keys, and set up the HubSpot webhook for automatic provisioning. No further development is required for the core feature set.</p>
+
+  <h2>Deployment timeline</h2>
+  <p>The application is ready to deploy. The steps below represent elapsed time, not development work &mdash; no code changes are required.</p>
+
+  <table class="time-table">
+    <thead><tr><th style="width:50%">Step</th><th style="width:25%">Estimated time</th><th style="width:25%">Who</th></tr></thead>
+    <tbody>
+      <tr><td class="task-name">Provision Azure App Service<span class="task-note">Create B1/B2 Linux Node.js 20 instance</span></td><td>~30 min</td><td>IT / Admin</td></tr>
+      <tr><td class="task-name">Configure environment variables<span class="task-note">Set API keys for Smartsheet, HubSpot, Anthropic, Resend</span></td><td>~15 min</td><td>IT / Admin</td></tr>
+      <tr><td class="task-name">Deploy application code<span class="task-note">ZIP deploy or Git push to Azure</span></td><td>~15 min</td><td>IT / Admin</td></tr>
+      <tr><td class="task-name">Configure custom domain + SSL<span class="task-note">Optional: e.g. hub.esmsolutions.com with managed cert</span></td><td>~30 min</td><td>IT / Admin</td></tr>
+      <tr><td class="task-name">Set up HubSpot webhook<span class="task-note">Enable auto-provisioning when intake records are created</span></td><td>~15 min</td><td>SC / Admin</td></tr>
+      <tr><td class="task-name">Verify with first customer project<span class="task-note">End-to-end test: provisioning, portal access, document generation</span></td><td>~30 min</td><td>SC</td></tr>
+    </tbody>
+    <tfoot><tr><td>Total time to go live</td><td colspan="2"><strong style="color:var(--positive)">~2 hours</strong></td></tr></tfoot>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted)">All steps can be completed in a single session. The application can serve customers the same day it is deployed.</p>
 
   <h2>Estimated new costs</h2>
   <p>Smartsheet Enterprise and HubSpot are already covered by existing ESM subscriptions. The Customer Hub adds three services:</p>

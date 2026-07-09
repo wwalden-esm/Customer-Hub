@@ -3,6 +3,7 @@ import type { ProjectStatus, DocumentStatus } from "./enums";
 export interface BrandingConfig {
   accentColor?: string;
   logoUrl?: string;
+  logoAttachmentId?: number;
 }
 
 export interface SmartsheetConfig {

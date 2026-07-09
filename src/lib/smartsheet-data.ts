@@ -250,9 +250,10 @@ export async function getProjectDocuments(documentSheetId: string): Promise<Docu
   try {
     const docs: DocumentInfo[] = [];
 
-    // File attachments on the sheet
+    // File attachments on the sheet (exclude logo files)
     const attachments = await listSheetAttachments(documentSheetId);
     for (const att of attachments) {
+      if (att.name.startsWith("customer-logo.")) continue;
       docs.push({
         id: String(att.id),
         type: inferDocType(att.name),
@@ -275,6 +276,7 @@ export async function getProjectDocuments(documentSheetId: string): Promise<Docu
         const nameCell = row.cells.find((c) => c.columnId === nameColId);
         const linkCell = row.cells.find((c) => c.columnId === linkColId);
         const docName = String(nameCell?.value ?? "").trim();
+        if (docName === "Customer Logo") continue;
         const linkUrl = linkCell?.hyperlink?.url ?? String(linkCell?.value ?? "").trim();
         if (!docName || !linkUrl) continue;
         docs.push({
