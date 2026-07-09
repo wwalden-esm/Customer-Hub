@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Hub — Platform Comparison</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --navy: #1E3A5F;
+    --slate: #2B3441;
+    --ground: #F4F6F8;
+    --border-c: #D8DDE3;
+    --muted: #6B7685;
+    --positive: #1A7A4C;
+    --positive-bg: #E8F5EE;
+    --caution: #9E7B15;
+    --caution-bg: #FDF6E3;
+    --gap: #A83232;
+    --gap-bg: #FDF0F0;
+    --accent: #3B7DD8;
+    --accent-bg: #EBF2FC;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--slate);
+    line-height: 1.65;
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 2rem 4rem;
+  }
+
+  .doc-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  h1 {
+    font-family: Charter, Georgia, 'Times New Roman', serif;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--navy);
+    text-wrap: balance;
+    margin-bottom: 0.5rem;
+  }
+  .doc-subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+  }
+
+  .exec-summary {
+    background: var(--ground);
+    border-left: 3px solid var(--navy);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+    border-radius: 0 6px 6px 0;
+  }
+  .exec-summary .es-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .exec-summary p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--slate);
+  }
+  .exec-summary p + p { margin-top: 0.5rem; }
+
+  h2 {
+    font-family: Charter, Georgia, 'Times New Roman', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--navy);
+    margin: 2.5rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-c);
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+
+  h3 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 2rem 0 0.75rem;
+  }
+
+  p { font-size: 14px; margin-bottom: 0.75rem; }
+
+  .platform-cards { display: flex; flex-direction: column; gap: 1.5rem; margin: 1.25rem 0; }
+  .plat-card { border: 1px solid var(--border-c); border-radius: 8px; overflow: hidden; }
+  .plat-card.featured { border-color: var(--navy); border-width: 2px; }
+  .plat-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--ground); border-bottom: 1px solid var(--border-c); }
+  .plat-card.featured .plat-header { background: var(--navy); }
+  .plat-card.featured .plat-header .plat-name, .plat-card.featured .plat-header .plat-desc { color: #fff; }
+  .plat-card.featured .plat-header .plat-desc { opacity: 0.7; }
+  .plat-name { font-size: 15px; font-weight: 600; color: var(--slate); }
+  .plat-desc { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .plat-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.02em; }
+  .badge-recommended { background: rgba(255,255,255,0.2); color: #fff; }
+  .badge-native { background: #E3E8ED; color: #5A6570; }
+  .plat-body { padding: 16px; }
+
+  .mock-frame { border: 1px solid #E0E3E8; border-radius: 6px; overflow: hidden; margin-bottom: 12px; font-size: 0; }
+
+  .sp-bar { height: 36px; background: #0078D4; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
+  .sp-bar .sp-dots { display: flex; gap: 2px; }
+  .sp-bar .sp-dots i { width: 3px; height: 3px; background: rgba(255,255,255,0.6); border-radius: 1px; display: inline-block; }
+  .sp-bar span { color: #fff; font-size: 11px; font-weight: 500; }
+  .sp-bar .sp-search-box { margin-left: 8px; background: rgba(255,255,255,0.15); border-radius: 3px; height: 24px; width: 140px; }
+  .sp-nav { height: 32px; background: #fff; border-bottom: 1px solid #EDEBE9; display: flex; align-items: center; padding: 0 12px; gap: 14px; }
+  .sp-nav .site-title { font-size: 12px; font-weight: 600; color: #323130; }
+  .sp-nav .nav-link { font-size: 11px; color: #605E5C; }
+  .sp-nav .nav-link.active { color: #0078D4; border-bottom: 2px solid #0078D4; padding-bottom: 6px; margin-bottom: -7px; }
+  .sp-content { background: #FAF9F8; padding: 12px; min-height: 200px; }
+  .sp-hero-block { background: #fff; border: 1px solid #EDEBE9; border-radius: 3px; padding: 12px; margin-bottom: 10px; }
+  .sp-hero-block h4 { font-size: 14px; font-weight: 600; color: #323130; margin-bottom: 2px; }
+  .sp-hero-block p { font-size: 11px; color: #605E5C; margin: 0; }
+  .sp-wp { background: #fff; border: 1px solid #EDEBE9; border-radius: 3px; padding: 10px; margin-bottom: 8px; }
+  .sp-wp-title { font-size: 12px; font-weight: 600; color: #323130; margin-bottom: 6px; }
+  .sp-embed { background: #F3F2F1; border: 1.5px dashed #C8C6C4; border-radius: 3px; padding: 16px; text-align: center; font-size: 10px; color: #A19F9D; }
+  .sp-list-item { font-size: 10px; color: #323130; padding: 4px 0; border-bottom: 1px solid #F3F2F1; display: flex; justify-content: space-between; }
+  .sp-list-item:last-child { border-bottom: none; }
+  .sp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sp-gap-tag { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; color: #A19F9D; margin-top: 6px; }
+
+  .ss-bar { height: 34px; background: #003B5C; display: flex; align-items: center; padding: 0 12px; gap: 12px; }
+  .ss-bar span { color: rgba(255,255,255,0.8); font-size: 11px; }
+  .ss-bar span.logo { color: #fff; font-weight: 600; }
+  .ss-dh { height: 30px; background: #fff; border-bottom: 1px solid #E0E0E0; display: flex; align-items: center; padding: 0 12px; }
+  .ss-dh span { font-size: 13px; font-weight: 600; color: #1A1A1A; }
+  .ss-content { background: #F5F5F5; padding: 10px; min-height: 200px; }
+  .ss-widgets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ss-w { background: #fff; border: 1px solid #E0E0E0; border-radius: 4px; overflow: hidden; }
+  .ss-w-head { padding: 6px 8px; border-bottom: 1px solid #E0E0E0; font-size: 10px; font-weight: 600; color: #1A1A1A; background: #FAFAFA; }
+  .ss-w-body { padding: 8px; font-size: 10px; color: #4A4A4A; }
+  .ss-w.full { grid-column: 1 / -1; }
+  .ss-metric-val { font-size: 20px; font-weight: 700; color: #003B5C; text-align: center; padding: 4px 0; }
+  .ss-metric-lbl { font-size: 9px; color: #757575; text-align: center; }
+  .ss-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #F0F0F0; font-size: 9px; }
+  .ss-row:last-child { border-bottom: none; }
+
+  .hub-bar { height: 36px; background: var(--navy); display: flex; align-items: center; padding: 0 14px; gap: 16px; }
+  .hub-bar .logo { color: #fff; font-size: 12px; font-weight: 500; }
+  .hub-bar .nav { display: flex; gap: 12px; margin-left: 8px; }
+  .hub-bar .nav span { color: rgba(255,255,255,0.55); font-size: 10px; }
+  .hub-bar .nav span.active { color: #fff; }
+  .hub-content { background: #F8F9FA; padding: 12px; min-height: 200px; }
+  .hub-health-strip { padding: 8px 12px; border-radius: 6px; background: #E6F4EA; border-left: 3px solid #34A853; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .hub-health-strip .dot { width: 7px; height: 7px; border-radius: 50%; background: #34A853; flex-shrink: 0; }
+  .hub-health-strip span { font-size: 10px; color: #1A4D2E; }
+  .hub-team-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .hub-team-card { flex: 1; background: #fff; border: 1px solid #E8E8E8; border-radius: 6px; padding: 8px; display: flex; align-items: center; gap: 6px; }
+  .hub-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 500; flex-shrink: 0; }
+  .hub-team-info { font-size: 9px; }
+  .hub-team-info .n { font-weight: 500; color: #1A1A1A; }
+  .hub-team-info .r { color: #888; }
+  .hub-metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  .hub-m-card { background: #fff; border: 1px solid #E8E8E8; border-radius: 6px; padding: 8px; text-align: center; }
+  .hub-m-card .v { font-size: 18px; font-weight: 600; color: var(--navy); }
+  .hub-m-card .l { font-size: 9px; color: #888; }
+  .hub-tl-box { background: #fff; border: 1px solid #E8E8E8; border-radius: 6px; padding: 10px; margin-bottom: 10px; }
+  .hub-tl-title { font-size: 11px; font-weight: 500; color: #1A1A1A; margin-bottom: 6px; }
+  .hub-tl-track { height: 6px; background: #E8E8E8; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+  .hub-tl-fill { height: 100%; width: 45%; background: linear-gradient(90deg, #34A853 80%, #4285F4); border-radius: 3px; }
+  .hub-tl-dates { display: flex; justify-content: space-between; font-size: 8px; color: #888; margin-bottom: 5px; }
+  .hub-ms-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .hub-ms-tag { font-size: 8px; padding: 2px 6px; border-radius: 3px; }
+  .ms-done { background: #E6F4EA; color: #1A4D2E; }
+  .ms-active { background: #EBF2FC; color: #185FA5; }
+  .ms-future { background: #F0F0F0; color: #888; }
+  .hub-lower { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .hub-lcard { background: #fff; border: 1px solid #E8E8E8; border-radius: 6px; padding: 10px; }
+  .hub-lcard-title { font-size: 11px; font-weight: 500; color: #1A1A1A; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+  .hub-ai-pill { font-size: 8px; background: #EEEDFE; color: #534AB7; padding: 1px 6px; border-radius: 8px; font-weight: 500; }
+  .hub-ai-item { font-size: 9px; padding: 3px 0; border-bottom: 1px solid #F3F2F1; display: flex; justify-content: space-between; align-items: center; color: #4A4A4A; }
+  .hub-ai-item:last-child { border-bottom: none; }
+  .hub-gen-btn { font-size: 8px; padding: 2px 6px; border-radius: 3px; border: none; cursor: default; }
+  .hub-gen-btn.dl { background: #E6F4EA; color: #1A4D2E; }
+  .hub-gen-btn.gen { background: var(--navy); color: #fff; }
+
+  .assess { font-size: 13px; line-height: 1.6; padding: 10px 14px; border-radius: 6px; }
+  .assess strong { font-weight: 600; }
+  .assess-positive { background: var(--positive-bg); color: #145C39; }
+  .assess-caution { background: var(--caution-bg); color: #6B5310; }
+
+  .matrix-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border-c); border-radius: 6px; }
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .matrix-table th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--ground); border-bottom: 1px solid var(--border-c); white-space: nowrap; }
+  .matrix-table th:not(:first-child) { text-align: center; }
+  .matrix-table td { padding: 8px 12px; border-bottom: 1px solid #EEF0F2; vertical-align: top; }
+  .matrix-table td:not(:first-child) { text-align: center; }
+  .matrix-table tr:last-child td { border-bottom: none; }
+  .matrix-table .feat-label { font-weight: 400; color: var(--slate); }
+  .matrix-table .feat-detail { display: block; font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 10px; white-space: nowrap; }
+  .chip-yes { background: var(--positive-bg); color: var(--positive); }
+  .chip-partial { background: var(--caution-bg); color: var(--caution); }
+  .chip-no { background: var(--gap-bg); color: var(--gap); }
+
+  .cost-block { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 1rem 0; }
+  .cost-card { background: var(--ground); border-radius: 6px; padding: 14px; text-align: center; }
+  .cost-card .cost-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .cost-card .cost-value { font-size: 22px; font-weight: 600; color: var(--navy); font-variant-numeric: tabular-nums; }
+  .cost-card .cost-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .time-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; margin: 1rem 0; border: 1px solid var(--border-c); border-radius: 6px; overflow: hidden; }
+  .time-table th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--ground); border-bottom: 1px solid var(--border-c); }
+  .time-table th:nth-child(2), .time-table th:nth-child(3) { text-align: center; }
+  .time-table td { padding: 8px 12px; border-bottom: 1px solid #EEF0F2; vertical-align: top; }
+  .time-table td:nth-child(2), .time-table td:nth-child(3) { text-align: center; }
+  .time-table tr:last-child td { border-bottom: none; }
+  .time-table .saved { color: var(--positive); font-weight: 600; }
+  .time-table .task-name { color: var(--slate); }
+  .time-table .task-note { display: block; font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .time-table tfoot td { font-weight: 600; border-top: 2px solid var(--border-c); background: var(--ground); }
+
+  .scale-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 1rem 0; }
+  .scale-card { border: 1px solid var(--border-c); border-radius: 6px; padding: 16px; text-align: center; }
+  .scale-card .sc-count { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .scale-card .sc-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; }
+  .scale-card .sc-label { color: var(--muted); }
+  .scale-card .sc-val { font-weight: 600; color: var(--slate); font-variant-numeric: tabular-nums; }
+  .scale-card .sc-val.highlight { color: var(--positive); }
+  .scale-card .sc-val.warn { color: var(--gap); }
+  .scale-bar-track { height: 6px; background: #EEF0F2; border-radius: 3px; margin-top: 10px; overflow: hidden; }
+  .scale-bar-fill { height: 100%; border-radius: 3px; }
+
+  .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1rem 0; }
+  .risk-card { border: 1px solid var(--border-c); border-radius: 6px; padding: 14px; }
+  .risk-card .risk-label { font-size: 12px; font-weight: 600; color: var(--slate); margin-bottom: 4px; }
+  .risk-card .risk-body { font-size: 12px; color: var(--muted); line-height: 1.55; }
+  .risk-card .risk-mitigation { font-size: 11px; color: var(--positive); margin-top: 6px; font-weight: 500; }
+
+  .ready-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 1rem 0; }
+  .ready-item { background: var(--ground); border-radius: 6px; padding: 12px; text-align: center; }
+  .ready-item .ri-icon { font-size: 20px; color: var(--positive); margin-bottom: 4px; }
+  .ready-item .ri-label { font-size: 11px; font-weight: 500; color: var(--slate); line-height: 1.4; }
+
+  .bottom-line { background: var(--navy); color: #fff; padding: 1.25rem 1.5rem; border-radius: 8px; margin-top: 2.5rem; }
+  .bottom-line .bl-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem; }
+  .bottom-line p { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.92); margin-bottom: 0.5rem; }
+  .bottom-line p:last-child { margin-bottom: 0; }
+
+  .doc-footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border-c); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 11px; }
+    .page { padding: 1rem 0.5rem; max-width: none; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; margin-top: 1.5rem; padding-top: 1rem; break-after: avoid; }
+    p { font-size: 12px; }
+    .exec-summary { break-inside: avoid; }
+    .exec-summary p { font-size: 12px; }
+    .plat-card { break-inside: avoid; }
+    .mock-frame { break-inside: avoid; }
+    .assess { break-inside: avoid; }
+    .matrix-wrap { break-inside: avoid; }
+    .matrix-table { font-size: 11px; }
+    .matrix-table th { padding: 6px 8px; font-size: 9px; }
+    .matrix-table td { padding: 5px 8px; }
+    .chip { font-size: 9px; padding: 1px 6px; }
+    .feat-detail { font-size: 8px; }
+    .time-table { font-size: 11px; break-inside: avoid; }
+    .time-table th { padding: 6px 8px; font-size: 9px; }
+    .time-table td { padding: 5px 8px; }
+    .scale-grid { break-inside: avoid; }
+    .risk-grid { break-inside: avoid; }
+    .risk-card { break-inside: avoid; }
+    .ready-grid { break-inside: avoid; }
+    .cost-block { break-inside: avoid; }
+    .bottom-line { break-inside: avoid; }
+    .bottom-line p { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="doc-eyebrow">ESM Solutions &mdash; Internal</div>
+  <h1>Customer Hub: platform comparison</h1>
+  <p class="doc-subtitle">A realistic assessment of building the Customer Hub experience using SharePoint, Smartsheet, or a purpose-built application.</p>
+
+  <div class="exec-summary">
+    <div class="es-label">Executive summary</div>
+    <p>The Customer Hub consolidates data from Smartsheet, HubSpot, and AI-powered document generation into a single branded portal for customers and a management dashboard for ESM staff. This document compares what the custom application delivers against what SharePoint and Smartsheet can realistically provide using their native capabilities.</p>
+    <p>SharePoint and Smartsheet are strong tools for their intended purposes, but neither can replicate the hub's core differentiators: AI document generation, cross-platform data unification, magic link authentication, or automatic provisioning from HubSpot. A SharePoint or Smartsheet version would require significant manual effort per customer and would not deliver the same experience.</p>
+    <p>The application is already built and functional. The decision is not whether to invest in building it, but whether to deploy what already exists. At current team size, the hub saves an estimated 5&ndash;8 hours of SC/PM time per project through automated document generation and provisioning &mdash; time that compounds as the customer portfolio grows.</p>
+  </div>
+
+  <h2>What each platform looks like</h2>
+  <p>Below are realistic mockups of the customer-facing portal as it would appear on each platform, based on their actual native capabilities.</p>
+
+  <div class="platform-cards">
+    <div class="plat-card featured">
+      <div class="plat-header">
+        <span class="plat-name">Customer Hub</span>
+        <span class="plat-badge badge-recommended">Recommended</span>
+        <span class="plat-desc">Purpose-built Next.js application</span>
+      </div>
+      <div class="plat-body">
+        <div class="mock-frame">
+          <div class="hub-bar">
+            <span class="logo">Customer Hub</span>
+            <div class="nav"><span class="active">Dashboard</span><span>Documents</span><span>Intake</span></div>
+          </div>
+          <div class="hub-content">
+            <div class="hub-health-strip">
+              <div class="dot"></div>
+              <span><strong>On track</strong> &mdash; All milestones on schedule. Intake 75% complete. 3 open items for your team.</span>
+            </div>
+            <div class="hub-team-row">
+              <div class="hub-team-card"><div class="hub-avatar">WW</div><div class="hub-team-info"><div class="n">Whitney Walden</div><div class="r">Solutions consultant</div></div></div>
+              <div class="hub-team-card"><div class="hub-avatar">PM</div><div class="hub-team-info"><div class="n">Project Manager</div><div class="r">Implementation PM</div></div></div>
+            </div>
+            <div class="hub-metrics-row">
+              <div class="hub-m-card"><div class="v">87</div><div class="l">Days to go-live</div></div>
+              <div class="hub-m-card"><div class="v">75%</div><div class="l">Intake complete</div></div>
+              <div class="hub-m-card"><div class="v">3</div><div class="l">Open items</div></div>
+            </div>
+            <div class="hub-tl-box">
+              <div class="hub-tl-title">Implementation timeline</div>
+              <div class="hub-tl-track"><div class="hub-tl-fill"></div></div>
+              <div class="hub-tl-dates"><span>Jan 2026</span><span>Apr</span><span>Jul</span><span>Oct 2026</span></div>
+              <div class="hub-ms-tags">
+                <span class="hub-ms-tag ms-done">Kickoff</span>
+                <span class="hub-ms-tag ms-done">Intake</span>
+                <span class="hub-ms-tag ms-active">Configuration</span>
+                <span class="hub-ms-tag ms-future">UAT</span>
+                <span class="hub-ms-tag ms-future">Go-live</span>
+              </div>
+            </div>
+            <div class="hub-lower">
+              <div class="hub-lcard">
+                <div class="hub-lcard-title">Action items</div>
+                <div class="hub-ai-item"><span>Complete AP workflow doc</span><span style="color:#888">Jul 15</span></div>
+                <div class="hub-ai-item"><span>Review UAT test cases</span><span style="color:#888">Jul 22</span></div>
+                <div class="hub-ai-item"><span>Submit chart of accounts</span><span style="color:#C0392B">Jul 10</span></div>
+              </div>
+              <div class="hub-lcard">
+                <div class="hub-lcard-title">Documents <span class="hub-ai-pill">AI generated</span></div>
+                <div class="hub-ai-item"><span>Workflow Guide.docx</span><button class="hub-gen-btn dl">Download</button></div>
+                <div class="hub-ai-item"><span>UAT Tracker.xlsx</span><button class="hub-gen-btn dl">Download</button></div>
+                <div class="hub-ai-item"><span>Project Charter</span><button class="hub-gen-btn gen">Generate</button></div>
+                <div class="hub-ai-item"><span>Training Guide</span><button class="hub-gen-btn gen">Generate</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="assess assess-positive">
+          <strong>Unified experience.</strong> Live data from Smartsheet and HubSpot. AI generates 7 document types from project data. Magic link login &mdash; no customer accounts needed in any system. Fully branded, mobile-responsive. New projects provision automatically from HubSpot in under a minute.
+        </div>
+      </div>
+    </div>
+
+    <div class="plat-card">
+      <div class="plat-header">
+        <span class="plat-name">SharePoint</span>
+        <span class="plat-badge badge-native">Native</span>
+        <span class="plat-desc">Communication site with web parts</span>
+      </div>
+      <div class="plat-body">
+        <div class="mock-frame">
+          <div class="sp-bar"><div class="sp-dots"><i></i><i></i><i></i></div><span>SharePoint</span><div class="sp-search-box"></div></div>
+          <div class="sp-nav"><span class="site-title">Customer Implementation Portal</span><span class="nav-link active">Home</span><span class="nav-link">Documents</span><span class="nav-link">Contacts</span></div>
+          <div class="sp-content">
+            <div class="sp-hero-block"><h4>Welcome to your implementation portal</h4><p>Status: On Track &nbsp;|&nbsp; Go-live: Oct 1, 2026</p></div>
+            <div class="sp-grid">
+              <div class="sp-wp"><div class="sp-wp-title">Project timeline</div><div class="sp-embed">Embedded Smartsheet iframe<br><span style="font-size:9px">(Customer needs Smartsheet license to view)</span></div></div>
+              <div class="sp-wp"><div class="sp-wp-title">Action items</div><div class="sp-list-item"><span>Complete AP workflow doc</span><span style="color:#107C10">Open</span></div><div class="sp-list-item"><span>Review UAT test cases</span><span style="color:#107C10">Open</span></div><div class="sp-list-item"><span>Submit chart of accounts</span><span style="color:#C0392B">Overdue</span></div><div class="sp-gap-tag">&#x26A0; Must be manually duplicated from Smartsheet</div></div>
+            </div>
+            <div class="sp-wp"><div class="sp-wp-title">Documents</div><div class="sp-list-item"><span>Workflow Guide.docx</span><span style="color:#605E5C">Jul 3</span></div><div class="sp-list-item"><span>UAT Tracker.xlsx</span><span style="color:#605E5C">Jul 1</span></div><div class="sp-gap-tag">&#x2717; No AI generation &mdash; all documents created manually</div></div>
+          </div>
+        </div>
+        <div class="assess assess-caution">
+          <strong>Hosts documents well, but cannot replicate core features.</strong> No AI generation, no live Smartsheet data aggregation, no HubSpot integration. Timeline requires an embedded iframe (customers need Smartsheet licenses). Action items must be manually duplicated. External access requires Azure AD B2C (additional setup and cost). Each customer site takes 2&ndash;4 hours to build manually.
+        </div>
+      </div>
+    </div>
+
+    <div class="plat-card">
+      <div class="plat-header">
+        <span class="plat-name">Smartsheet</span>
+        <span class="plat-badge badge-native">Native</span>
+        <span class="plat-desc">Dashboard with widgets</span>
+      </div>
+      <div class="plat-body">
+        <div class="mock-frame">
+          <div class="ss-bar"><span class="logo">smartsheet</span><span>Dashboard</span><span>Sheets</span></div>
+          <div class="ss-dh"><span>Customer Implementation Dashboard</span></div>
+          <div class="ss-content">
+            <div class="ss-widgets">
+              <div class="ss-w"><div class="ss-w-head">Go-live countdown</div><div class="ss-w-body"><div class="ss-metric-val">87</div><div class="ss-metric-lbl">days remaining</div></div></div>
+              <div class="ss-w"><div class="ss-w-head">Status</div><div class="ss-w-body"><div class="ss-metric-val" style="color:#107C10">On Track</div><div class="ss-metric-lbl">current project status</div></div></div>
+              <div class="ss-w full"><div class="ss-w-head">Project plan (report widget)</div><div class="ss-w-body" style="padding:6px 8px"><div class="ss-row" style="font-weight:600;color:#757575"><span>Task</span><span>Status</span></div><div class="ss-row"><span>Kickoff</span><span style="color:#107C10">Complete</span></div><div class="ss-row"><span>Intake discovery</span><span style="color:#107C10">Complete</span></div><div class="ss-row"><span>Configuration</span><span style="color:#0076BF">In progress</span></div><div class="ss-row"><span>UAT</span><span style="color:#999">Not started</span></div><div class="ss-row"><span>Go-live prep</span><span style="color:#999">Not started</span></div></div></div>
+              <div class="ss-w"><div class="ss-w-head">Action items (report)</div><div class="ss-w-body" style="padding:6px 8px"><div class="ss-row"><span>Complete AP workflow doc</span><span>Jul 15</span></div><div class="ss-row"><span>Review UAT test cases</span><span>Jul 22</span></div><div class="ss-row"><span>Submit chart of accounts</span><span style="color:#C0392B">Jul 10</span></div></div></div>
+              <div class="ss-w"><div class="ss-w-head">Shortcuts</div><div class="ss-w-body" style="font-size:9px;color:#0076BF">Project plan &nbsp; Action items &nbsp; RAID log &nbsp; Intake</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="assess assess-caution">
+          <strong>Shows project data natively but locked into Smartsheet's grid layout.</strong> No AI generation, no HubSpot data, no custom branding beyond a logo widget. Customers need Smartsheet viewer licenses or the dashboard must be published (no per-customer access control). No file upload capability. Dashboards are read-only with no interactive features. Each dashboard takes ~30 minutes to configure manually.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Feature comparison</h2>
+
+  <div class="matrix-wrap">
+    <table class="matrix-table">
+      <thead><tr><th style="width:38%">Feature</th><th style="width:20%">Customer Hub</th><th style="width:21%">SharePoint</th><th style="width:21%">Smartsheet</th></tr></thead>
+      <tbody>
+        <tr><td class="feat-label">Branded customer portal</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-partial">Limited</span><span class="feat-detail">Site theming only</span></td><td><span class="chip chip-no">No</span><span class="feat-detail">Smartsheet chrome</span></td></tr>
+        <tr><td class="feat-label">AI health summary</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">Visual milestone timeline</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-partial">Iframe</span><span class="feat-detail">Requires SS license</span></td><td><span class="chip chip-yes">Yes</span><span class="feat-detail">Gantt view</span></td></tr>
+        <tr><td class="feat-label">Live Smartsheet data</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span><span class="feat-detail">Manual duplicate</span></td><td><span class="chip chip-yes">Yes</span><span class="feat-detail">Native</span></td></tr>
+        <tr><td class="feat-label">HubSpot intake integration</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">AI document generation<span class="feat-detail">7 document types from project data</span></td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">Customer file upload + AI extraction</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">Magic link login<span class="feat-detail">No customer accounts needed</span></td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span><span class="feat-detail">Needs Azure AD B2C</span></td><td><span class="chip chip-no">No</span><span class="feat-detail">Viewer license required</span></td></tr>
+        <tr><td class="feat-label">Auto-provision from HubSpot</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">Team contacts with booking links</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-partial">Partial</span><span class="feat-detail">People web part</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">Meeting recordings library</td><td><span class="chip chip-no">No</span><span class="feat-detail">Links to SharePoint</span></td><td><span class="chip chip-yes">Yes</span><span class="feat-detail">Native storage</span></td><td><span class="chip chip-no">No</span></td></tr>
+        <tr><td class="feat-label">ESM multi-project dashboard</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-no">No</span></td><td><span class="chip chip-partial">Partial</span><span class="feat-detail">Portfolio view</span></td></tr>
+        <tr><td class="feat-label">No per-customer licensing cost</td><td><span class="chip chip-yes">Yes</span></td><td><span class="chip chip-partial">Partial</span><span class="feat-detail">External sharing</span></td><td><span class="chip chip-no">No</span><span class="feat-detail">Viewer licenses</span></td></tr>
+        <tr><td class="feat-label">Setup time per customer</td><td><span class="chip chip-yes">~1 min</span><span class="feat-detail">Automated from HubSpot</span></td><td><span class="chip chip-no">2&ndash;4 hrs</span><span class="feat-detail">Manual site build</span></td><td><span class="chip chip-partial">~30 min</span><span class="feat-detail">Dashboard + sharing</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Time savings per project</h2>
+  <p>Each implementation project requires a set of deliverables. The table below compares estimated SC/PM time to produce them manually versus using the Customer Hub's AI generation.</p>
+
+  <table class="time-table">
+    <thead><tr><th style="width:44%">Task</th><th style="width:28%">Manual effort</th><th style="width:28%">With Customer Hub</th></tr></thead>
+    <tbody>
+      <tr><td class="task-name">Workflow Data Template (XLSX)<span class="task-note">Structured extraction from customer procurement docs</span></td><td>2&ndash;3 hrs</td><td class="saved">~30 sec</td></tr>
+      <tr><td class="task-name">Workflow Guide (DOCX)<span class="task-note">Narrative guide for customer's procurement workflows</span></td><td>1.5&ndash;2 hrs</td><td class="saved">~30 sec</td></tr>
+      <tr><td class="task-name">UAT Tracker<span class="task-note">Testing tracker spreadsheet per customer config</span></td><td>30&ndash;45 min</td><td class="saved">~15 sec</td></tr>
+      <tr><td class="task-name">UAT Completion Guide<span class="task-note">Step-by-step testing instructions</span></td><td>45 min&ndash;1 hr</td><td class="saved">~15 sec</td></tr>
+      <tr><td class="task-name">Project Charter<span class="task-note">SOW/charter with scope, timeline, contacts</span></td><td>1&ndash;1.5 hrs</td><td class="saved">~15 sec</td></tr>
+      <tr><td class="task-name">Training Guide<span class="task-note">End-user training materials</span></td><td>1&ndash;2 hrs</td><td class="saved">~15 sec</td></tr>
+      <tr><td class="task-name">Go-Live Checklist<span class="task-note">Pre-go-live verification checklist</span></td><td>20&ndash;30 min</td><td class="saved">~15 sec</td></tr>
+      <tr><td class="task-name">Customer portal setup<span class="task-note">Provisioning workspace, sheets, folders, portal access</span></td><td>1&ndash;2 hrs</td><td class="saved">&lt; 1 min</td></tr>
+    </tbody>
+    <tfoot><tr><td>Estimated total per project</td><td>8&ndash;13 hrs</td><td class="saved">~3 min</td></tr></tfoot>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted)">Manual estimates assume an experienced SC/PM working from existing templates. AI-generated documents still require SC review and may need edits, but the starting point eliminates the bulk of the drafting work. Estimates are approximate and will vary by project complexity.</p>
+
+  <h2>Scale impact</h2>
+  <p>The time savings compound as the customer portfolio grows. Below is the cumulative manual effort required to produce deliverables across the active portfolio, assuming each project needs a full document set.</p>
+
+  <div class="scale-grid">
+    <div class="scale-card"><div class="sc-count">15 projects</div><div class="sc-row"><span class="sc-label">Manual</span><span class="sc-val warn">120&ndash;195 hrs</span></div><div class="sc-row"><span class="sc-label">Hub</span><span class="sc-val highlight">~45 min</span></div><div class="scale-bar-track"><div class="scale-bar-fill" style="width:38%;background:#A83232"></div></div></div>
+    <div class="scale-card"><div class="sc-count">20 projects</div><div class="sc-row"><span class="sc-label">Manual</span><span class="sc-val warn">160&ndash;260 hrs</span></div><div class="sc-row"><span class="sc-label">Hub</span><span class="sc-val highlight">~1 hr</span></div><div class="scale-bar-track"><div class="scale-bar-fill" style="width:50%;background:#A83232"></div></div></div>
+    <div class="scale-card"><div class="sc-count">40 projects</div><div class="sc-row"><span class="sc-label">Manual</span><span class="sc-val warn">320&ndash;520 hrs</span></div><div class="sc-row"><span class="sc-label">Hub</span><span class="sc-val highlight">~2 hrs</span></div><div class="scale-bar-track"><div class="scale-bar-fill" style="width:100%;background:#A83232"></div></div></div>
+  </div>
+
+  <p style="font-size:13px;color:var(--muted)">At 20 active projects, the manual approach consumes 4&ndash;6.5 full work-weeks of SC/PM time just on document creation and portal setup. The Customer Hub reduces this to review-and-edit time only.</p>
+
+  <h2>Customer impression</h2>
+  <p>Implementation is often the customer's first hands-on experience with ESM after signing. The portal they interact with during this period shapes their perception of ESM as a technology partner.</p>
+
+  <div class="risk-grid">
+    <div class="risk-card"><div class="risk-label">Customer Hub</div><div class="risk-body">A branded, purpose-built portal with the customer's name, their specific timeline, their action items, and their documents. Login is a single magic link &mdash; no accounts to create, no licenses to manage. The experience signals that ESM has invested in their success.</div></div>
+    <div class="risk-card"><div class="risk-label">SharePoint / Smartsheet</div><div class="risk-body">A generic SharePoint site or Smartsheet dashboard that looks like an internal tool shared externally. Customers see Microsoft or Smartsheet branding, standard grid layouts, and may need additional licenses just to view their own project data. The experience feels like an afterthought.</div></div>
+  </div>
+
+  <h2>Risks and considerations</h2>
+  <p>The custom application approach has real tradeoffs that should be weighed against the benefits.</p>
+
+  <div class="risk-grid">
+    <div class="risk-card"><div class="risk-label">Maintenance responsibility</div><div class="risk-body">A custom app requires ongoing maintenance &mdash; dependency updates, API changes from Smartsheet/HubSpot, and bug fixes. SharePoint and Smartsheet handle this as part of their SaaS service.</div><div class="risk-mitigation">Mitigation: The app is stateless with no database. Maintenance is limited to Node.js updates and occasional API changes.</div></div>
+    <div class="risk-card"><div class="risk-label">Knowledge concentration</div><div class="risk-body">The codebase was built by one person. If that person is unavailable, updates and troubleshooting require someone with Next.js/TypeScript knowledge.</div><div class="risk-mitigation">Mitigation: Codebase is documented (PM guide + technical hosting guide). Standard Next.js patterns &mdash; any TypeScript developer can maintain it.</div></div>
+    <div class="risk-card"><div class="risk-label">AI output quality</div><div class="risk-body">AI-generated documents require SC review before delivery. Output quality depends on the completeness of source data in Smartsheet and HubSpot. Poor input data produces poor documents.</div><div class="risk-mitigation">Mitigation: AI provides a strong first draft, not a final product. SCs review and edit before sharing with customers.</div></div>
+    <div class="risk-card"><div class="risk-label">API cost variability</div><div class="risk-body">Anthropic API costs are usage-based. High document generation volume or complex extractions could push costs above the $50/month estimate.</div><div class="risk-mitigation">Mitigation: Usage can be monitored in the Anthropic Console. Cost caps can be set. Switching to a lighter model reduces costs further.</div></div>
+  </div>
+
+  <h2>Current readiness</h2>
+  <p>The Customer Hub is not a proposal &mdash; it is a working application. The core features are built, tested, and functional.</p>
+
+  <div class="ready-grid">
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">Customer portal built and functional</div></div>
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">ESM staff dashboard complete</div></div>
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">7 AI document types working</div></div>
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">HubSpot auto-provisioning active</div></div>
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">Magic link auth for customers</div></div>
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">Smartsheet integration live</div></div>
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">PM guide and tech docs written</div></div>
+    <div class="ready-item"><div class="ri-icon">&#10003;</div><div class="ri-label">Azure deployment documented</div></div>
+  </div>
+
+  <p>To go live, the remaining steps are: provision an Azure App Service instance (~1 hour), configure environment variables with production API keys, and set up the HubSpot webhook for automatic provisioning. No further development is required for the core feature set.</p>
+
+  <h2>Estimated new costs</h2>
+  <p>Smartsheet Enterprise and HubSpot are already covered by existing ESM subscriptions. The Customer Hub adds three services:</p>
+
+  <div class="cost-block">
+    <div class="cost-card"><div class="cost-label">Anthropic API</div><div class="cost-value">$15&ndash;50</div><div class="cost-note">AI document generation</div></div>
+    <div class="cost-card"><div class="cost-label">Resend (email)</div><div class="cost-value">$0</div><div class="cost-note">Free tier covers volume</div></div>
+    <div class="cost-card"><div class="cost-label">Azure App Service</div><div class="cost-value">$13&ndash;26</div><div class="cost-note">B1 or B2 tier</div></div>
+  </div>
+
+  <p style="font-size:13px;color:var(--muted)">Estimated new monthly cost: <strong style="color:var(--slate)">$28&ndash;76/month</strong>. API costs scale with document generation volume. Figures are approximate based on moderate usage (20 projects, 3&ndash;5 documents per week). This content requires management review before any commercial commitment.</p>
+
+  <div class="bottom-line">
+    <div class="bl-label">Recommendation</div>
+    <p>SharePoint and Smartsheet are effective tools for document storage and project tracking respectively, but neither can deliver a unified customer experience that combines live data from multiple sources with AI-powered document generation.</p>
+    <p>The Customer Hub saves an estimated 5&ndash;8 SC/PM hours per project, presents a professional branded experience to customers during their critical first engagement with ESM, and scales without proportional increases in manual effort. The application is already built and documented &mdash; deploying it requires only an Azure App Service instance and production API keys.</p>
+    <p>The risks are real but manageable: maintenance is lightweight (no database, standard framework), AI output requires human review, and the codebase is documented for handoff. At $28&ndash;76/month in new costs, the investment is modest relative to the time it returns.</p>
+  </div>
+
+  <div class="doc-footer">
+    <span>ESM Solutions &mdash; Customer Hub platform comparison</span>
+    <span>July 2026</span>
+  </div>
+</div>
+</body>
+</html>
