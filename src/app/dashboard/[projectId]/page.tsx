@@ -17,6 +17,7 @@ import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import RefreshMetricsButton from "@/components/dashboard/RefreshMetricsButton";
+import PortalActivityCard from "@/components/dashboard/PortalActivityCard";
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
@@ -269,6 +270,8 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             )}
             <RefreshMetricsButton projectId={project.id} />
           </div>
+
+          <PortalActivityCard projectId={project.id} />
 
           <ActivityFeed events={activity} />
         </div>

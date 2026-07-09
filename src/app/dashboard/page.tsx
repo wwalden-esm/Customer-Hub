@@ -2,6 +2,7 @@ import { auth, signOut } from "@/lib/auth";
 import { parseLocalDate } from "@/lib/date-utils";
 import { getProjectList, getSmartsheetConfig, getProjectMilestones, deriveCurrentPhase } from "@/lib/smartsheet-data";
 import SyncHubSpotButton from "@/components/dashboard/SyncHubSpotButton";
+import SendNotificationsButton from "@/components/dashboard/SendNotificationsButton";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 // LinkSheetsButton imported by ProjectTable directly
 import ProjectTable from "@/components/dashboard/ProjectTable";
@@ -83,7 +84,10 @@ export default async function DashboardPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="mb-4 flex items-center justify-between">
-          <SyncHubSpotButton />
+          <div className="flex items-center gap-4">
+            <SyncHubSpotButton />
+            <SendNotificationsButton />
+          </div>
           <SyncStatusBar dataTimestamp={dataTimestamp} />
         </div>
         <ProjectTable projects={projectRows} />

@@ -8,6 +8,7 @@ import SessionGuard from "@/components/hub/SessionGuard";
 import NotificationBell from "@/components/hub/NotificationBell";
 import HubNav from "@/components/hub/HubNav";
 import Breadcrumbs from "@/components/hub/Breadcrumbs";
+import PortalActivityTracker from "@/components/hub/PortalActivityTracker";
 
 const ALL_NAV_ITEMS = [
   { href: "/hub", label: "Dashboard", key: "dashboard" },
@@ -83,6 +84,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
         {children}
       </main>
       <SessionGuard />
+      <PortalActivityTracker />
     </div>
   );
 }

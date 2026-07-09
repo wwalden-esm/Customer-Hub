@@ -45,6 +45,63 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
     : ALL_DOC_TYPES;
   const [generating, setGenerating] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number } | null>(null);
+  const [bulkSummary, setBulkSummary] = useState<{ succeeded: number; failed: number } | null>(null);
+
+  const handleBulkGenerate = useCallback(async (regenerateAll: boolean) => {
+    setError(null);
+    setBulkSummary(null);
+
+    const typesToGenerate = regenerateAll
+      ? DOC_TYPES.map((dt) => dt.key)
+      : DOC_TYPES.filter((dt) => {
+          const latest = documents.filter((d) => d.type === dt.key)[0];
+          return !latest || latest.status !== "READY";
+        }).map((dt) => dt.key);
+
+    if (typesToGenerate.length === 0) {
+      setBulkSummary({ succeeded: 0, failed: 0 });
+      return;
+    }
+
+    setBulkProgress({ current: 0, total: typesToGenerate.length });
+    let succeeded = 0;
+    let failed = 0;
+
+    for (let i = 0; i < typesToGenerate.length; i++) {
+      const type = typesToGenerate[i];
+      setBulkProgress({ current: i + 1, total: typesToGenerate.length });
+      setGenerating((prev) => new Set(prev).add(type));
+      try {
+        const res = await fetch(`/api/projects/${projectId}/documents/${type}`, { method: "POST" });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Generation failed");
+        }
+        const result = await res.json();
+        setDocuments((prev) => [
+          {
+            id: result.documentId,
+            type,
+            name: result.name,
+            status: result.status || "READY",
+            fileSize: result.fileSize,
+            generatedAt: new Date().toISOString(),
+            downloads: 0,
+          },
+          ...prev,
+        ]);
+        succeeded++;
+      } catch {
+        failed++;
+      } finally {
+        setGenerating((prev) => { const n = new Set(prev); n.delete(type); return n; });
+      }
+    }
+
+    setBulkProgress(null);
+    setBulkSummary({ succeeded, failed });
+  }, [DOC_TYPES, documents, projectId]);
 
   const handleGenerate = useCallback(async (type: string) => {
     setError(null);
@@ -85,9 +142,42 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
         <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
+      {bulkSummary && (
+        <div className={`rounded-lg px-4 py-3 text-sm ${bulkSummary.failed === 0 ? "bg-green-50 border border-green-200 text-green-700" : "bg-amber-50 border border-amber-200 text-amber-700"}`}>
+          {bulkSummary.failed === 0
+            ? `Generated ${bulkSummary.succeeded} document${bulkSummary.succeeded !== 1 ? "s" : ""}`
+            : `${bulkSummary.succeeded} succeeded, ${bulkSummary.failed} failed`}
+          {bulkSummary.succeeded === 0 && bulkSummary.failed === 0 && "All documents are already up to date"}
+          <button onClick={() => setBulkSummary(null)} className="ml-3 underline hover:no-underline">Dismiss</button>
+        </div>
+      )}
+
       {/* Document generation */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Generate Documents</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Generate Documents</h2>
+          <div className="flex items-center gap-2">
+            {bulkProgress && (
+              <span className="text-sm text-slate-500">
+                Generating {bulkProgress.current} of {bulkProgress.total}...
+              </span>
+            )}
+            <button
+              onClick={() => handleBulkGenerate(false)}
+              disabled={!!bulkProgress || generating.size > 0}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-esm-red rounded hover:bg-esm-red/90 disabled:opacity-50"
+            >
+              Generate All
+            </button>
+            <button
+              onClick={() => handleBulkGenerate(true)}
+              disabled={!!bulkProgress || generating.size > 0}
+              className="px-3 py-1.5 text-sm font-medium text-esm-red border border-esm-red rounded hover:bg-red-50 disabled:opacity-50"
+            >
+              Regenerate All
+            </button>
+          </div>
+        </div>
         <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-200">
           {DOC_TYPES.map((dt) => {
             const docs = documents.filter((d) => d.type === dt.key);
