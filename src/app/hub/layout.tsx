@@ -13,6 +13,7 @@ import PortalActivityTracker from "@/components/hub/PortalActivityTracker";
 const ALL_NAV_ITEMS = [
   { href: "/hub", label: "Dashboard", key: "dashboard" },
   { href: "/hub/intake", label: "Intake", key: "intake" },
+  { href: "/hub/action-items", label: "Action Items", key: "action-items" },
   { href: "/hub/raid-log", label: "RAID Log", key: "raid-log" },
   { href: "/hub/meetings", label: "Meetings", key: "meetings" },
   { href: "/hub/documents", label: "Documents", key: "documents" },
