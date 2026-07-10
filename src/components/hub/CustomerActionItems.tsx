@@ -1,5 +1,6 @@
 import type { HubActionItem } from "@/types/hub";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, Card } from "@/components/ui";
 
 function fmt(d: string) {
   return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -18,24 +19,20 @@ export default function CustomerActionItems({ items, contactName }: { items: Hub
   const upcoming = items.filter((a) => !a.isOverdue);
 
   return (
-    <section
-      className="bg-white border border-esm-border rounded-card overflow-hidden"
-      style={{ borderLeftWidth: "4px", borderLeftColor: overdue.length > 0 ? "#F4333F" : "var(--hub-accent, #F4333F)" }}
-      aria-labelledby="customer-actions-heading"
-    >
+    <section aria-labelledby="customer-actions-heading">
+      <Card
+        padding="sm"
+        className="!p-0 overflow-hidden"
+        accent="left"
+        accentColor={overdue.length > 0 ? "#F4333F" : "var(--hub-accent, #F4333F)"}
+      >
       <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
         <h2 id="customer-actions-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
           Your Action Items
         </h2>
-        <div
-          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-card border ${
-            overdue.length > 0
-              ? "bg-red-50 text-esm-red border-esm-red/25"
-              : "bg-amber-50 text-amber-700 border-amber-200"
-          }`}
-        >
+        <Badge variant={overdue.length > 0 ? "danger" : "warning"} className="text-[11px] font-bold">
           {items.length} item{items.length !== 1 ? "s" : ""} need{items.length === 1 ? "s" : ""} your attention
-        </div>
+        </Badge>
       </div>
       <ul className="divide-y divide-gray-100">
         {[...overdue, ...upcoming].map((item) => {
@@ -80,14 +77,15 @@ export default function CustomerActionItems({ items, contactName }: { items: Hub
                 </div>
               </div>
               {item.priority === "high" && (
-                <span className="text-[9px] font-bold tracking-wide uppercase text-esm-red bg-red-50 border border-esm-red/25 px-1.5 py-0.5 rounded-card shrink-0">
+                <Badge variant="danger" className="text-[9px] tracking-wide px-1.5 shrink-0">
                   High
-                </span>
+                </Badge>
               )}
             </li>
           );
         })}
       </ul>
+      </Card>
     </section>
   );
 }

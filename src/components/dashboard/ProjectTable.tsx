@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import LinkSheetsButton from "./LinkSheetsButton";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Button } from "@/components/ui/Button";
+import { Badge, type BadgeVariant, Card } from "@/components/ui";
 
 interface ProjectRow {
   id: string;
@@ -18,10 +20,10 @@ interface ProjectRow {
   daysToGoLive?: number | null;
 }
 
-const STATUS_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  ON_TRACK: { bg: "bg-emerald-100", text: "text-emerald-800", label: "On Track" },
-  AT_RISK: { bg: "bg-amber-100", text: "text-amber-800", label: "At Risk" },
-  OFF_TRACK: { bg: "bg-red-100", text: "text-red-800", label: "Off Track" },
+const STATUS_BADGE: Record<string, { variant: BadgeVariant; label: string }> = {
+  ON_TRACK: { variant: "success", label: "On Track" },
+  AT_RISK: { variant: "warning", label: "At Risk" },
+  OFF_TRACK: { variant: "danger", label: "Off Track" },
 };
 
 function fmtDate(d: string | null | undefined): string {
@@ -182,20 +184,24 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
         <div className="bg-blue-50 border border-blue-200 rounded px-4 py-2.5 mb-3 flex items-center gap-4 text-sm">
           <span className="font-medium text-blue-800">{selectedCount} project{selectedCount > 1 ? "s" : ""} selected</span>
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={() => runBulk("link-sheets")}
               disabled={!!bulkAction}
-              className="px-3 py-1 text-xs font-medium text-white bg-esm-red rounded hover:bg-esm-red/90 disabled:opacity-50"
+              variant="primary"
+              size="sm"
+              className="py-1"
             >
               {bulkAction === "link-sheets" ? `Linking ${bulkProgress?.done}/${bulkProgress?.total}...` : "Link Sheets"}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => runBulk("refresh-metrics")}
               disabled={!!bulkAction}
-              className="px-3 py-1 text-xs font-medium text-white bg-esm-red rounded hover:bg-esm-red/90 disabled:opacity-50"
+              variant="primary"
+              size="sm"
+              className="py-1"
             >
               {bulkAction === "refresh-metrics" ? `Refreshing ${bulkProgress?.done}/${bulkProgress?.total}...` : "Refresh Metrics"}
-            </button>
+            </Button>
           </div>
           <button
             onClick={() => setSelected(new Set())}
@@ -215,7 +221,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
         </div>
       )}
 
-      <div className="bg-white rounded-card border border-esm-border overflow-hidden">
+      <Card padding="sm" className="!p-0 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-left text-esm-grey">
@@ -279,9 +285,9 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${badge.bg} ${badge.text}`}>
+                      <Badge variant={badge.variant} pill>
                         {badge.label}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-4 py-3 capitalize">{p.currentPhase}</td>
                     <td className="px-4 py-3">
@@ -293,7 +299,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { SectionLabel } from "@/components/ui";
 
 interface Notification {
   id: string;
@@ -84,7 +85,7 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
           aria-label="Notifications"
         >
           <div className="px-4 py-3 border-b border-esm-border">
-            <span className="text-xs font-bold text-esm-grey uppercase tracking-wider">Notifications</span>
+            <SectionLabel>Notifications</SectionLabel>
           </div>
           {notifications.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-esm-grey">No notifications</div>

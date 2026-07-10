@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, Card } from "@/components/ui";
+import type { BadgeVariant } from "@/components/ui";
 
 interface RaidItem {
   id: string;
@@ -15,24 +17,24 @@ interface RaidItem {
   targetDate: string | null;
 }
 
-const TYPE_COLORS: Record<string, string> = {
-  Risk: "bg-amber-100 text-amber-800",
-  Action: "bg-blue-100 text-blue-800",
-  Issue: "bg-red-100 text-red-800",
-  Decision: "bg-purple-100 text-purple-800",
+const TYPE_VARIANTS: Record<string, BadgeVariant> = {
+  Risk: "warning",
+  Action: "info",
+  Issue: "danger",
+  Decision: "accent",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  New: "bg-slate-100 text-slate-700",
-  "In Progress": "bg-blue-100 text-blue-700",
-  Blocked: "bg-red-100 text-red-700",
-  Complete: "bg-green-100 text-green-700",
+const STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  New: "neutral",
+  "In Progress": "info",
+  Blocked: "danger",
+  Complete: "success",
 };
 
-const PRIORITY_COLORS: Record<string, string> = {
-  High: "bg-red-50 text-red-700 border border-red-200",
-  Medium: "bg-amber-50 text-amber-700 border border-amber-200",
-  Low: "bg-slate-50 text-esm-grey border border-esm-border",
+const PRIORITY_VARIANTS: Record<string, BadgeVariant> = {
+  High: "danger",
+  Medium: "warning",
+  Low: "neutral",
 };
 
 const TYPES = ["All", "Risk", "Action", "Issue", "Decision"] as const;
@@ -71,13 +73,13 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
 
   if (items.length === 0) {
     return (
-      <div className="bg-white rounded-card border border-esm-border px-6 py-8 text-center">
+      <Card padding="sm" className="!px-6 !py-8 text-center">
         <svg className="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
         </svg>
         <p className="text-sm text-slate-500">No RAID log items yet.</p>
         <p className="text-xs text-esm-muted mt-1">Risks, actions, issues, and decisions will appear here as they are logged.</p>
-      </div>
+      </Card>
     );
   }
 
@@ -85,10 +87,10 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
     <>
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5" role="group" aria-label="RAID log summary">
-        <div className="bg-white rounded-card border border-esm-border px-4 py-3 text-center">
+        <Card padding="sm" className="!px-4 !py-3 text-center">
           <p className="text-2xl font-semibold text-esm-black">{counts.open}</p>
           <p className="text-xs text-esm-grey">Open</p>
-        </div>
+        </Card>
         {(["Risk", "Action", "Issue", "Decision"] as const).map((t) => (
           <button
             key={t}
@@ -148,7 +150,7 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
       </div>
 
       {/* Items list */}
-      <div className="bg-white rounded-card border border-esm-border divide-y divide-esm-border">
+      <Card padding="sm" className="!p-0 divide-y divide-esm-border">
         {filtered.length === 0 ? (
           <div className="px-5 py-6 text-center text-sm text-slate-500">
             No items match the selected filters.
@@ -176,19 +178,19 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
                   </svg>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${TYPE_COLORS[item.type]}`}>
+                      <Badge variant={TYPE_VARIANTS[item.type]} pill>
                         {item.type}
-                      </span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[item.status]}`}>
+                      </Badge>
+                      <Badge variant={STATUS_VARIANTS[item.status]} pill>
                         {item.status}
-                      </span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${PRIORITY_COLORS[item.priority]}`}>
+                      </Badge>
+                      <Badge variant={PRIORITY_VARIANTS[item.priority]} pill>
                         {item.priority}
-                      </span>
+                      </Badge>
                       {isOverdue && (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700">
+                        <Badge variant="danger" pill>
                           Overdue
-                        </span>
+                        </Badge>
                       )}
                     </div>
                     <p className="text-sm font-medium text-esm-black mt-1.5">{item.item}</p>
@@ -213,7 +215,7 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
             );
           })
         )}
-      </div>
+      </Card>
 
       <p className="text-xs text-esm-muted mt-3" aria-live="polite">
         Showing {filtered.length} of {items.length} items

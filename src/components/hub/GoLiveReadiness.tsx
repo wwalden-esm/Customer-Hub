@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { GoLiveReadinessItem } from "@/types/hub";
+import { Badge, SectionLabel, Card } from "@/components/ui";
 
 function ReadinessRow({ item }: { item: GoLiveReadinessItem }) {
   const content = (
@@ -48,14 +49,15 @@ export default function GoLiveReadiness({ items, daysToGoLive }: { items: GoLive
   const pct = items.length > 0 ? Math.round((done / items.length) * 100) : 0;
 
   return (
-    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="readiness-heading">
+    <section aria-labelledby="readiness-heading">
+      <Card padding="md">
       <div className="flex items-center justify-between mb-3">
-        <h2 id="readiness-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
+        <SectionLabel><h2 id="readiness-heading">
           Go-Live Readiness
-        </h2>
-        <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-card border bg-gray-50 text-esm-grey border-esm-border">
+        </h2></SectionLabel>
+        <Badge variant="neutral" className="text-[11px] font-bold px-2.5">
           {pct}%
-        </span>
+        </Badge>
       </div>
 
       {daysToGoLive !== null && daysToGoLive <= 60 && (
@@ -79,6 +81,7 @@ export default function GoLiveReadiness({ items, daysToGoLive }: { items: GoLive
       <ul className="space-y-2">
         {items.map((item, i) => <ReadinessRow key={i} item={item} />)}
       </ul>
+      </Card>
     </section>
   );
 }

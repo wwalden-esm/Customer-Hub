@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
+import { SectionLabel, Card } from "@/components/ui";
 
 interface TimelineMilestone {
   id: string;
@@ -87,9 +88,11 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
 
   if (items.length === 0) {
     return (
-      <section className="bg-white rounded-card border border-esm-border p-5" aria-labelledby="timeline-heading-empty">
-        <h2 id="timeline-heading-empty" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-4">Project Timeline</h2>
+      <section aria-labelledby="timeline-heading-empty">
+      <Card padding="md">
+        <SectionLabel className="mb-4"><h2 id="timeline-heading-empty">Project Timeline</h2></SectionLabel>
         <p className="text-sm text-slate-500 text-center py-6">No milestone dates available for timeline view.</p>
+      </Card>
       </section>
     );
   }
@@ -102,8 +105,9 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
   })();
 
   return (
-    <section className="bg-white rounded-card border border-esm-border p-5" aria-labelledby="timeline-heading">
-      <h2 id="timeline-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-4">Project Timeline</h2>
+    <section aria-labelledby="timeline-heading">
+    <Card padding="md">
+      <SectionLabel className="mb-4"><h2 id="timeline-heading">Project Timeline</h2></SectionLabel>
 
       <div className="overflow-x-auto">
         <div className="min-w-[700px]">
@@ -228,6 +232,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
           </div>
         </div>
       </div>
+    </Card>
     </section>
   );
 }

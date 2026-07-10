@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { HubDeadline } from "@/types/hub";
+import { SectionLabel, Card } from "@/components/ui";
 
 const SOURCE_LABELS: Record<string, { label: string; className: string }> = {
   action: { label: "Action Item", className: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -51,10 +52,11 @@ export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadlin
   const nextWeek = deadlines.filter((d) => d.daysUntil > 7 && d.daysUntil <= 14);
 
   return (
-    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="deadlines-heading">
-      <h2 id="deadlines-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+    <section aria-labelledby="deadlines-heading">
+      <Card padding="md">
+      <SectionLabel className="mb-3"><h2 id="deadlines-heading">
         Upcoming Deadlines
-      </h2>
+      </h2></SectionLabel>
 
       {thisWeek.length > 0 && (
         <div className="mb-3">
@@ -73,6 +75,7 @@ export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadlin
           </ul>
         </div>
       )}
+      </Card>
     </section>
   );
 }

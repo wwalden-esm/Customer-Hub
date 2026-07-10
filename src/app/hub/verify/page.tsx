@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Card } from "@/components/ui";
 
 function VerifyToken() {
   const params = useSearchParams();
@@ -38,7 +39,7 @@ function VerifyToken() {
   }, [token]);
 
   return (
-    <div className="w-full max-w-md bg-white rounded-lg shadow p-8 text-center">
+    <Card padding="lg" className="!border-0 shadow w-full max-w-md !p-8 text-center">
       <div className="flex items-center justify-center gap-3 mb-4">
         <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold" aria-hidden="true">
           ESM
@@ -80,7 +81,7 @@ function VerifyToken() {
           </a>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 

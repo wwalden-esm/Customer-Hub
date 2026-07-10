@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ALL_DOC_TYPES } from "./EsmDocumentsClient";
+import { SectionLabel, Card } from "@/components/ui";
 
 interface ProjectLink {
   label: string;
@@ -102,8 +103,8 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
   return (
     <div className="space-y-6">
       {/* Branding */}
-      <section className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Branding</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-4">Branding</SectionLabel>
         <div className="space-y-4">
           <div>
             <label htmlFor="accent-color" className="block text-sm font-medium text-esm-black mb-1">Accent Color</label>
@@ -208,11 +209,11 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             {logoError && <p className="text-sm text-red-600 mt-2">{logoError}</p>}
           </div>
         </div>
-      </section>
+      </Card>
 
       {/* Portal Access */}
-      <section className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Portal Access</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-4">Portal Access</SectionLabel>
         <div>
           <label htmlFor="portal-password" className="block text-sm font-medium text-esm-black mb-1">Customer Portal Password</label>
           <input
@@ -224,11 +225,11 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
           />
           <p className="text-xs text-esm-grey mt-1">Customers use this password to log in to their project portal.</p>
         </div>
-      </section>
+      </Card>
 
       {/* Portal Contacts */}
-      <section className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Portal Contacts</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-4">Portal Contacts</SectionLabel>
         <p className="text-xs text-esm-grey mb-3">
           Add customer contacts who can access the portal. After saving, generate invite links to send them direct access (no password needed).
         </p>
@@ -348,11 +349,11 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
         {contactError && (
           <p className="text-sm text-red-600 mt-2">{contactError}</p>
         )}
-      </section>
+      </Card>
 
       {/* Hub Sections */}
-      <section className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Hub Sections</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-4">Hub Sections</SectionLabel>
         <p className="text-xs text-esm-grey mb-3">Choose which sections are visible in the customer portal. Dashboard is always shown.</p>
         <div className="space-y-2">
           {HUB_SECTIONS.map((s) => (
@@ -370,11 +371,11 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             </label>
           ))}
         </div>
-      </section>
+      </Card>
 
       {/* Document Types */}
-      <section className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Document Types</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-4">Document Types</SectionLabel>
         <p className="text-xs text-esm-grey mb-3">Choose which document types are available for generation on this project.</p>
         <div className="space-y-2">
           {ALL_DOC_TYPES.map((dt) => (
@@ -392,11 +393,11 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             </label>
           ))}
         </div>
-      </section>
+      </Card>
 
       {/* Customer Links */}
-      <section className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Customer Links</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-4">Customer Links</SectionLabel>
         <p className="text-xs text-esm-grey mb-3">Add links that will appear in the customer portal sidebar (e.g. training resources, SharePoint, Smartsheet views).</p>
         <div className="space-y-3">
           {links.map((link, i) => (
@@ -470,11 +471,11 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             Add Link
           </button>
         </div>
-      </section>
+      </Card>
 
       {/* Smartsheet IDs (read-only) */}
-      <section className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Smartsheet Configuration</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-4">Smartsheet Configuration</SectionLabel>
         {project.smartsheetConfig && Object.keys(project.smartsheetConfig).length > 0 ? (
           <div className="space-y-2 text-sm">
             {Object.entries(project.smartsheetConfig).map(([key, val]) => (
@@ -487,7 +488,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
         ) : (
           <p className="text-sm text-esm-grey">No Smartsheet sheets linked. Use the &quot;Link Sheets&quot; button on the project dashboard to connect.</p>
         )}
-      </section>
+      </Card>
 
       {/* Save */}
       <div className="flex items-center gap-3">

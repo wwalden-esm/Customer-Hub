@@ -19,16 +19,17 @@ import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import RefreshMetricsButton from "@/components/dashboard/RefreshMetricsButton";
 import PortalActivityCard from "@/components/dashboard/PortalActivityCard";
 import GenerateMeetingsButton from "@/components/dashboard/GenerateMeetingsButton";
+import { SectionLabel, Badge, Card, type BadgeVariant } from "@/components/ui";
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
   return parseLocalDate(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
-const STATUS_BADGE: Record<string, { bg: string; text: string; label: string }> = {
-  ON_TRACK: { bg: "bg-emerald-100", text: "text-emerald-800", label: "On Track" },
-  AT_RISK: { bg: "bg-amber-100", text: "text-amber-800", label: "At Risk" },
-  OFF_TRACK: { bg: "bg-red-100", text: "text-red-800", label: "Off Track" },
+const STATUS_BADGE: Record<string, { variant: BadgeVariant; label: string }> = {
+  ON_TRACK: { variant: "success", label: "On Track" },
+  AT_RISK: { variant: "warning", label: "At Risk" },
+  OFF_TRACK: { variant: "danger", label: "Off Track" },
 };
 
 export default async function ProjectDetailPage({ params }: { params: { projectId: string } }) {
@@ -95,9 +96,9 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             </div>
             <div className="flex items-center gap-4">
               <SyncStatusBar dataTimestamp={dataTimestamp} />
-              <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${badge.bg} ${badge.text}`}>
+              <Badge variant={badge.variant} pill>
                 {badge.label}
-              </span>
+              </Badge>
             </div>
           </div>
         </div>
@@ -106,8 +107,8 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
       <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-3 gap-6">
         {/* Project info */}
         <div className="col-span-2 space-y-6">
-          <div className="bg-white rounded-card border border-esm-border p-5">
-            <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Project Details</h2>
+          <Card padding="md">
+            <SectionLabel className="mb-4">Project Details</SectionLabel>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <InfoRow label="Go-Live" value={fmtDate(project.goLiveDate)} />
               <InfoRow label="Phase" value={deriveCurrentPhase(milestones, project.currentPhase)} />
@@ -115,7 +116,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
               <InfoRow label="SC" value={`${project.scName} (${project.scEmail})`} />
               <InfoRow label="PM" value={project.pmName || "—"} />
             </div>
-          </div>
+          </Card>
 
           {/* Timeline / Gantt */}
           <ProjectTimeline
@@ -132,8 +133,8 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
           />
 
           {/* Milestone list */}
-          <div className="bg-white rounded-card border border-esm-border p-5">
-            <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Milestones</h2>
+          <Card padding="md">
+            <SectionLabel className="mb-4">Milestones</SectionLabel>
             <div className="space-y-1">
               {milestones.map((m) => (
                 <div key={m.id} className="flex items-center justify-between text-xs py-1.5 border-b border-gray-100 last:border-0">
@@ -153,13 +154,13 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white rounded-card border border-esm-border p-5">
-            <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Quick Stats</h2>
+          <Card padding="md">
+            <SectionLabel className="mb-3">Quick Stats</SectionLabel>
             <div className="space-y-2.5 text-sm">
               {daysToGoLive !== null && (
                 <div className="flex justify-between">
@@ -200,7 +201,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
                 <span className="font-medium text-esm-black">{documents.length}</span>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Meeting recap alerts */}
           {meetingsMissingRecap.length > 0 && (
@@ -226,9 +227,9 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
 
           {/* RAID breakdown */}
           {raidItems.length > 0 && (
-            <div className="bg-white rounded-card border border-esm-border p-5">
+            <Card padding="md">
               <div className="flex justify-between items-center mb-3">
-                <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider">RAID Log</h2>
+                <SectionLabel>RAID Log</SectionLabel>
                 {config.raidLogSheetId && (
                   <a
                     href={ssUrl(config.raidLogSheetId)}
@@ -247,14 +248,14 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
                   const openCount = raidItems.filter((r) => r.type === type && r.status !== "Complete").length;
                   return (
                     <div key={type} className="bg-gray-50 rounded px-3 py-2">
-                      <div className="text-[10px] font-bold text-esm-grey uppercase tracking-wider">{type}s</div>
+                      <SectionLabel>{type}s</SectionLabel>
                       <div className="text-lg font-bold text-esm-black">{count}</div>
                       {openCount > 0 && <div className="text-[10px] text-amber-600">{openCount} open</div>}
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </Card>
           )}
 
           <div className="space-y-2">

@@ -1,13 +1,16 @@
+import { SectionLabel, Card } from "@/components/ui";
+
 export default function TrainingProgress({ completed, total }: { completed: number; total: number }) {
   if (total === 0) return null;
 
   const pct = Math.round((completed / total) * 100);
 
   return (
-    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="training-heading">
-      <h2 id="training-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+    <section aria-labelledby="training-heading">
+      <Card padding="md">
+      <SectionLabel className="mb-3"><h2 id="training-heading">
         Training Progress
-      </h2>
+      </h2></SectionLabel>
       <div className="flex items-center gap-3">
         <div className="flex-1">
           <div className="w-full h-2 bg-[#E2E0E1] rounded-full overflow-hidden">
@@ -25,6 +28,7 @@ export default function TrainingProgress({ completed, total }: { completed: numb
       <p className="text-xs text-esm-muted mt-2">
         {completed} of {total} training milestone{total !== 1 ? "s" : ""} complete
       </p>
+      </Card>
     </section>
   );
 }

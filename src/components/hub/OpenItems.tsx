@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { HubActionItem } from "@/types/hub";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, SectionLabel, Card, type BadgeVariant } from "@/components/ui";
 
 function fmt(d: string) {
   return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -12,19 +13,20 @@ function daysUntil(d: string): number {
   return Math.ceil((parseLocalDate(d).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-const PRI_META = {
-  high: { className: "text-esm-red bg-red-50 border-esm-red/25", label: "High" },
-  medium: { className: "text-esm-grey bg-gray-100 border-esm-grey/25", label: "Medium" },
-  low: { className: "text-esm-muted bg-gray-50 border-esm-border", label: "Low" },
+const PRI_META: Record<string, { variant: BadgeVariant; label: string }> = {
+  high: { variant: "danger", label: "High" },
+  medium: { variant: "neutral", label: "Medium" },
+  low: { variant: "neutral", label: "Low" },
 };
 
 export default function OpenItems({ items }: { items: HubActionItem[] }) {
   return (
-    <section className="bg-white border border-esm-border rounded-card overflow-hidden" aria-labelledby="open-items-heading">
+    <section aria-labelledby="open-items-heading">
+      <Card padding="sm" className="!p-0 overflow-hidden">
       <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
-        <h2 id="open-items-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
+        <SectionLabel><h2 id="open-items-heading">
           Open Action Items
-        </h2>
+        </h2></SectionLabel>
         <Link
           href="/hub/raid-log"
           className={`text-[11px] font-bold px-2.5 py-0.5 rounded-card border hover:opacity-80 transition-opacity ${
@@ -90,11 +92,9 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
                       </span>
                     </td>
                     <td className="px-[18px] py-3">
-                      <span
-                        className={`text-[10px] font-bold tracking-wide uppercase border px-2 py-0.5 rounded-card ${pm.className}`}
-                      >
+                      <Badge variant={pm.variant} className="text-[10px] tracking-wide uppercase">
                         {pm.label}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-[18px] py-3">
                       <svg className="w-3.5 h-3.5 text-esm-muted opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -108,6 +108,7 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
           </table>
         </div>
       )}
+      </Card>
     </section>
   );
 }

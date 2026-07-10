@@ -1,4 +1,5 @@
 import type { HubLink } from "@/types/hub";
+import { SectionLabel, Card } from "@/components/ui";
 
 const ICON_PATHS: Record<string, string> = {
   smartsheet: "M3 3h18v18H3V3zm2 2v14h14V5H5zm2 3h10v2H7V8zm0 4h10v2H7v-2z",
@@ -25,10 +26,11 @@ export default function QuickLinks({ links }: { links: HubLink[] }) {
   if (links.length === 0) return null;
 
   return (
-    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="quick-links-heading">
-      <h2 id="quick-links-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+    <section aria-labelledby="quick-links-heading">
+      <Card padding="md">
+      <SectionLabel className="mb-3"><h2 id="quick-links-heading">
         Quick Links
-      </h2>
+      </h2></SectionLabel>
       <ul className="space-y-1.5">
         {links.map((link, i) => (
           <li key={i}>
@@ -47,6 +49,7 @@ export default function QuickLinks({ links }: { links: HubLink[] }) {
           </li>
         ))}
       </ul>
+      </Card>
     </section>
   );
 }

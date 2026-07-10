@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/Button";
+
 export default function HubError({
   error,
   reset,
@@ -16,12 +18,9 @@ export default function HubError({
       </div>
       <h2 className="text-lg font-semibold text-esm-black mb-2">Something went wrong</h2>
       <p className="text-sm text-slate-500 mb-4">{error.message || "An unexpected error occurred."}</p>
-      <button
-        onClick={reset}
-        className="px-4 py-2 bg-esm-red text-white text-sm font-medium rounded hover:bg-esm-red/90 transition-colors"
-      >
+      <Button onClick={reset} variant="primary" size="md">
         Try again
-      </button>
+      </Button>
     </div>
   );
 }

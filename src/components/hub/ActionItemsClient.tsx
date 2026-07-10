@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, Card } from "@/components/ui";
+import type { BadgeVariant } from "@/components/ui";
 
 interface ActionItem {
   id: string;
@@ -78,13 +80,11 @@ export default function ActionItemsClient({
     }
   }
 
-  function priorityBadge(p: string) {
+  function priorityVariant(p: string): BadgeVariant {
     const pl = p.toLowerCase();
-    if (pl === "high" || pl === "critical")
-      return "bg-red-100 text-red-700";
-    if (pl === "medium" || pl === "med")
-      return "bg-amber-100 text-amber-700";
-    return "bg-slate-100 text-slate-600";
+    if (pl === "high" || pl === "critical") return "danger";
+    if (pl === "medium" || pl === "med") return "warning";
+    return "neutral";
   }
 
   function formatDate(d?: string): string {
@@ -123,7 +123,7 @@ export default function ActionItemsClient({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-card border border-esm-border p-8 text-center">
+        <Card padding="lg" className="!p-8 text-center">
           <p className="text-sm text-esm-grey">
             {filter === "overdue"
               ? "No overdue items — nice work!"
@@ -131,9 +131,9 @@ export default function ActionItemsClient({
                 ? "No completed items yet."
                 : "No action items found."}
           </p>
-        </div>
+        </Card>
       ) : (
-        <div className="bg-white rounded-card border border-esm-border overflow-hidden">
+        <Card padding="sm" className="!p-0 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-esm-border bg-gray-50">
@@ -170,9 +170,9 @@ export default function ActionItemsClient({
                         {item.description}
                       </span>
                       {overdue && (
-                        <span className="ml-2 inline-block px-1.5 py-0.5 text-[10px] font-medium bg-red-100 text-red-700 rounded">
+                        <Badge variant="danger" className="ml-2 text-[10px]">
                           Overdue
-                        </span>
+                        </Badge>
                       )}
                     </td>
                     <td className="px-4 py-3 text-esm-grey">{item.owner || "—"}</td>
@@ -182,9 +182,9 @@ export default function ActionItemsClient({
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded-full ${priorityBadge(item.priority)}`}>
+                      <Badge variant={priorityVariant(item.priority)} pill className="text-[10px]">
                         {item.priority}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-4 py-3">
                       {open ? (
@@ -199,9 +199,9 @@ export default function ActionItemsClient({
                           <option value="complete">Complete</option>
                         </select>
                       ) : (
-                        <span className="inline-block px-2 py-0.5 text-[10px] font-medium rounded-full bg-green-100 text-green-700">
+                        <Badge variant="success" pill className="text-[10px]">
                           Complete
-                        </span>
+                        </Badge>
                       )}
                     </td>
                   </tr>
@@ -209,7 +209,7 @@ export default function ActionItemsClient({
               })}
             </tbody>
           </table>
-        </div>
+        </Card>
       )}
     </div>
   );

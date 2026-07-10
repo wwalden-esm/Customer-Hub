@@ -1,5 +1,6 @@
 import type { HubMilestone } from "@/types/hub";
 import { parseLocalDate } from "@/lib/date-utils";
+import { SectionLabel, Card } from "@/components/ui";
 
 function fmtShort(d: string) {
   return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -17,10 +18,11 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
   };
 
   return (
-    <section className="bg-white border border-esm-border rounded-card px-6 pt-6 pb-7 mb-5" aria-labelledby="milestones-heading">
-      <h2 id="milestones-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-7">
+    <section className="mb-5" aria-labelledby="milestones-heading">
+      <Card padding="sm" className="!px-6 !pt-6 !pb-7">
+      <SectionLabel className="mb-7"><h2 id="milestones-heading">
         Project Milestones
-      </h2>
+      </h2></SectionLabel>
       <div className="overflow-x-auto pb-1" role="list" aria-label={`${completed} of ${milestones.length} milestones complete`}>
         <div className="flex items-start min-w-max relative">
           {/* Rail background */}
@@ -100,6 +102,7 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
           })}
         </div>
       </div>
+      </Card>
     </section>
   );
 }

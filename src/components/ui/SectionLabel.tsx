@@ -1,18 +1,19 @@
-import type { HTMLAttributes } from "react";
-
-interface SectionLabelProps extends HTMLAttributes<HTMLParagraphElement> {
+interface SectionLabelProps {
+  id?: string;
   color?: string;
+  className?: string;
+  children: React.ReactNode;
 }
 
-function SectionLabel({ color, className = "", children, ...props }: SectionLabelProps) {
+function SectionLabel({ id, color, className, children }: SectionLabelProps) {
   const colorClass = color ?? "text-esm-grey";
   return (
-    <p
-      className={`text-label uppercase ${colorClass} ${className}`}
-      {...props}
+    <span
+      id={id}
+      className={`text-label font-extrabold tracking-[0.09em] uppercase ${colorClass} ${className ?? ""}`.trim()}
     >
       {children}
-    </p>
+    </span>
   );
 }
 

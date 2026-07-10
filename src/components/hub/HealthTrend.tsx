@@ -1,3 +1,5 @@
+import { SectionLabel, Card } from "@/components/ui";
+
 const STATUS_COLORS: Record<string, string> = {
   ON_TRACK: "#22c55e",
   AT_RISK: "#eab308",
@@ -16,10 +18,11 @@ export default function HealthTrend({ history, currentStatus }: Props) {
   const gap = 6;
 
   return (
-    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="health-trend-heading">
-      <h2 id="health-trend-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+    <section aria-labelledby="health-trend-heading">
+      <Card padding="md">
+      <SectionLabel className="mb-3"><h2 id="health-trend-heading">
         Health Trend
-      </h2>
+      </h2></SectionLabel>
       <div className="flex items-center gap-1 mb-2">
         {history.map((h, i) => (
           <div key={i} className="flex flex-col items-center" style={{ gap: `${gap}px` }}>
@@ -51,6 +54,7 @@ export default function HealthTrend({ history, currentStatus }: Props) {
           );
         })}
       </div>
+      </Card>
     </section>
   );
 }

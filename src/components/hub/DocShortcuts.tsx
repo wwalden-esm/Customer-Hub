@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SectionLabel, Card } from "@/components/ui";
 
 const DOC_META: Record<string, { label: string; description: string }> = {
   "workflow-xlsx": { label: "Workflow Data (XLSX)", description: "Data collection spreadsheet" },
@@ -35,10 +36,11 @@ export default function DocShortcuts({ projectId, documentTypes }: { projectId: 
   }
 
   return (
-    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="doc-shortcuts-heading">
-      <h2 id="doc-shortcuts-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+    <section aria-labelledby="doc-shortcuts-heading">
+      <Card padding="md">
+      <SectionLabel className="mb-3"><h2 id="doc-shortcuts-heading">
         Generate Documents
-      </h2>
+      </h2></SectionLabel>
       {message && (
         <div className={`text-xs px-3 py-2 rounded-card mb-3 ${
           message.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-esm-red"
@@ -72,6 +74,7 @@ export default function DocShortcuts({ projectId, documentTypes }: { projectId: 
       >
         View all documents →
       </a>
+      </Card>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { SectionLabel, Card } from "@/components/ui";
 
 interface Visitor {
   email: string;
@@ -30,19 +31,19 @@ export default function PortalActivityCard({ projectId }: { projectId: string })
 
   if (loading) {
     return (
-      <div className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Portal Activity</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-3">Portal Activity</SectionLabel>
         <p className="text-xs text-esm-grey">Loading...</p>
-      </div>
+      </Card>
     );
   }
 
   if (!data || data.totalVisits === 0) {
     return (
-      <div className="bg-white rounded-card border border-esm-border p-5">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Portal Activity</h2>
+      <Card padding="md">
+        <SectionLabel className="mb-3">Portal Activity</SectionLabel>
         <p className="text-xs text-esm-grey">No customer portal visits recorded yet.</p>
-      </div>
+      </Card>
     );
   }
 
@@ -59,25 +60,25 @@ export default function PortalActivityCard({ projectId }: { projectId: string })
   }
 
   return (
-    <div className="bg-white rounded-card border border-esm-border p-5">
-      <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Portal Activity</h2>
+    <Card padding="md">
+      <SectionLabel className="mb-3">Portal Activity</SectionLabel>
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="text-center">
           <div className="text-lg font-bold text-esm-black">{data.totalVisits}</div>
-          <div className="text-[10px] text-esm-grey uppercase tracking-wider">Page views</div>
+          <SectionLabel>Page views</SectionLabel>
         </div>
         <div className="text-center">
           <div className="text-lg font-bold text-esm-black">{data.uniqueVisitors}</div>
-          <div className="text-[10px] text-esm-grey uppercase tracking-wider">Visitors</div>
+          <SectionLabel>Visitors</SectionLabel>
         </div>
         <div className="text-center">
           <div className="text-lg font-bold text-esm-black">{data.lastVisit ? timeAgo(data.lastVisit) : "—"}</div>
-          <div className="text-[10px] text-esm-grey uppercase tracking-wider">Last visit</div>
+          <SectionLabel>Last visit</SectionLabel>
         </div>
       </div>
       {data.recentVisitors.length > 0 && (
         <div className="border-t border-gray-100 pt-3">
-          <h3 className="text-[10px] font-bold text-esm-grey uppercase tracking-wider mb-2">Recent visitors</h3>
+          <SectionLabel className="mb-2">Recent visitors</SectionLabel>
           <div className="space-y-2">
             {data.recentVisitors.slice(0, 5).map((v) => (
               <div key={v.email} className="flex items-center justify-between text-xs">
@@ -94,6 +95,6 @@ export default function PortalActivityCard({ projectId }: { projectId: string })
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

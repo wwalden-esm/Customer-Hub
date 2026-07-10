@@ -2,6 +2,7 @@
 
 import type { SectionKey, SectionStatus } from "@/types/enums";
 import { PART_FOR_SECTION, PART_LABELS, SECTION_LABELS, SECTION_ORDER, WORKSHOP_SECTIONS } from "@/types";
+import { Badge, type BadgeVariant } from "@/components/ui";
 
 interface Props {
   active: SectionKey;
@@ -9,11 +10,11 @@ interface Props {
   statuses: Record<SectionKey, SectionStatus>;
 }
 
-const STATUS_BADGE: Record<SectionStatus, { label: string; className: string }> = {
-  NOT_STARTED: { label: "Not started", className: "bg-slate-100 text-slate-500" },
-  IN_PROGRESS: { label: "In progress", className: "bg-amber-100 text-amber-800" },
-  IN_WORKSHOP: { label: "In workshop", className: "bg-blue-100 text-blue-800" },
-  COMPLETE: { label: "Complete", className: "bg-emerald-100 text-emerald-800" },
+const STATUS_BADGE: Record<SectionStatus, { label: string; variant: BadgeVariant }> = {
+  NOT_STARTED: { label: "Not started", variant: "neutral" },
+  IN_PROGRESS: { label: "In progress", variant: "warning" },
+  IN_WORKSHOP: { label: "In workshop", variant: "info" },
+  COMPLETE: { label: "Complete", variant: "success" },
 };
 
 export function SectionNav({ active, onSelect, statuses }: Props) {
@@ -48,9 +49,9 @@ export function SectionNav({ active, onSelect, statuses }: Props) {
                         {isWorkshop && <span className="ml-1 text-blue-600" title="Workshop section">⚑</span>}
                       </span>
                     </div>
-                    <span className={`mt-1 inline-block text-xs px-2 py-0.5 rounded-full ${badge.className}`}>
+                    <Badge variant={badge.variant} pill className="mt-1 text-xs">
                       {badge.label}
-                    </span>
+                    </Badge>
                   </button>
                 </li>
               );

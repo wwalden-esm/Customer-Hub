@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, type BadgeVariant, SectionLabel, Card } from "@/components/ui";
 
 interface Meeting {
   id: string;
@@ -44,11 +45,11 @@ interface TranscriptResult {
   recapAttachmentId: number | null;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  Upcoming: "bg-amber-100 text-amber-700",
-  Scheduled: "bg-blue-100 text-blue-700",
-  Complete: "bg-green-100 text-green-700",
-  Skipped: "bg-gray-100 text-gray-500",
+const STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  Upcoming: "warning",
+  Scheduled: "info",
+  Complete: "success",
+  Skipped: "neutral",
 };
 
 function fmtDate(d: string | null): string {
@@ -196,13 +197,13 @@ export default function MeetingManagement({
       )}
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-card border border-esm-border px-6 py-8 text-center">
+        <Card padding="sm" className="!px-6 !py-8 text-center">
           <p className="text-sm text-slate-500">
             {filter === "needs-action"
               ? "All completed meetings have action items logged and recaps sent."
               : "No meetings found."}
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="space-y-3">
           {filtered.map((meeting) => {
@@ -210,7 +211,7 @@ export default function MeetingManagement({
             const panel = activePanel?.id === meeting.id ? activePanel.type : null;
 
             return (
-              <div key={meeting.id} className="bg-white rounded-card border border-esm-border">
+              <Card key={meeting.id} padding="sm" className="!p-0">
                 <button
                   onClick={() => toggle(meeting.id)}
                   className="w-full text-left px-5 py-4 flex items-center gap-4"
@@ -226,9 +227,9 @@ export default function MeetingManagement({
                       <span className="text-sm font-semibold text-esm-black">{meeting.week}</span>
                       <span className="text-xs text-esm-grey">{meeting.phase}</span>
                       <span className="text-xs text-esm-grey">{fmtDate(meeting.meetingDate)}</span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[meeting.status] ?? "bg-gray-100 text-gray-700"}`}>
+                      <Badge variant={STATUS_VARIANTS[meeting.status] ?? "neutral"} pill>
                         {meeting.status}
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
@@ -241,7 +242,7 @@ export default function MeetingManagement({
                   <div className="border-t border-esm-border px-5 py-4 space-y-4">
                     {meeting.agendaSummary && (
                       <div className="pl-4 border-l-2 border-esm-border">
-                        <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Agenda</p>
+                        <SectionLabel className="mb-1">Agenda</SectionLabel>
                         <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.agendaSummary}</p>
                       </div>
                     )}
@@ -269,7 +270,7 @@ export default function MeetingManagement({
                     {(meeting.status === "Complete" || meeting.status === "Skipped") && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-esm-grey mr-1">Status:</span>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[meeting.status]}`}>{meeting.status}</span>
+                        <Badge variant={STATUS_VARIANTS[meeting.status] ?? "neutral"} pill>{meeting.status}</Badge>
                         <button
                           onClick={() => updateStatus(meeting.id, "Upcoming")}
                           disabled={statusUpdating === meeting.id}
@@ -366,7 +367,7 @@ export default function MeetingManagement({
                     )}
                   </div>
                 )}
-              </div>
+              </Card>
             );
           })}
         </div>
@@ -377,11 +378,7 @@ export default function MeetingManagement({
 
 function StatusBadge({ done, label }: { done: boolean; label: string }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${
-        done ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
-      }`}
-    >
+    <Badge variant={done ? "success" : "warning"} pill>
       {done ? (
         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -392,7 +389,7 @@ function StatusBadge({ done, label }: { done: boolean; label: string }) {
         </svg>
       )}
       {label}
-    </span>
+    </Badge>
   );
 }
 
@@ -496,31 +493,31 @@ function ProcessTranscriptPanel({
         <div className="grid grid-cols-4 gap-2">
           <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.actionItemsLogged}</p>
-            <p className="text-[10px] text-esm-grey uppercase tracking-wider">Actions</p>
+            <SectionLabel>Actions</SectionLabel>
           </div>
           <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.decisionsLogged}</p>
-            <p className="text-[10px] text-esm-grey uppercase tracking-wider">Decisions</p>
+            <SectionLabel>Decisions</SectionLabel>
           </div>
           <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.risksLogged}</p>
-            <p className="text-[10px] text-esm-grey uppercase tracking-wider">Risks</p>
+            <SectionLabel>Risks</SectionLabel>
           </div>
           <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.raidItemsLogged}</p>
-            <p className="text-[10px] text-esm-grey uppercase tracking-wider">RAID Total</p>
+            <SectionLabel>RAID Total</SectionLabel>
           </div>
         </div>
 
         {/* Recap preview */}
         <div className="pl-4 border-l-2 border-esm-border">
-          <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Summary</p>
+          <SectionLabel className="mb-1">Summary</SectionLabel>
           <p className="text-sm text-esm-black">{r.summary}</p>
         </div>
 
         {r.action_items.length > 0 && (
           <div className="pl-4 border-l-2 border-amber-200">
-            <p className="text-[10px] font-extrabold text-amber-600 tracking-[0.09em] uppercase mb-1">Action Items</p>
+            <SectionLabel color="text-amber-600" className="mb-1">Action Items</SectionLabel>
             <ul className="space-y-1">
               {r.action_items.map((ai, i) => (
                 <li key={i} className="text-xs text-esm-black">
@@ -534,7 +531,7 @@ function ProcessTranscriptPanel({
 
         {r.decisions.length > 0 && (
           <div className="pl-4 border-l-2 border-blue-200">
-            <p className="text-[10px] font-extrabold text-blue-600 tracking-[0.09em] uppercase mb-1">Decisions</p>
+            <SectionLabel color="text-blue-600" className="mb-1">Decisions</SectionLabel>
             <ul className="space-y-1">
               {r.decisions.map((d, i) => (
                 <li key={i} className="text-xs text-esm-black">
@@ -547,7 +544,7 @@ function ProcessTranscriptPanel({
 
         {r.risks.length > 0 && (
           <div className="pl-4 border-l-2 border-red-200">
-            <p className="text-[10px] font-extrabold text-red-600 tracking-[0.09em] uppercase mb-1">Risks / Open Items</p>
+            <SectionLabel color="text-red-600" className="mb-1">Risks / Open Items</SectionLabel>
             <ul className="space-y-1">
               {r.risks.map((risk, i) => (
                 <li key={i} className="text-xs text-esm-black">
@@ -583,9 +580,9 @@ function ProcessTranscriptPanel({
 
   return (
     <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-3">
-      <h4 className="text-xs font-bold text-esm-grey uppercase tracking-wider">
+      <SectionLabel>
         Process Meeting Transcript
-      </h4>
+      </SectionLabel>
       <p className="text-xs text-esm-grey">
         Drop or paste a transcript (.srt, .vtt, or text). Claude will extract the recap,
         action items, decisions, and risks — then push RAID items to Smartsheet and open the
@@ -718,9 +715,9 @@ function LogActionItemsPanel({
 
   return (
     <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-3">
-      <h4 className="text-xs font-bold text-esm-grey uppercase tracking-wider">
+      <SectionLabel>
         Log Action Items Manually
-      </h4>
+      </SectionLabel>
       {items.map((item, idx) => (
         <div key={idx} className="grid grid-cols-[1fr_150px_140px_32px] gap-2 items-start">
           <input
@@ -815,9 +812,9 @@ function SendRecapPanel({
 
   return (
     <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-3">
-      <h4 className="text-xs font-bold text-esm-grey uppercase tracking-wider">
+      <SectionLabel>
         Send Meeting Recap
-      </h4>
+      </SectionLabel>
       <p className="text-xs text-esm-grey">
         Sends a recap email to all customer contacts and the SC/PM. The email includes
         the meeting agenda, deliverables, and any notes you add below.
@@ -920,13 +917,13 @@ function ViewRecapPanel({ meetingId, projectId }: { meetingId: string; projectId
       </div>
 
       <div className="pl-4 border-l-2 border-esm-border">
-        <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Summary</p>
+        <SectionLabel className="mb-1">Summary</SectionLabel>
         <p className="text-sm text-esm-black">{recap.summary}</p>
       </div>
 
       {recap.action_items.length > 0 && (
         <div className="pl-4 border-l-2 border-amber-200">
-          <p className="text-[10px] font-extrabold text-amber-600 tracking-[0.09em] uppercase mb-1">Action Items</p>
+          <SectionLabel color="text-amber-600" className="mb-1">Action Items</SectionLabel>
           <ul className="space-y-1">
             {recap.action_items.map((ai, i) => (
               <li key={i} className="text-xs text-esm-black">
@@ -940,7 +937,7 @@ function ViewRecapPanel({ meetingId, projectId }: { meetingId: string; projectId
 
       {recap.decisions.length > 0 && (
         <div className="pl-4 border-l-2 border-blue-200">
-          <p className="text-[10px] font-extrabold text-blue-600 tracking-[0.09em] uppercase mb-1">Decisions</p>
+          <SectionLabel color="text-blue-600" className="mb-1">Decisions</SectionLabel>
           <ul className="space-y-1">
             {recap.decisions.map((d, i) => (
               <li key={i} className="text-xs text-esm-black">
@@ -953,7 +950,7 @@ function ViewRecapPanel({ meetingId, projectId }: { meetingId: string; projectId
 
       {recap.risks.length > 0 && (
         <div className="pl-4 border-l-2 border-red-200">
-          <p className="text-[10px] font-extrabold text-red-600 tracking-[0.09em] uppercase mb-1">Risks / Open Items</p>
+          <SectionLabel color="text-red-600" className="mb-1">Risks / Open Items</SectionLabel>
           <ul className="space-y-1">
             {recap.risks.map((r, i) => (
               <li key={i} className="text-xs text-esm-black">
@@ -1036,7 +1033,7 @@ function AddMeetingPanel({
   }
 
   return (
-    <div className="bg-white rounded-card border border-esm-border p-5 mb-5 space-y-4">
+    <Card padding="md" className="mb-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-esm-black">Add Ad-Hoc Meeting</h3>
         <button onClick={onCancel} className="text-esm-grey hover:text-esm-black">
@@ -1127,6 +1124,6 @@ function AddMeetingPanel({
           Cancel
         </button>
       </div>
-    </div>
+    </Card>
   );
 }

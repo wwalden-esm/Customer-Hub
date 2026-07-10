@@ -26,6 +26,8 @@ import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import QuickLinks from "@/components/hub/QuickLinks";
 import RefreshButton from "@/components/hub/RefreshButton";
+import { Badge, Card, SectionLabel } from "@/components/ui";
+import type { BadgeVariant } from "@/components/ui";
 
 export default async function HubDashboard() {
   const session = await getCustomerSession();
@@ -73,7 +75,7 @@ export default async function HubDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
         {/* Team contact card */}
         {data.team.length > 0 && (
-          <div className="bg-white border border-esm-border rounded-card px-5 py-3 flex flex-col gap-3">
+          <Card className="!px-5 !py-3 flex flex-col gap-3">
             {data.team.map((member) => (
               <div key={member.role} className="flex items-center gap-2.5">
                 <div
@@ -113,16 +115,17 @@ export default async function HubDashboard() {
                 Request a meeting
               </a>
             )}
-          </div>
+          </Card>
         )}
 
         {/* Timeline bar */}
         {timelinePercent !== null && totalDays !== null && daysElapsed !== null && (
-          <section className="bg-white border border-esm-border rounded-card p-4 flex flex-col justify-center" aria-label="Implementation timeline progress">
+          <section aria-label="Implementation timeline progress">
+            <Card padding="sm" className="flex flex-col justify-center">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
+              <SectionLabel>
                 Implementation Timeline
-              </span>
+              </SectionLabel>
               <span className="text-xs text-esm-grey">
                 Day {daysElapsed} of {totalDays}
               </span>
@@ -137,6 +140,7 @@ export default async function HubDashboard() {
               />
             </div>
             <p className="text-[11px] text-esm-muted mt-1.5">{timelinePercent}% of timeline elapsed</p>
+            </Card>
           </section>
         )}
       </div>
@@ -221,10 +225,11 @@ export default async function HubDashboard() {
         <div className={`grid grid-cols-1 ${hasDeadlines && hasMeetings ? "lg:grid-cols-2" : ""} gap-5 mb-5`}>
           {hasDeadlines && <UpcomingDeadlines deadlines={data.deadlines} />}
           {hasMeetings && (
-            <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="upcoming-meetings-heading">
-              <h2 id="upcoming-meetings-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
+            <section aria-labelledby="upcoming-meetings-heading">
+              <Card padding="md">
+              <SectionLabel className="mb-3"><h2 id="upcoming-meetings-heading">
                 Upcoming Meetings
-              </h2>
+              </h2></SectionLabel>
               <ul className="space-y-4">
                 {upcomingMeetings.map((m) => (
                   <li key={m.id} className="border-l-2 pl-3" style={{ borderColor: "var(--hub-accent, #F4333F)" }}>
@@ -252,6 +257,7 @@ export default async function HubDashboard() {
               <a href="/hub/meetings" aria-label="View all meetings" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--hub-accent, #F4333F)" }}>
                 View all meetings →
               </a>
+              </Card>
             </section>
           )}
         </div>
@@ -293,14 +299,15 @@ export default async function HubDashboard() {
           )}
 
           {data.integrations.length > 0 && (
-            <section className="bg-white border border-esm-border rounded-card overflow-hidden" aria-labelledby="integrations-heading">
+            <section aria-labelledby="integrations-heading">
+              <Card padding="sm" className="!p-0 overflow-hidden">
               <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
-                <h2 id="integrations-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
+                <SectionLabel><h2 id="integrations-heading">
                   Integration Status
-                </h2>
-                <div className="text-[11px] font-bold px-2.5 py-0.5 rounded-card border bg-gray-50 text-esm-grey border-esm-border">
+                </h2></SectionLabel>
+                <Badge variant="neutral" className="text-[11px] font-bold">
                   {data.integrations.filter((i) => { const s = i.status.toLowerCase(); return s === "complete" || s === "done" || s === "live"; }).length} of {data.integrations.length} complete
-                </div>
+                </Badge>
               </div>
               <div className="divide-y divide-gray-100">
                 {data.integrations.map((integ) => {
@@ -309,6 +316,7 @@ export default async function HubDashboard() {
                   const isActive = s.includes("progress") || s === "in progress";
                   const integSheetUrl = pl.integrationTrackerSheetId;
                   const Row = integSheetUrl ? "a" : "div";
+                  const integBadgeVariant: BadgeVariant = isDone ? "success" : isActive ? "info" : "neutral";
                   return (
                     <Row
                       key={integ.id}
@@ -323,17 +331,14 @@ export default async function HubDashboard() {
                           </svg>
                         )}
                       </span>
-                      <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-card border ${
-                        isDone ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : isActive ? "bg-blue-50 text-blue-700 border-blue-200"
-                        : "bg-gray-50 text-esm-grey border-esm-border"
-                      }`}>
+                      <Badge variant={integBadgeVariant} className="text-[10px] font-bold tracking-wide uppercase">
                         {integ.status}
-                      </span>
+                      </Badge>
                     </Row>
                   );
                 })}
               </div>
+              </Card>
             </section>
           )}
         </div>

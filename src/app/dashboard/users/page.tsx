@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { Badge, Card } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
 
 interface UserRow {
   email: string;
@@ -194,16 +196,18 @@ export default function UsersPage() {
         {/* Add user form */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-esm-black">ESM Staff Accounts</h2>
-          <button
+          <Button
             onClick={() => { setShowForm(!showForm); setError(null); }}
-            className="bg-esm-red hover:bg-esm-red-dark text-white text-sm font-medium px-4 py-2 rounded-card transition-colors"
+            variant="primary"
+            size="md"
           >
             {showForm ? "Cancel" : "Add User"}
-          </button>
+          </Button>
         </div>
 
         {showForm && (
-          <form onSubmit={handleAdd} className="mb-6 bg-white rounded-card border border-esm-border p-5">
+          <form onSubmit={handleAdd} className="mb-6">
+          <Card padding="md">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="new-name" className="block text-sm font-medium text-esm-black mb-1">
@@ -252,19 +256,21 @@ export default function UsersPage() {
             {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
             <p className="mt-3 text-xs text-esm-grey">A password will be automatically generated.</p>
             <div className="mt-4">
-              <button
+              <Button
                 type="submit"
                 disabled={saving}
-                className="bg-esm-red hover:bg-esm-red-dark disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-card transition-colors"
+                variant="primary"
+                size="md"
               >
                 {saving ? "Creating..." : "Create User"}
-              </button>
+              </Button>
             </div>
+          </Card>
           </form>
         )}
 
         {/* Users table */}
-        <div className="bg-white rounded-card border border-esm-border overflow-hidden">
+        <Card padding="sm" className="!p-0 overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-sm text-esm-grey">Loading users...</div>
           ) : users.length === 0 ? (
@@ -286,9 +292,9 @@ export default function UsersPage() {
                       <td className="px-5 py-3 text-esm-black font-medium">{u.name}</td>
                       <td className="px-5 py-3 text-esm-grey">{u.email}</td>
                       <td className="px-5 py-3">
-                        <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-700 text-xs font-medium rounded-card">
+                        <Badge variant="neutral">
                           {u.role === "SC" ? "Solutions Consultant" : u.role === "PM" ? "Project Manager" : "Admin"}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -312,7 +318,7 @@ export default function UsersPage() {
               </table>
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </main>
   );

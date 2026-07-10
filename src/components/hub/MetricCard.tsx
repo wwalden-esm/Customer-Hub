@@ -1,4 +1,5 @@
 import DonutRing from "./DonutRing";
+import { Card } from "@/components/ui";
 
 function scoreColor(v: number): string {
   if (v >= 80) return "#2D2826";
@@ -43,8 +44,10 @@ export default function MetricCard({ label, value, sub, percent, color, href }: 
     </>
   );
 
-  const className = "bg-white border border-esm-border rounded-card p-[18px_20px] flex-1 min-w-[150px]"
-    + (href ? " hover:shadow-md hover:border-esm-border-hover transition-shadow cursor-pointer" : "");
+  // Card only renders a <div>; when this needs to be a link (href), we can't use
+  // Card directly (no polymorphic `as`), so the <a> case mirrors Card's own
+  // className output (bg-white rounded-card border border-esm-border) manually.
+  const linkClassName = "bg-white rounded-card border border-esm-border p-[18px_20px] flex-1 min-w-[150px] hover:shadow-md hover:border-esm-border-hover transition-shadow cursor-pointer block no-underline";
 
   if (href) {
     const isExternal = href.startsWith("http");
@@ -52,7 +55,7 @@ export default function MetricCard({ label, value, sub, percent, color, href }: 
       <a
         href={href}
         {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        className={className + " block no-underline"}
+        className={linkClassName}
         style={{ borderTopWidth: "3px", borderTopColor: c || "var(--hub-accent)" }}
       >
         {content}
@@ -61,11 +64,13 @@ export default function MetricCard({ label, value, sub, percent, color, href }: 
   }
 
   return (
-    <div
-      className={className}
-      style={{ borderTopWidth: "3px", borderTopColor: c || "var(--hub-accent)" }}
+    <Card
+      padding="sm"
+      className="!p-[18px_20px] flex-1 min-w-[150px]"
+      accent="top"
+      accentColor={c || "var(--hub-accent)"}
     >
       {content}
-    </div>
+    </Card>
   );
 }

@@ -5,6 +5,7 @@ import { getProjectById } from "@/lib/smartsheet-data";
 import { getIntakeRecord, normalizeIntakeData } from "@/lib/hubspot";
 import type { IntakeField } from "@/lib/hubspot";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, Card } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -52,12 +53,9 @@ function FieldDisplay({ field }: { field: IntakeField }) {
     return (
       <div className="flex flex-wrap gap-1.5">
         {items.map((item) => (
-          <span
-            key={item}
-            className="inline-block px-2.5 py-0.5 bg-blue-50 text-blue-800 text-xs font-medium rounded-full"
-          >
+          <Badge key={item} variant="info" pill>
             {item}
-          </span>
+          </Badge>
         ))}
       </div>
     );
@@ -95,12 +93,12 @@ export default async function IntakePage() {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-esm-black">Customer Intake</h1>
         <div className="mt-2 flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+          <Badge variant="info" pill>
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             Sourced from HubSpot
-          </span>
+          </Badge>
           {intakeData && (
             <span className="text-xs text-esm-muted">
               Last updated: {parseLocalDate(intakeData.updatedAt).toLocaleDateString("en-US", {
@@ -122,7 +120,7 @@ export default async function IntakePage() {
       )}
 
       {intakeData && (
-        <div className="bg-white rounded-card border border-esm-border divide-y divide-esm-border">
+        <Card padding="sm" className="!p-0 divide-y divide-esm-border">
           {intakeData.fields.map((field) => (
             <div key={field.key} className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
               <dt className="text-sm font-medium text-esm-grey sm:w-56 shrink-0">
@@ -133,7 +131,7 @@ export default async function IntakePage() {
               </dd>
             </div>
           ))}
-        </div>
+        </Card>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import StatusPill from "./StatusPill";
 import type { HubDashboardData } from "@/types/hub";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Card } from "@/components/ui";
 
 function healthSummary(data: HubDashboardData): string {
   const goLive = data.project.goLiveDate
@@ -30,10 +31,12 @@ const BORDER_COLOR: Record<string, string> = {
 
 export default function HealthBanner({ data }: { data: HubDashboardData }) {
   return (
-    <section
-      className="bg-white rounded-card border border-esm-border p-6 mb-5"
-      style={{ borderLeftWidth: "4px", borderLeftColor: BORDER_COLOR[data.project.status] }}
-      aria-labelledby="health-heading"
+    <section aria-labelledby="health-heading">
+    <Card
+      padding="lg"
+      className="mb-5"
+      accent="left"
+      accentColor={BORDER_COLOR[data.project.status]}
     >
       <div className="flex items-center gap-3 mb-3">
         <h2 id="health-heading" className="sr-only">Project Health</h2>
@@ -60,6 +63,7 @@ export default function HealthBanner({ data }: { data: HubDashboardData }) {
           return parts.map((p, i) => <span key={i}>{p}</span>);
         })()}
       </div>
+    </Card>
     </section>
   );
 }

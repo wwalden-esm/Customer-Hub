@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { SectionLabel, Card } from "@/components/ui";
 
 interface ActivityEvent {
   id: string;
@@ -61,9 +63,10 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
   const hasMore = filtered.length > limit;
 
   return (
-    <section className="bg-white rounded-card border border-esm-border p-5" aria-labelledby="activity-heading">
+    <section aria-labelledby="activity-heading">
+    <Card padding="md">
       <div className="flex items-center justify-between mb-4">
-        <h2 id="activity-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">Activity</h2>
+        <SectionLabel><h2 id="activity-heading">Activity</h2></SectionLabel>
         <div className="flex gap-1" role="group" aria-label="Filter activity">
           {Object.entries(FILTER_LABELS).map(([key, label]) => (
             <button
@@ -129,17 +132,20 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
       )}
 
       {hasMore && (
-        <button
+        <Button
           onClick={() => setLimit((l) => l + 15)}
-          className="w-full mt-3 py-1.5 text-xs text-esm-grey hover:text-esm-black border border-esm-border rounded-card hover:bg-slate-50 transition-colors"
+          variant="ghost"
+          size="sm"
+          className="w-full mt-3 py-1.5 text-xs border border-esm-border"
         >
           Show more ({filtered.length - limit} remaining)
-        </button>
+        </Button>
       )}
 
       <div className="mt-3 pt-2 border-t border-esm-border text-[10px] text-esm-muted">
         {filtered.length} event{filtered.length !== 1 ? "s" : ""}
       </div>
+    </Card>
     </section>
   );
 }

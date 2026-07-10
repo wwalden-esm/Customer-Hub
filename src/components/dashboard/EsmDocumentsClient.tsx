@@ -3,6 +3,8 @@
 import { useState, useCallback } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
 import FileUploader from "@/components/hub/FileUploader";
+import { Card, Badge, type BadgeVariant } from "@/components/ui";
+import { Button } from "@/components/ui/Button";
 
 interface DocRecord {
   id: string;
@@ -31,11 +33,11 @@ export const ALL_DOC_TYPES = [
   { key: "go-live-checklist", label: "Go-Live Checklist", category: "Project" },
 ];
 
-const STATUS_BADGES: Record<string, string> = {
-  READY: "bg-green-100 text-green-700",
-  DRAFT: "bg-amber-100 text-amber-700",
-  GENERATING: "bg-blue-100 text-blue-700",
-  ERROR: "bg-red-100 text-red-700",
+const STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  READY: "success",
+  DRAFT: "warning",
+  GENERATING: "info",
+  ERROR: "danger",
 };
 
 export default function EsmDocumentsClient({ projectId, documents: initialDocs, enabledTypes }: Props) {
@@ -162,23 +164,27 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
                 Generating {bulkProgress.current} of {bulkProgress.total}...
               </span>
             )}
-            <button
+            <Button
               onClick={() => handleBulkGenerate(false)}
               disabled={!!bulkProgress || generating.size > 0}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-esm-red rounded hover:bg-esm-red/90 disabled:opacity-50"
+              variant="primary"
+              size="sm"
+              className="text-sm"
             >
               Generate All
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleBulkGenerate(true)}
               disabled={!!bulkProgress || generating.size > 0}
-              className="px-3 py-1.5 text-sm font-medium text-esm-red border border-esm-red rounded hover:bg-red-50 disabled:opacity-50"
+              variant="secondary"
+              size="sm"
+              className="text-sm"
             >
               Regenerate All
-            </button>
+            </Button>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-200">
+        <Card padding="sm" className="!p-0 divide-y divide-slate-200">
           {DOC_TYPES.map((dt) => {
             const docs = documents.filter((d) => d.type === dt.key);
             const latest = docs[0];
@@ -190,9 +196,9 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-esm-black">{dt.label}</p>
                     {latest && (
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_BADGES[latest.status] || ""}`}>
+                      <Badge variant={STATUS_VARIANTS[latest.status] ?? "neutral"} pill>
                         {latest.status}
-                      </span>
+                      </Badge>
                     )}
                   </div>
                   {latest && (
@@ -211,24 +217,26 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
                       Download
                     </a>
                   )}
-                  <button
+                  <Button
                     onClick={() => handleGenerate(dt.key)}
                     disabled={isGen}
-                    className="px-3 py-1.5 text-sm font-medium text-esm-red border border-esm-red rounded hover:bg-red-50 disabled:opacity-50"
+                    variant="secondary"
+                    size="sm"
+                    className="text-sm"
                   >
                     {isGen ? "Generating..." : latest ? "Regenerate" : "Generate"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             );
           })}
-        </div>
+        </Card>
       </section>
 
       {/* Upload section */}
       <section>
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Customer Uploads</h2>
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <Card padding="lg">
           <p className="text-sm text-slate-500 mb-4">
             Upload procurement workflow documents. Files are automatically processed with AI to extract
             workflow data and generate the corresponding templates.
@@ -237,13 +245,13 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
             projectId={projectId}
             onUploadComplete={handleUploadComplete}
           />
-        </div>
+        </Card>
       </section>
 
       {/* All documents */}
       <section>
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">All Documents</h2>
-        <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-200">
+        <Card padding="sm" className="!p-0 divide-y divide-slate-200">
           {documents.length === 0 ? (
             <div className="px-6 py-4 text-sm text-slate-500">No documents generated yet.</div>
           ) : (
@@ -276,7 +284,7 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
               </div>
             ))
           )}
-        </div>
+        </Card>
       </section>
     </div>
   );

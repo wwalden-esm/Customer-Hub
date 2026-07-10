@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { SectionLabel, Card } from "@/components/ui";
 
 interface LinkItem {
   label: string;
@@ -29,9 +31,9 @@ export default function GlobalLinksEditor({ initialLinks }: { initialLinks: Link
   }
 
   return (
-    <section className="bg-white rounded-card border border-esm-border p-5">
+    <Card padding="md">
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider">Global Customer Links</h2>
+        <SectionLabel>Global Customer Links</SectionLabel>
       </div>
       <p className="text-xs text-esm-grey mb-4">These links appear on every customer hub. Use for company-wide resources like support portals, knowledge bases, or training sites.</p>
       <div className="space-y-3">
@@ -110,15 +112,17 @@ export default function GlobalLinksEditor({ initialLinks }: { initialLinks: Link
         </button>
       </div>
       <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
-        <button
+        <Button
           onClick={handleSave}
           disabled={saving}
-          className="px-4 py-1.5 text-sm font-medium text-white bg-esm-red rounded hover:opacity-90 transition-opacity disabled:opacity-50"
+          variant="primary"
+          size="sm"
+          className="text-sm"
         >
           {saving ? "Saving..." : "Save Global Links"}
-        </button>
+        </Button>
         {saved && <span className="text-sm text-emerald-600">Saved</span>}
       </div>
-    </section>
+    </Card>
   );
 }

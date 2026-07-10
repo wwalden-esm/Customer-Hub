@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, type BadgeVariant, Card } from "@/components/ui";
 
 interface Meeting {
   id: string;
@@ -20,19 +21,19 @@ interface Meeting {
   recapAttachmentId: number | null;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  Upcoming: "bg-blue-100 text-blue-700",
-  Scheduled: "bg-amber-100 text-amber-700",
-  Complete: "bg-green-100 text-green-700",
-  Skipped: "bg-slate-100 text-slate-500",
+const STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  Upcoming: "info",
+  Scheduled: "warning",
+  Complete: "success",
+  Skipped: "neutral",
 };
 
-const PHASE_COLORS: Record<string, string> = {
-  "Phase 1 — Kickoff & Discovery": "bg-indigo-100 text-indigo-700",
-  "Phase 2 — Design / Config Training": "bg-violet-100 text-violet-700",
-  "Phase 3 — Production Build": "bg-sky-100 text-sky-700",
-  "Phase 4 — Validation Testing": "bg-amber-100 text-amber-700",
-  "Phase 5 — Cutover & Hypercare": "bg-emerald-100 text-emerald-700",
+const PHASE_VARIANTS: Record<string, BadgeVariant> = {
+  "Phase 1 — Kickoff & Discovery": "accent",
+  "Phase 2 — Design / Config Training": "accent",
+  "Phase 3 — Production Build": "info",
+  "Phase 4 — Validation Testing": "warning",
+  "Phase 5 — Cutover & Hypercare": "success",
 };
 
 const STATUSES = ["All", "Upcoming", "Scheduled", "Complete", "Skipped"] as const;
@@ -177,13 +178,13 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
 
   if (meetings.length === 0) {
     return (
-      <div className="bg-white rounded-card border border-esm-border px-6 py-8 text-center">
+      <Card padding="sm" className="!px-6 !py-8 text-center">
         <svg className="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
         </svg>
         <p className="text-sm text-slate-500">No meetings scheduled yet.</p>
         <p className="text-xs text-esm-muted mt-1">Weekly implementation meetings will appear here once scheduled.</p>
-      </div>
+      </Card>
     );
   }
 
@@ -191,10 +192,10 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
     <>
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5" role="group" aria-label="Meeting summary">
-        <div className="bg-white rounded-card border border-esm-border px-4 py-3 text-center">
+        <Card padding="sm" className="!px-4 !py-3 text-center">
           <p className="text-2xl font-semibold text-esm-black">{counts.total}</p>
           <p className="text-xs text-esm-grey">Total</p>
-        </div>
+        </Card>
         {(["Complete", "Scheduled", "Upcoming", "Skipped"] as const).map((s) => {
           const colorMap: Record<string, { active: string; count: string }> = {
             Complete: { active: "border-green-400 bg-green-50", count: "text-green-700" },
@@ -258,7 +259,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
       </div>
 
       {/* Meeting list */}
-      <div className="bg-white rounded-card border border-esm-border divide-y divide-esm-border">
+      <Card padding="sm" className="!p-0 divide-y divide-esm-border">
         {filtered.length === 0 ? (
           <div className="px-5 py-6 text-center text-sm text-slate-500">
             No meetings match the selected filters.
@@ -288,13 +289,13 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-esm-black">{meeting.week}</span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[meeting.status]}`}>
+                      <Badge variant={STATUS_VARIANTS[meeting.status]} pill className="text-xs font-medium">
                         {meeting.status}
-                      </span>
+                      </Badge>
                       {meeting.phase && (
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${PHASE_COLORS[meeting.phase] ?? "bg-slate-100 text-esm-grey"}`}>
+                        <Badge variant={PHASE_VARIANTS[meeting.phase] ?? "neutral"} pill className="text-xs font-medium">
                           {shortPhase(meeting.phase)}
-                        </span>
+                        </Badge>
                       )}
                       {meeting.actionItemsLogged && (
                         <span className="text-green-600" aria-label="Action items logged">
@@ -366,7 +367,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
             );
           })
         )}
-      </div>
+      </Card>
 
       <p className="text-xs text-esm-muted mt-3" aria-live="polite">
         Showing {filtered.length} of {meetings.length} meetings

@@ -1,5 +1,6 @@
 import type { HubDecision } from "@/types/hub";
 import { parseLocalDate } from "@/lib/date-utils";
+import { Badge, Card } from "@/components/ui";
 
 function fmt(d: string) {
   return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -9,14 +10,15 @@ export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubD
   if (decisions.length === 0) return null;
 
   return (
-    <section className="bg-white border border-esm-border rounded-card overflow-hidden" aria-labelledby="decisions-heading">
+    <section aria-labelledby="decisions-heading">
+      <Card padding="sm" className="!p-0 overflow-hidden">
       <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
         <h2 id="decisions-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
           Decision Log
         </h2>
-        <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-card border bg-gray-50 text-esm-grey border-esm-border">
+        <Badge variant="neutral" className="text-[11px] font-bold px-2.5">
           {decisions.length} recorded
-        </span>
+        </Badge>
       </div>
       <ul className="divide-y divide-gray-100">
         {decisions.slice(0, 5).map((d) => (
@@ -29,13 +31,9 @@ export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubD
                 )}
               </div>
               <div className="text-right shrink-0">
-                <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-card border ${
-                  d.status === "Complete"
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                    : "bg-blue-50 text-blue-700 border-blue-200"
-                }`}>
+                <Badge variant={d.status === "Complete" ? "success" : "info"} className="text-[10px] tracking-wide uppercase">
                   {d.status}
-                </span>
+                </Badge>
                 {d.date && (
                   <p className="text-[10px] text-esm-muted mt-1">{fmt(d.date)}</p>
                 )}
@@ -56,6 +54,7 @@ export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubD
           </a>
         </div>
       )}
+      </Card>
     </section>
   );
 }

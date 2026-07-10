@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Card, SectionLabel } from "@/components/ui";
 
 const DAY_OPTIONS = [
   { value: 1, label: "Monday" },
@@ -107,10 +109,10 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
   }
 
   return (
-    <div className="bg-white border border-esm-border rounded-card p-4">
-      <h3 className="text-xs font-bold text-esm-grey uppercase tracking-wider mb-3">
+    <Card padding="sm">
+      <SectionLabel className="mb-3">
         Generate Meeting Schedule
-      </h3>
+      </SectionLabel>
       <p className="text-xs text-esm-grey mb-3">
         Creates weekly meetings from project start through hypercare with phase-appropriate agendas, SC prep items, and customer deliverables.
       </p>
@@ -147,20 +149,23 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
       )}
 
       <div className="flex items-center gap-2">
-        <button
+        <Button
           onClick={handleGenerate}
           disabled={generating}
-          className="flex-1 text-center bg-esm-red text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity disabled:opacity-50"
+          variant="primary"
+          size="md"
+          className="flex-1"
         >
           {generating ? "Generating..." : "Generate"}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => { setOpen(false); setError(null); }}
-          className="px-3 py-2 text-sm text-esm-grey border border-esm-border rounded hover:bg-slate-50 transition-colors"
+          variant="secondary"
+          size="md"
         >
           Cancel
-        </button>
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 }

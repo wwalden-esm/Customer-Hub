@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
 
 interface SyncResult {
   created: Array<{ projectId: string; customerName: string }>;
@@ -34,10 +35,11 @@ export default function SyncHubSpotButton() {
 
   return (
     <div className="flex items-center gap-3">
-      <button
+      <Button
         onClick={handleSync}
         disabled={syncing}
-        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-esm-red hover:bg-esm-red/90 rounded transition-colors disabled:opacity-50"
+        variant="primary"
+        size="md"
       >
         {syncing ? (
           <>
@@ -55,7 +57,7 @@ export default function SyncHubSpotButton() {
             Sync from HubSpot
           </>
         )}
-      </button>
+      </Button>
 
       {result && result.created.length > 0 && (
         <span className="text-sm text-green-700">
