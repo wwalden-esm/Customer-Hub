@@ -118,6 +118,7 @@ export default function MeetingManagement({
     setActivePanel(null);
   };
 
+  const [showAddForm, setShowAddForm] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
 
   const updateStatus = async (id: string, newStatus: Meeting["status"]) => {
@@ -169,7 +170,28 @@ export default function MeetingManagement({
         >
           All Meetings ({meetings.length})
         </button>
+        <div className="flex-1" />
+        <button
+          onClick={() => setShowAddForm((p) => !p)}
+          className="px-3 py-1.5 text-xs font-medium bg-esm-red text-white rounded hover:opacity-90 transition-opacity flex items-center gap-1.5"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Meeting
+        </button>
       </div>
+
+      {showAddForm && (
+        <AddMeetingPanel
+          projectId={projectId}
+          onAdded={(m) => {
+            setMeetings((prev) => [...prev, m]);
+            setShowAddForm(false);
+          }}
+          onCancel={() => setShowAddForm(false)}
+        />
+      )}
 
       {filtered.length === 0 ? (
         <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-8 text-center">
@@ -801,6 +823,169 @@ function SendRecapPanel({
           className="px-4 py-2 text-sm font-medium bg-esm-red text-white rounded hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           {sending ? "Sending..." : "Send Recap Email"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// --- Add Ad-Hoc Meeting Panel ---
+
+const TIME_OPTIONS = [
+  { value: "", label: "No time" },
+  { value: "08:00", label: "8:00 AM" },
+  { value: "08:30", label: "8:30 AM" },
+  { value: "09:00", label: "9:00 AM" },
+  { value: "09:30", label: "9:30 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "10:30", label: "10:30 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "11:30", label: "11:30 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "12:30", label: "12:30 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "13:30", label: "1:30 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "14:30", label: "2:30 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "15:30", label: "3:30 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "16:30", label: "4:30 PM" },
+  { value: "17:00", label: "5:00 PM" },
+];
+
+function AddMeetingPanel({
+  projectId,
+  onAdded,
+  onCancel,
+}: {
+  projectId: string;
+  onAdded: (m: Meeting) => void;
+  onCancel: () => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [meetingDate, setMeetingDate] = useState("");
+  const [meetingTime, setMeetingTime] = useState("14:30");
+  const [phase, setPhase] = useState("");
+  const [agenda, setAgenda] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSave() {
+    if (!title.trim()) { setError("Title is required"); return; }
+    if (!meetingDate) { setError("Date is required"); return; }
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/meetings/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, meetingDate, meetingTime, phase, agenda, notes }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to add meeting");
+      }
+      const data = await res.json();
+      onAdded(data.meeting);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-sm border border-[#E2E0E1] p-5 mb-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold text-esm-black">Add Ad-Hoc Meeting</h3>
+        <button onClick={onCancel} className="text-esm-grey hover:text-esm-black">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-esm-black mb-1">Meeting Title</label>
+          <input
+            type="text"
+            placeholder="e.g. Ad-Hoc: Integration Review"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-esm-black mb-1">Date</label>
+          <input
+            type="date"
+            value={meetingDate}
+            onChange={(e) => setMeetingDate(e.target.value)}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-esm-black mb-1">Time (EST)</label>
+          <select
+            value={meetingTime}
+            onChange={(e) => setMeetingTime(e.target.value)}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+          >
+            {TIME_OPTIONS.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-esm-black mb-1">Phase</label>
+          <input
+            type="text"
+            placeholder="e.g. Configuration, UAT, Go-Live"
+            value={phase}
+            onChange={(e) => setPhase(e.target.value)}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+          />
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-esm-black mb-1">Agenda</label>
+          <textarea
+            rows={3}
+            placeholder="Meeting agenda items..."
+            value={agenda}
+            onChange={(e) => setAgenda(e.target.value)}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
+          />
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-esm-black mb-1">Notes</label>
+          <textarea
+            rows={2}
+            placeholder="Any additional notes..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
+          />
+        </div>
+      </div>
+
+      {error && <p className="text-xs text-esm-red">{error}</p>}
+
+      <div className="flex gap-2">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-4 py-2 text-sm font-medium bg-esm-red text-white rounded hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          {saving ? "Adding..." : "Add Meeting"}
+        </button>
+        <button
+          onClick={onCancel}
+          className="px-4 py-2 text-sm font-medium border border-[#E2E0E1] text-esm-grey rounded hover:bg-slate-50 transition-colors"
+        >
+          Cancel
         </button>
       </div>
     </div>
