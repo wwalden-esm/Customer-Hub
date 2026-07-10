@@ -258,6 +258,9 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
           )}
 
           <div className="space-y-2">
+            <Link href={`/dashboard/${project.id}/meetings`} className="block w-full text-center bg-esm-black text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
+              Manage Meetings
+            </Link>
             <Link href={`/dashboard/${project.id}/documents`} className="block w-full text-center bg-esm-red text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
               Documents
             </Link>

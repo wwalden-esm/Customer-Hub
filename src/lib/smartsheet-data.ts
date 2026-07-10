@@ -7,6 +7,7 @@ import {
   listSheetAttachments,
   getSheetPermalink,
 } from "@/lib/smartsheet";
+import { parseLocalDate } from "@/lib/date-utils";
 import projectsJson from "../../config/projects.json";
 
 const projects = projectsJson as Record<string, Omit<Project, "id"> & { password?: string }>;
@@ -429,26 +430,52 @@ export async function getProjectMeetings(meetingTrackerSheetId: string): Promise
     const actionCol = cols.get("Action Items Logged?");
     const recapCol = cols.get("Recap Sent?");
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     return sheet.rows
       .filter((row) => {
         const week = weekCol ? cellValue(row, weekCol) : null;
         return week && week.trim().length > 0;
       })
-      .map((row) => ({
-        id: String(row.id),
-        week: weekCol ? cellValue(row, weekCol) ?? "" : "",
-        days: daysCol ? cellValue(row, daysCol) ?? "" : "",
-        phase: phaseCol ? cellValue(row, phaseCol) ?? "" : "",
-        milestone: milestoneCol ? cellValue(row, milestoneCol) ?? "" : "",
-        meetingDate: dateCol ? cellValue(row, dateCol) ?? null : null,
-        status: (statusCol ? cellValue(row, statusCol) ?? "Upcoming" : "Upcoming") as Meeting["status"],
-        scPrepItems: prepCol ? cellValue(row, prepCol) ?? "" : "",
-        agendaSummary: agendaCol ? cellValue(row, agendaCol) ?? "" : "",
-        customerDeliverables: delivCol ? cellValue(row, delivCol) ?? "" : "",
-        notes: notesCol ? cellValue(row, notesCol) ?? "" : "",
-        actionItemsLogged: actionCol ? cellValue(row, actionCol) === "true" : false,
-        recapSent: recapCol ? cellValue(row, recapCol) === "true" : false,
-      }));
+      .map((row) => {
+        const explicit = statusCol ? cellValue(row, statusCol) ?? "" : "";
+        const dateStr = dateCol ? cellValue(row, dateCol) ?? null : null;
+        const actionsLogged = actionCol ? cellValue(row, actionCol) === "true" : false;
+        const recapDone = recapCol ? cellValue(row, recapCol) === "true" : false;
+
+        let status: Meeting["status"];
+        if (explicit === "Complete" || explicit === "Skipped") {
+          status = explicit;
+        } else if (dateStr) {
+          const mtgDate = parseLocalDate(dateStr);
+          if (mtgDate > today) {
+            status = "Scheduled";
+          } else if (actionsLogged && recapDone) {
+            status = "Complete";
+          } else {
+            status = "Upcoming";
+          }
+        } else {
+          status = "Upcoming";
+        }
+
+        return {
+          id: String(row.id),
+          week: weekCol ? cellValue(row, weekCol) ?? "" : "",
+          days: daysCol ? cellValue(row, daysCol) ?? "" : "",
+          phase: phaseCol ? cellValue(row, phaseCol) ?? "" : "",
+          milestone: milestoneCol ? cellValue(row, milestoneCol) ?? "" : "",
+          meetingDate: dateStr,
+          status,
+          scPrepItems: prepCol ? cellValue(row, prepCol) ?? "" : "",
+          agendaSummary: agendaCol ? cellValue(row, agendaCol) ?? "" : "",
+          customerDeliverables: delivCol ? cellValue(row, delivCol) ?? "" : "",
+          notes: notesCol ? cellValue(row, notesCol) ?? "" : "",
+          actionItemsLogged: actionsLogged,
+          recapSent: recapDone,
+        };
+      });
   } catch {
     return [];
   }

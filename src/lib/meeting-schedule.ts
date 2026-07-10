@@ -130,6 +130,7 @@ export function generateMeetingSchedule(
   startDate: string,
   goLiveDate: string,
   meetingDay: number, // 0=Sun, 1=Mon, 2=Tue, etc.
+  meetingTime: string = "14:30", // HH:mm in EST
 ): GeneratedMeeting[] {
   const start = parseLocalDate(startDate);
   const end = parseLocalDate(goLiveDate);
@@ -188,7 +189,7 @@ export function generateMeetingSchedule(
     const delivFn = PHASE_DELIVERABLES[phase.id];
     const prepFn = PHASE_PREP[phase.id];
 
-    const dateStr = meetDate.toISOString().split("T")[0];
+    const dateStr = `${meetDate.toISOString().split("T")[0]}T${meetingTime}:00`;
 
     meetings.push({
       week: `Week ${week}`,

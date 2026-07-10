@@ -31,8 +31,9 @@ export async function POST(
 
   const body = await req.json();
   const meetingDay = typeof body.meetingDay === "number" ? body.meetingDay : 2; // default Tuesday
+  const meetingTime = typeof body.meetingTime === "string" ? body.meetingTime : "14:30";
 
-  const meetings = generateMeetingSchedule(project.startDate, project.goLiveDate, meetingDay);
+  const meetings = generateMeetingSchedule(project.startDate, project.goLiveDate, meetingDay, meetingTime);
 
   const sheet = await getSheet(config.meetingTrackerSheetId);
   const cols = columnIdMap(sheet);

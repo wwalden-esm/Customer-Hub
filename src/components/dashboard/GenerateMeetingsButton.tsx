@@ -10,6 +10,28 @@ const DAY_OPTIONS = [
   { value: 5, label: "Friday" },
 ];
 
+const TIME_OPTIONS = [
+  { value: "08:00", label: "8:00 AM" },
+  { value: "08:30", label: "8:30 AM" },
+  { value: "09:00", label: "9:00 AM" },
+  { value: "09:30", label: "9:30 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "10:30", label: "10:30 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "11:30", label: "11:30 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "12:30", label: "12:30 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "13:30", label: "1:30 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "14:30", label: "2:30 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "15:30", label: "3:30 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "16:30", label: "4:30 PM" },
+  { value: "17:00", label: "5:00 PM" },
+];
+
 interface Result {
   generated: number;
   phases: string[];
@@ -19,6 +41,7 @@ interface Result {
 export default function GenerateMeetingsButton({ projectId }: { projectId: string }) {
   const [open, setOpen] = useState(false);
   const [meetingDay, setMeetingDay] = useState(2);
+  const [meetingTime, setMeetingTime] = useState("14:30");
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +55,7 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
       const res = await fetch(`/api/projects/${projectId}/generate-meetings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ meetingDay }),
+        body: JSON.stringify({ meetingDay, meetingTime }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -92,18 +115,32 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
         Creates weekly meetings from project start through hypercare with phase-appropriate agendas, SC prep items, and customer deliverables.
       </p>
 
-      <label className="block text-xs font-medium text-esm-black mb-1">
-        Weekly meeting day
-      </label>
-      <select
-        value={meetingDay}
-        onChange={(e) => setMeetingDay(Number(e.target.value))}
-        className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 mb-3 focus:outline-none focus:border-esm-black"
-      >
-        {DAY_OPTIONS.map((d) => (
-          <option key={d.value} value={d.value}>{d.label}</option>
-        ))}
-      </select>
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <div>
+          <label className="block text-xs font-medium text-esm-black mb-1">Day</label>
+          <select
+            value={meetingDay}
+            onChange={(e) => setMeetingDay(Number(e.target.value))}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+          >
+            {DAY_OPTIONS.map((d) => (
+              <option key={d.value} value={d.value}>{d.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-esm-black mb-1">Time (EST)</label>
+          <select
+            value={meetingTime}
+            onChange={(e) => setMeetingTime(e.target.value)}
+            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+          >
+            {TIME_OPTIONS.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {error && (
         <p className="text-xs text-esm-red mb-2">{error}</p>
