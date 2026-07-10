@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
 
 interface Meeting {
@@ -17,6 +17,7 @@ interface Meeting {
   notes: string;
   actionItemsLogged: boolean;
   recapSent: boolean;
+  recapAttachmentId: number | null;
 }
 
 interface ActionItemDraft {
@@ -38,8 +39,9 @@ interface TranscriptResult {
   actionItemsLogged: number;
   decisionsLogged: number;
   risksLogged: number;
-  mailtoUrl: string;
+  emlContent: string;
   meetingWeek: string;
+  recapAttachmentId: number | null;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -67,7 +69,7 @@ export default function MeetingManagement({
 }) {
   const [meetings, setMeetings] = useState(initialMeetings);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [activePanel, setActivePanel] = useState<{ id: string; type: "transcript" | "manual-actions" | "manual-recap" } | null>(null);
+  const [activePanel, setActivePanel] = useState<{ id: string; type: "transcript" | "manual-actions" | "manual-recap" | "view-recap" } | null>(null);
   const [filter, setFilter] = useState<"all" | "needs-action">("needs-action");
 
   const isPastMeeting = (m: Meeting) => {
@@ -93,13 +95,13 @@ export default function MeetingManagement({
     setActivePanel(null);
   };
 
-  const openPanel = (id: string, type: "transcript" | "manual-actions" | "manual-recap") => {
+  const openPanel = (id: string, type: "transcript" | "manual-actions" | "manual-recap" | "view-recap") => {
     setActivePanel(activePanel?.id === id && activePanel?.type === type ? null : { id, type });
   };
 
-  const markBoth = (id: string) => {
+  const markBoth = (id: string, recapAttachmentId?: number | null) => {
     setMeetings((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, actionItemsLogged: true, recapSent: true, status: "Complete" } : m)),
+      prev.map((m) => (m.id === id ? { ...m, actionItemsLogged: true, recapSent: true, status: "Complete", recapAttachmentId: recapAttachmentId ?? m.recapAttachmentId } : m)),
     );
     setActivePanel(null);
   };
@@ -278,6 +280,23 @@ export default function MeetingManagement({
                       </div>
                     )}
 
+                    {/* View existing recap */}
+                    {meeting.recapAttachmentId && (
+                      <button
+                        onClick={() => openPanel(meeting.id, "view-recap")}
+                        className={`px-4 py-2 text-sm font-medium rounded transition-opacity flex items-center gap-2 ${
+                          panel === "view-recap"
+                            ? "bg-esm-blue/90 text-white"
+                            : "bg-esm-blue text-white hover:opacity-90"
+                        }`}
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        View Recap
+                      </button>
+                    )}
+
                     {/* Primary action: Process Transcript (handles both action items + recap) */}
                     {(!meeting.actionItemsLogged || !meeting.recapSent) && (
                       <div className="flex flex-wrap gap-3">
@@ -320,7 +339,7 @@ export default function MeetingManagement({
                         meetingId={meeting.id}
                         projectId={projectId}
                         meeting={meeting}
-                        onDone={() => markBoth(meeting.id)}
+                        onDone={(attachmentId) => markBoth(meeting.id, attachmentId)}
                         onRecapOpened={() => markRecapSent(meeting.id)}
                       />
                     )}
@@ -340,6 +359,10 @@ export default function MeetingManagement({
                         meeting={meeting}
                         onDone={() => markRecapSent(meeting.id)}
                       />
+                    )}
+
+                    {panel === "view-recap" && (
+                      <ViewRecapPanel meetingId={meeting.id} projectId={projectId} />
                     )}
                   </div>
                 )}
@@ -385,7 +408,7 @@ function ProcessTranscriptPanel({
   meetingId: string;
   projectId: string;
   meeting: Meeting;
-  onDone: () => void;
+  onDone: (recapAttachmentId?: number | null) => void;
   onRecapOpened: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -442,7 +465,15 @@ function ProcessTranscriptPanel({
 
   function openRecapInOutlook() {
     if (!result) return;
-    window.open(result.mailtoUrl, "_self");
+    const blob = new Blob([result.emlContent], { type: "message/rfc822" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Recap-${result.meetingWeek.replace(/\s+/g, "-")}.eml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
     fetch(`/api/projects/${projectId}/meetings/${meetingId}/mark-recap`, { method: "POST" });
     onRecapOpened();
   }
@@ -540,7 +571,7 @@ function ProcessTranscriptPanel({
             Open Recap in Outlook
           </button>
           <button
-            onClick={onDone}
+            onClick={() => onDone(result.recapAttachmentId)}
             className="px-4 py-2 text-sm font-medium border border-[#E2E0E1] text-esm-grey rounded hover:bg-slate-50 transition-colors"
           >
             Done
@@ -825,6 +856,114 @@ function SendRecapPanel({
           {sending ? "Sending..." : "Send Recap Email"}
         </button>
       </div>
+    </div>
+  );
+}
+
+// --- View Recap Panel ---
+
+interface RecapData {
+  meeting_name: string;
+  attendees: string;
+  summary: string;
+  action_items: { owner: string; task: string; due: string; type: string }[];
+  decisions: { title: string; description: string; made_by: string; type: string; impact: string }[];
+  risks: { description: string; owner: string; mitigation: string; priority: string }[];
+}
+
+function ViewRecapPanel({ meetingId, projectId }: { meetingId: string; projectId: string }) {
+  const [recap, setRecap] = useState<RecapData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/projects/${projectId}/meetings/${meetingId}/recap`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to load recap");
+        const data = await res.json();
+        setRecap(data.recap);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load"))
+      .finally(() => setLoading(false));
+  }, [projectId, meetingId]);
+
+  if (loading) {
+    return (
+      <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-6 text-center">
+        <svg className="w-5 h-5 animate-spin mx-auto text-esm-grey mb-2" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <p className="text-xs text-esm-grey">Loading recap...</p>
+      </div>
+    );
+  }
+
+  if (error || !recap) {
+    return (
+      <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4">
+        <p className="text-xs text-esm-red">{error || "Recap not found"}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4 space-y-4">
+      <div className="flex items-center gap-3">
+        <svg className="w-5 h-5 text-esm-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <div>
+          <h4 className="text-sm font-semibold text-esm-black">{recap.meeting_name}</h4>
+          <p className="text-xs text-esm-grey">{recap.attendees}</p>
+        </div>
+      </div>
+
+      <div className="pl-4 border-l-2 border-[#E2E0E1]">
+        <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Summary</p>
+        <p className="text-sm text-esm-black">{recap.summary}</p>
+      </div>
+
+      {recap.action_items.length > 0 && (
+        <div className="pl-4 border-l-2 border-amber-200">
+          <p className="text-[10px] font-extrabold text-amber-600 tracking-[0.09em] uppercase mb-1">Action Items</p>
+          <ul className="space-y-1">
+            {recap.action_items.map((ai, i) => (
+              <li key={i} className="text-xs text-esm-black">
+                <span className="font-medium">{ai.owner}:</span> {ai.task}
+                <span className="text-esm-grey ml-1">(Due: {ai.due}, {ai.type})</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {recap.decisions.length > 0 && (
+        <div className="pl-4 border-l-2 border-blue-200">
+          <p className="text-[10px] font-extrabold text-blue-600 tracking-[0.09em] uppercase mb-1">Decisions</p>
+          <ul className="space-y-1">
+            {recap.decisions.map((d, i) => (
+              <li key={i} className="text-xs text-esm-black">
+                <span className="font-medium">{d.title}:</span> {d.description}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {recap.risks.length > 0 && (
+        <div className="pl-4 border-l-2 border-red-200">
+          <p className="text-[10px] font-extrabold text-red-600 tracking-[0.09em] uppercase mb-1">Risks / Open Items</p>
+          <ul className="space-y-1">
+            {recap.risks.map((r, i) => (
+              <li key={i} className="text-xs text-esm-black">
+                {r.description}
+                <span className="text-esm-grey ml-1">({r.priority})</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

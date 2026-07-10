@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getProjectById, getSmartsheetConfig, getProjectContacts } from "@/lib/smartsheet-data";
-import { getSheet, columnIdMap, updateRows, addRows } from "@/lib/smartsheet";
+import { getSheet, columnIdMap, updateRows, addRows, attachFileToRow } from "@/lib/smartsheet";
 import type { SsCell } from "@/lib/smartsheet";
 import {
   parseTranscriptFile,
   processTranscript,
   buildRecapEmailBody,
-  buildMailtoUrl,
+  buildEml,
 } from "@/lib/transcript-recap";
 
 export async function POST(
@@ -168,10 +168,10 @@ export async function POST(
     ]);
   }
 
-  // Build the mailto URL for the recap email
+  // Build the .eml draft for the recap email
   const contacts = getProjectContacts(id);
   const primaryContact = contacts[0]?.name ?? "Team";
-  const toEmail = contacts.map((c) => c.email).join(";");
+  const toEmail = contacts.map((c) => c.email).join(", ");
 
   const emailBody = buildRecapEmailBody(
     recap,
@@ -180,7 +180,31 @@ export async function POST(
   );
 
   const subject = `Meeting Recap — ${recap.meeting_name}`;
-  const mailtoUrl = buildMailtoUrl(toEmail, subject, emailBody);
+  const emlContent = buildEml(
+    toEmail,
+    subject,
+    emailBody,
+    project!.scName,
+    project!.scEmail,
+  );
+
+  // Attach recap as a text file to the meeting row in Smartsheet
+  let recapAttachmentId: number | null = null;
+  try {
+    const recapJson = JSON.stringify(recap, null, 2);
+    const buf = new TextEncoder().encode(recapJson);
+    const weekSlug = meetingWeek.replace(/\s+/g, "-");
+    const attachment = await attachFileToRow(
+      config.meetingTrackerSheetId,
+      Number(meetingId),
+      `Recap-${weekSlug}.json`,
+      "application/json",
+      buf,
+    );
+    recapAttachmentId = attachment.id;
+  } catch {
+    // Non-fatal — recap still works via email
+  }
 
   return NextResponse.json({
     recap,
@@ -188,7 +212,8 @@ export async function POST(
     actionItemsLogged: recap.action_items.length,
     decisionsLogged: recap.decisions.length,
     risksLogged: recap.risks.length,
-    mailtoUrl,
+    emlContent,
     meetingWeek,
+    recapAttachmentId,
   });
 }

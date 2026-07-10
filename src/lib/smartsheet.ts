@@ -40,6 +40,7 @@ export interface SsRow {
   id: number;
   cells: SsCell[];
   rowNumber?: number;
+  attachments?: SsAttachment[];
 }
 
 export interface SsColumn {
@@ -81,7 +82,7 @@ export async function getFolder(folderId: string | number): Promise<SsFolder> {
 const permalinkCache = new Map<string, string>();
 
 export async function getSheet(sheetId: string | number): Promise<SsSheet> {
-  const sheet = await ssFetch<SsSheet>(`/sheets/${sheetId}`);
+  const sheet = await ssFetch<SsSheet>(`/sheets/${sheetId}?include=attachments`);
   if (sheet.permalink) permalinkCache.set(String(sheetId), sheet.permalink);
   return sheet;
 }

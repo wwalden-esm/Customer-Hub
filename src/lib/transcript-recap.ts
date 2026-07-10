@@ -157,33 +157,44 @@ export function buildRecapEmailBody(
   return lines.join("\n") + SIGNATURE;
 }
 
-export function buildMailtoUrl(
+function escHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+export function buildEml(
   to: string,
   subject: string,
   body: string,
+  fromName: string,
+  fromEmail: string,
 ): string {
-  const safe = " .,;:!?@#-_=+/*[](){}|'\"";
-  const quoteSafe = (s: string) => {
-    let result = "";
-    for (const ch of s) {
-      if (
-        (ch >= "A" && ch <= "Z") ||
-        (ch >= "a" && ch <= "z") ||
-        (ch >= "0" && ch <= "9") ||
-        safe.includes(ch)
-      ) {
-        result += ch;
-      } else {
-        const code = ch.charCodeAt(0);
-        if (code < 128) {
-          result += `%${code.toString(16).toUpperCase().padStart(2, "0")}`;
-        } else {
-          result += encodeURIComponent(ch);
-        }
-      }
-    }
-    return result;
-  };
+  const boundary = "----=_Part_ESM_" + Date.now().toString(36);
+  const htmlBody = `<html><body style="margin:0;padding:20px;background:#fff;">
+<pre style="font-family:Consolas,'Courier New',monospace;font-size:13px;line-height:1.5;color:#1a1a1a;white-space:pre-wrap;word-wrap:break-word;">${escHtml(body)}</pre>
+</body></html>`;
 
-  return `mailto:${encodeURIComponent(to)}?subject=${quoteSafe(subject)}&body=${quoteSafe(body)}`;
+  const lines = [
+    `From: "${fromName}" <${fromEmail}>`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    `X-Unsent: 1`,
+    ``,
+    `--${boundary}`,
+    `Content-Type: text/plain; charset="utf-8"`,
+    `Content-Transfer-Encoding: 7bit`,
+    ``,
+    body,
+    ``,
+    `--${boundary}`,
+    `Content-Type: text/html; charset="utf-8"`,
+    `Content-Transfer-Encoding: 7bit`,
+    ``,
+    htmlBody,
+    ``,
+    `--${boundary}--`,
+  ];
+
+  return lines.join("\r\n");
 }

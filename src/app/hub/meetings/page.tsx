@@ -20,7 +20,7 @@ export default async function MeetingsPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-esm-black mb-6">Meeting Tracker</h1>
-      <MeetingTrackerClient meetings={meetings} />
+      <MeetingTrackerClient meetings={meetings} projectId={session.projectId} />
     </div>
   );
 }

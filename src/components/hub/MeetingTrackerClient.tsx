@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
 
 interface Meeting {
@@ -17,6 +17,7 @@ interface Meeting {
   notes: string;
   actionItemsLogged: boolean;
   recapSent: boolean;
+  recapAttachmentId: number | null;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -46,10 +47,102 @@ function shortPhase(phase: string): string {
   return match ? `P${match[1]}` : phase;
 }
 
-export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[] }) {
+interface RecapData {
+  meeting_name: string;
+  attendees: string;
+  summary: string;
+  action_items: { owner: string; task: string; due: string; type: string }[];
+  decisions: { title: string; description: string; made_by: string; type: string; impact: string }[];
+  risks: { description: string; owner: string; mitigation: string; priority: string }[];
+}
+
+function RecapPanel({ meetingId, projectId }: { meetingId: string; projectId: string }) {
+  const [recap, setRecap] = useState<RecapData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/projects/${projectId}/meetings/${meetingId}/recap`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to load recap");
+        const data = await res.json();
+        setRecap(data.recap);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load"))
+      .finally(() => setLoading(false));
+  }, [projectId, meetingId]);
+
+  if (loading) {
+    return (
+      <div className="py-3 text-center">
+        <svg className="w-4 h-4 animate-spin mx-auto text-esm-grey" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (error || !recap) {
+    return <p className="text-xs text-esm-red py-2">{error || "Recap not available"}</p>;
+  }
+
+  return (
+    <div className="space-y-3 mt-3 pt-3 border-t border-[#E2E0E1]">
+      <div>
+        <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Meeting Summary</p>
+        <p className="text-sm text-esm-black">{recap.summary}</p>
+      </div>
+
+      {recap.action_items.length > 0 && (
+        <div className="pl-4 border-l-2 border-amber-200">
+          <p className="text-[10px] font-extrabold text-amber-600 tracking-[0.09em] uppercase mb-1">Action Items</p>
+          <ul className="space-y-1">
+            {recap.action_items.map((ai, i) => (
+              <li key={i} className="text-xs text-esm-black">
+                <span className="font-medium">{ai.owner}:</span> {ai.task}
+                <span className="text-esm-grey ml-1">(Due: {ai.due})</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {recap.decisions.length > 0 && (
+        <div className="pl-4 border-l-2 border-blue-200">
+          <p className="text-[10px] font-extrabold text-blue-600 tracking-[0.09em] uppercase mb-1">Decisions</p>
+          <ul className="space-y-1">
+            {recap.decisions.map((d, i) => (
+              <li key={i} className="text-xs text-esm-black">
+                <span className="font-medium">{d.title}:</span> {d.description}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {recap.risks.length > 0 && (
+        <div className="pl-4 border-l-2 border-red-200">
+          <p className="text-[10px] font-extrabold text-red-600 tracking-[0.09em] uppercase mb-1">Risks / Open Items</p>
+          <ul className="space-y-1">
+            {recap.risks.map((r, i) => (
+              <li key={i} className="text-xs text-esm-black">
+                {r.description}
+                <span className="text-esm-grey ml-1">({r.priority})</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function MeetingTrackerClient({ meetings, projectId }: { meetings: Meeting[]; projectId: string }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [phaseFilter, setPhaseFilter] = useState("All");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [viewingRecap, setViewingRecap] = useState<string | null>(null);
 
   const phases = useMemo(() => {
     const s = new Set(meetings.map((m) => m.phase).filter(Boolean));
@@ -248,10 +341,25 @@ export default function MeetingTrackerClient({ meetings }: { meetings: Meeting[]
                         <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.notes}</p>
                       </div>
                     )}
-                    <div className="flex gap-4 text-xs text-esm-grey pt-1">
+                    <div className="flex items-center gap-4 text-xs text-esm-grey pt-1">
                       <span>Action Items: {meeting.actionItemsLogged ? "Logged" : "Pending"}</span>
                       <span>Recap: {meeting.recapSent ? "Sent" : "Pending"}</span>
+                      {meeting.recapAttachmentId && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setViewingRecap(viewingRecap === meeting.id ? null : meeting.id);
+                          }}
+                          className="ml-auto px-2.5 py-1 text-xs font-medium rounded bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                        >
+                          {viewingRecap === meeting.id ? "Hide Recap" : "View Recap"}
+                        </button>
+                      )}
                     </div>
+
+                    {viewingRecap === meeting.id && (
+                      <RecapPanel meetingId={meeting.id} projectId={projectId} />
+                    )}
                   </div>
                 )}
               </div>

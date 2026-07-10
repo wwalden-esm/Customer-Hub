@@ -475,6 +475,7 @@ export async function getProjectMeetings(meetingTrackerSheetId: string): Promise
           notes: notesCol ? cellValue(row, notesCol) ?? "" : "",
           actionItemsLogged: actionsLogged,
           recapSent: recapDone,
+          recapAttachmentId: row.attachments?.find((a) => a.name.startsWith("Recap-"))?.id ?? null,
         };
       });
   } catch {

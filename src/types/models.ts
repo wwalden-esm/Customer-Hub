@@ -114,6 +114,7 @@ export interface Meeting {
   notes: string;
   actionItemsLogged: boolean;
   recapSent: boolean;
+  recapAttachmentId: number | null;
 }
 
 export interface ProjectLink {
