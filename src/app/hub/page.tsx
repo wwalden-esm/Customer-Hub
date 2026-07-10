@@ -69,74 +69,77 @@ export default async function HubDashboard() {
         <RefreshButton />
       </div>
 
-      {/* ── Team contact strip ── */}
-      {data.team.length > 0 && (
-        <div className="bg-white border border-[#E2E0E1] rounded-sm px-5 py-3 mb-5 flex flex-wrap items-center gap-x-6 gap-y-2">
-          {data.team.map((member) => (
-            <div key={member.role} className="flex items-center gap-2.5">
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-                style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
-                aria-hidden="true"
-              >
-                {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-              </div>
-              <div className="text-sm">
-                <span className="font-medium text-esm-black">{member.name}</span>
-                <span className="text-esm-grey">{" · "}{member.role}</span>
-              </div>
-              {member.email && (
-                <a
-                  href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
-                  className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-sm border border-[#E2E0E1] hover:bg-slate-50 transition-colors text-esm-grey"
-                  aria-label={`Email ${member.name}`}
+      {/* ── Team + Timeline row ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        {/* Team contact card */}
+        {data.team.length > 0 && (
+          <div className="bg-white border border-[#E2E0E1] rounded-sm px-5 py-3 flex flex-col gap-3">
+            {data.team.map((member) => (
+              <div key={member.role} className="flex items-center gap-2.5">
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                  style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+                  aria-hidden="true"
                 >
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  Email
-                </a>
-              )}
-            </div>
-          ))}
-          {data.team.length > 0 && data.team[0].email && (
-            <a
-              href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Request Meeting`)}`}
-              className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-sm border hover:bg-slate-50 transition-colors"
-              style={{ color: "var(--hub-accent, #F4333F)", borderColor: "var(--hub-accent, #F4333F)" }}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              Request a meeting
-            </a>
-          )}
-        </div>
-      )}
+                  {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                </div>
+                <div className="text-sm">
+                  <span className="font-medium text-esm-black">{member.name}</span>
+                  <span className="text-esm-grey">{" · "}{member.role}</span>
+                </div>
+                {member.email && (
+                  <a
+                    href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
+                    className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-sm border border-[#E2E0E1] hover:bg-slate-50 transition-colors text-esm-grey"
+                    aria-label={`Email ${member.name}`}
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Email
+                  </a>
+                )}
+              </div>
+            ))}
+            {data.team[0].email && (
+              <a
+                href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Meeting Request`)}&body=${encodeURIComponent(`Hi ${data.team[0].name.split(" ")[0]},\n\nI hope this message finds you well. I'd like to request a meeting to discuss our ${project.projectName} implementation. Please let me know your availability.\n\nThank you,\n${data.contactName || ""}`.trim())}`}
+                className="inline-flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-sm border hover:bg-slate-50 transition-colors"
+                style={{ color: "var(--hub-accent, #F4333F)", borderColor: "var(--hub-accent, #F4333F)" }}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Request a meeting
+              </a>
+            )}
+          </div>
+        )}
 
-      {/* ── Timeline bar ── */}
-      {timelinePercent !== null && totalDays !== null && daysElapsed !== null && (
-        <section className="bg-white border border-[#E2E0E1] rounded-sm p-4 mb-5" aria-label="Implementation timeline progress">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
-              Implementation Timeline
-            </span>
-            <span className="text-xs text-esm-grey">
-              Day {daysElapsed} of {totalDays}
-            </span>
-          </div>
-          <div className="w-full h-2 bg-[#E2E0E1] rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{
-                width: `${timelinePercent}%`,
-                backgroundColor: timelinePercent > 90 ? "#F4333F" : "var(--hub-accent, #F4333F)",
-              }}
-            />
-          </div>
-          <p className="text-[11px] text-[#9E9B9E] mt-1.5">{timelinePercent}% of timeline elapsed</p>
-        </section>
-      )}
+        {/* Timeline bar */}
+        {timelinePercent !== null && totalDays !== null && daysElapsed !== null && (
+          <section className="bg-white border border-[#E2E0E1] rounded-sm p-4 flex flex-col justify-center" aria-label="Implementation timeline progress">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
+                Implementation Timeline
+              </span>
+              <span className="text-xs text-esm-grey">
+                Day {daysElapsed} of {totalDays}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-[#E2E0E1] rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{
+                  width: `${timelinePercent}%`,
+                  backgroundColor: timelinePercent > 90 ? "#F4333F" : "var(--hub-accent, #F4333F)",
+                }}
+              />
+            </div>
+            <p className="text-[11px] text-[#9E9B9E] mt-1.5">{timelinePercent}% of timeline elapsed</p>
+          </section>
+        )}
+      </div>
 
       {/* ── Health + Metrics ── */}
       <HealthBanner data={data} />

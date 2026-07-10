@@ -62,6 +62,9 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <a href="/dashboard/meeting-guide" className="text-sm text-esm-grey hover:text-esm-black">
+              Meeting Guide
+            </a>
             <a href="/dashboard/settings" className="text-sm text-esm-grey hover:text-esm-black">
               Settings
             </a>

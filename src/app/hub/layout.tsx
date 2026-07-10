@@ -9,6 +9,7 @@ import NotificationBell from "@/components/hub/NotificationBell";
 import HubNav from "@/components/hub/HubNav";
 import Breadcrumbs from "@/components/hub/Breadcrumbs";
 import PortalActivityTracker from "@/components/hub/PortalActivityTracker";
+import CustomerLogo from "@/components/hub/CustomerLogo";
 
 const ALL_NAV_ITEMS = [
   { href: "/hub", label: "Dashboard", key: "dashboard" },
@@ -51,11 +52,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
               ESM
             </div>
             {branding.logoUrl && (
-              <>
-                <div className="w-px h-6 bg-white/20 hidden sm:block" aria-hidden="true" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={branding.logoUrl} alt={`${project.customerName} logo`} className="h-8 max-w-[120px] object-contain hidden sm:block" />
-              </>
+              <CustomerLogo src={branding.logoUrl} alt={`${project.customerName} logo`} />
             )}
             <span className="text-sm font-medium truncate">{project.customerName}</span>
           </div>

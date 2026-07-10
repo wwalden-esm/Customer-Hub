@@ -18,6 +18,7 @@ import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import RefreshMetricsButton from "@/components/dashboard/RefreshMetricsButton";
 import PortalActivityCard from "@/components/dashboard/PortalActivityCard";
+import GenerateMeetingsButton from "@/components/dashboard/GenerateMeetingsButton";
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
@@ -269,6 +270,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
               </a>
             )}
             <RefreshMetricsButton projectId={project.id} />
+            <GenerateMeetingsButton projectId={project.id} />
           </div>
 
           <PortalActivityCard projectId={project.id} />

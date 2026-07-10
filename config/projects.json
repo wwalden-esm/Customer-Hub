@@ -13,7 +13,9 @@
     "currentPhase": "intake",
     "status": "ON_TRACK",
     "branding": {
-      "accentColor": "#1E3A5F"
+      "accentColor": "#1E3A5F",
+      "logoAttachmentId": 8908937827356548,
+      "logoUrl": "/api/projects/rob-smith-consulting/logo"
     },
     "hubspotIntakeId": "57934330647",
     "smartsheetConfig": {
@@ -27,13 +29,35 @@
       "raidLogSheetId": "2861440821055364"
     },
     "links": [
-      { "label": "Project Plan", "url": "https://app.smartsheet.com/sheets/7010654106898308", "icon": "smartsheet" },
-      { "label": "Training Materials", "url": "https://esmsolutions.com/training", "icon": "training" },
-      { "label": "SharePoint Folder", "url": "https://esmsolutions.sharepoint.com/sites/rob-smith", "icon": "sharepoint" }
+      {
+        "label": "Project Plan",
+        "url": "https://app.smartsheet.com/sheets/7010654106898308",
+        "icon": "smartsheet"
+      },
+      {
+        "label": "Training Materials",
+        "url": "https://esmsolutions.com/training",
+        "icon": "training"
+      },
+      {
+        "label": "SharePoint Folder",
+        "url": "https://esmsolutions.sharepoint.com/sites/rob-smith",
+        "icon": "sharepoint"
+      }
     ],
     "contacts": [
-      { "email": "rob@robsmithconsulting.com", "name": "Rob Smith", "role": "Project Lead", "addedAt": "2026-07-07T00:00:00.000Z" },
-      { "email": "jdoe@robsmithconsulting.com", "name": "Jane Doe", "role": "IT Director", "addedAt": "2026-07-07T00:00:00.000Z" }
+      {
+        "email": "rob@robsmithconsulting.com",
+        "name": "Rob Smith",
+        "role": "Project Lead",
+        "addedAt": "2026-07-07T00:00:00.000Z"
+      },
+      {
+        "email": "jdoe@robsmithconsulting.com",
+        "name": "Jane Doe",
+        "role": "IT Director",
+        "addedAt": "2026-07-07T00:00:00.000Z"
+      }
     ],
     "sectionVisibility": {},
     "password": "RobSmithCons1246",
