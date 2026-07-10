@@ -131,10 +131,12 @@ export default function MeetingManagement({
       if (!res.ok) return;
       const data = await res.json();
       const shifted: Record<string, string> = data.shiftedDates ?? {};
+      const promoted: string | null = data.promotedId ?? null;
       setMeetings((prev) =>
         prev.map((m) => {
           const newDate = shifted[m.id];
           if (m.id === id) return { ...m, status: newStatus, meetingDate: newDate ?? m.meetingDate };
+          if (m.id === promoted) return { ...m, status: "Upcoming" as Meeting["status"] };
           if (newDate) return { ...m, meetingDate: newDate };
           return m;
         }),

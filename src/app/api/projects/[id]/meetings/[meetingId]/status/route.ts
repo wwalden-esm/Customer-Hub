@@ -53,6 +53,22 @@ export async function PATCH(
     { id: Number(meetingId), cells: [{ columnId: statusCol, value: newStatus }] },
   ];
 
+  // When completing, set the next non-complete/non-skipped meeting to "Upcoming"
+  let promotedId: string | null = null;
+  if (newStatus === "Complete") {
+    for (let i = rowIndex + 1; i < sheet.rows.length; i++) {
+      const row = sheet.rows[i];
+      const s = cellValue(row, statusCol) ?? "";
+      if (s === "Complete" || s === "Skipped") continue;
+      rowUpdates.push({
+        id: row.id,
+        cells: [{ columnId: statusCol, value: "Upcoming" }],
+      });
+      promotedId = String(row.id);
+      break;
+    }
+  }
+
   // When skipping, push this meeting and all subsequent meetings forward by 1 week
   const shiftedDates: Record<string, string> = {};
   if (newStatus === "Skipped" && dateCol) {
@@ -85,5 +101,5 @@ export async function PATCH(
 
   await updateRows(config.meetingTrackerSheetId, rowUpdates);
 
-  return NextResponse.json({ ok: true, status: newStatus, shiftedDates });
+  return NextResponse.json({ ok: true, status: newStatus, shiftedDates, promotedId });
 }

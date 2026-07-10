@@ -445,14 +445,15 @@ export async function getProjectMeetings(meetingTrackerSheetId: string): Promise
         const recapDone = recapCol ? cellValue(row, recapCol) === "true" : false;
 
         let status: Meeting["status"];
-        if (explicit === "Complete" || explicit === "Skipped") {
+        if (explicit === "Complete" || explicit === "Skipped" || explicit === "Upcoming") {
           status = explicit;
         } else if (dateStr) {
           const mtgDate = parseLocalDate(dateStr);
-          if (mtgDate > today) {
-            status = "Scheduled";
-          } else if (actionsLogged && recapDone) {
+          if (actionsLogged && recapDone) {
             status = "Complete";
+          } else if (mtgDate > today) {
+            const msInWeek = 7 * 24 * 60 * 60 * 1000;
+            status = mtgDate.getTime() - today.getTime() <= msInWeek ? "Upcoming" : "Scheduled";
           } else {
             status = "Upcoming";
           }
