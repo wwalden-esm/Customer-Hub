@@ -25,7 +25,7 @@ export function Field({ label, required, hint, warning, children }: FieldProps) 
 }
 
 export const inputClass =
-  "w-full rounded border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/40";
+  "w-full rounded border border-esm-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/40";
 
 export const textareaClass = `${inputClass} min-h-24`;
 export const selectClass = inputClass;
@@ -49,7 +49,7 @@ export function Toggle({ label, checked, onChange, disabled }: ToggleProps) {
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
-        className="rounded border-slate-300"
+        className="rounded border-esm-border"
       />
       <span className="text-sm text-slate-700">{label}</span>
     </label>
@@ -75,7 +75,7 @@ export function MultiCheckbox<T extends string>({ options, selected, onChange }:
             type="checkbox"
             checked={selected.includes(opt)}
             onChange={() => toggle(opt)}
-            className="rounded border-slate-300"
+            className="rounded border-esm-border"
           />
           <span className="text-sm text-slate-700">{opt}</span>
         </label>

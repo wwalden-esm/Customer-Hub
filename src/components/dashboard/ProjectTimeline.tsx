@@ -87,7 +87,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
 
   if (items.length === 0) {
     return (
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5" aria-labelledby="timeline-heading-empty">
+      <section className="bg-white rounded-card border border-esm-border p-5" aria-labelledby="timeline-heading-empty">
         <h2 id="timeline-heading-empty" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-4">Project Timeline</h2>
         <p className="text-sm text-slate-500 text-center py-6">No milestone dates available for timeline view.</p>
       </section>
@@ -102,20 +102,20 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
   })();
 
   return (
-    <section className="bg-white rounded-sm border border-[#E2E0E1] p-5" aria-labelledby="timeline-heading">
+    <section className="bg-white rounded-card border border-esm-border p-5" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-4">Project Timeline</h2>
 
       <div className="overflow-x-auto">
         <div className="min-w-[700px]">
           {/* Month headers */}
-          <div className="relative h-6 border-b border-[#E2E0E1] mb-2">
+          <div className="relative h-6 border-b border-esm-border mb-2">
             {months.map((m, i) => {
               const leftPct = ((m.getTime() - rangeStart.getTime()) / (rangeEnd.getTime() - rangeStart.getTime())) * 100;
               if (leftPct < 0 || leftPct > 100) return null;
               return (
                 <div
                   key={i}
-                  className="absolute text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider"
+                  className="absolute text-[10px] font-medium text-esm-muted uppercase tracking-wider"
                   style={{ left: `${leftPct}%` }}
                 >
                   {m.toLocaleDateString("en-US", { month: "short", year: "2-digit" })}
@@ -147,7 +147,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
                 style={{ left: `${todayPct}%`, height: `${items.length * 40 + 8}px` }}
                 aria-hidden="true"
               >
-                <div className="absolute -top-5 -translate-x-1/2 text-[9px] font-bold text-red-500 bg-red-50 px-1 rounded-sm">
+                <div className="absolute -top-5 -translate-x-1/2 text-[9px] font-bold text-red-500 bg-red-50 px-1 rounded-card">
                   TODAY
                 </div>
               </div>
@@ -167,7 +167,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
                 >
                   {/* Bar */}
                   <div
-                    className={`absolute h-6 rounded-sm transition-all ${colors.bar} ${isHovered ? "opacity-100 shadow-sm" : "opacity-80"}`}
+                    className={`absolute h-6 rounded-card transition-all ${colors.bar} ${isHovered ? "opacity-100 shadow-sm" : "opacity-80"}`}
                     style={{ left: `${item.leftPct}%`, width: `${item.widthPct}%` }}
                   >
                     {item.percentComplete != null && item.status !== "complete" && (
@@ -186,7 +186,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
                   {/* Tooltip */}
                   {isHovered && (
                     <div
-                      className="absolute z-20 bg-esm-black text-white text-xs rounded-sm px-3 py-2 shadow-lg pointer-events-none whitespace-nowrap"
+                      className="absolute z-20 bg-esm-black text-white text-xs rounded-card px-3 py-2 shadow-lg pointer-events-none whitespace-nowrap"
                       style={{
                         left: `${Math.min(item.leftPct + item.widthPct / 2, 80)}%`,
                         top: "-44px",
@@ -208,14 +208,14 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
           </div>
 
           {/* Legend */}
-          <div className="flex gap-4 mt-4 pt-3 border-t border-[#E2E0E1]">
+          <div className="flex gap-4 mt-4 pt-3 border-t border-esm-border">
             {[
               { label: "Complete", color: "bg-emerald-500" },
               { label: "In Progress", color: "bg-blue-500" },
               { label: "Upcoming", color: "bg-slate-300" },
             ].map((l) => (
               <div key={l.label} className="flex items-center gap-1.5 text-[10px] text-esm-grey">
-                <div className={`w-3 h-2 rounded-sm ${l.color}`} aria-hidden="true" />
+                <div className={`w-3 h-2 rounded-card ${l.color}`} aria-hidden="true" />
                 {l.label}
               </div>
             ))}

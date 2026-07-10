@@ -79,11 +79,11 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
       </button>
       {open && (
         <div
-          className="absolute right-0 top-8 w-80 bg-white rounded-sm border border-[#E2E0E1] shadow-lg z-50 max-h-80 overflow-y-auto"
+          className="absolute right-0 top-8 w-80 bg-white rounded-card border border-esm-border shadow-lg z-50 max-h-80 overflow-y-auto"
           role="region"
           aria-label="Notifications"
         >
-          <div className="px-4 py-3 border-b border-[#E2E0E1]">
+          <div className="px-4 py-3 border-b border-esm-border">
             <span className="text-xs font-bold text-esm-grey uppercase tracking-wider">Notifications</span>
           </div>
           {notifications.length === 0 ? (
@@ -104,7 +104,7 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-esm-black">{n.title}</p>
                         <p className="text-xs text-esm-grey mt-0.5 line-clamp-2">{n.detail}</p>
-                        <p className="text-[10px] text-[#9E9B9E] mt-1">
+                        <p className="text-[10px] text-esm-muted mt-1">
                           {new Date(n.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
                         </p>
                       </div>

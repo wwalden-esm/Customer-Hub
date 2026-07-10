@@ -67,7 +67,7 @@ export function SignoffSection({ data, onChange }: Props) {
                   <label className="inline-flex items-center gap-2 cursor-pointer text-sm">
                     <input
                       type="checkbox"
-                      className="rounded border-slate-300"
+                      className="rounded border-esm-border"
                       checked={Boolean(r.confirmed)}
                       onChange={(e) => setRow(i, { confirmed: e.target.checked })}
                     />

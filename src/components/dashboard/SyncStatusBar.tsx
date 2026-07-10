@@ -37,7 +37,7 @@ export default function SyncStatusBar({ dataTimestamp }: SyncStatusBarProps) {
       <button
         onClick={handleSync}
         disabled={syncing}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-esm-grey border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 transition-colors"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-esm-grey border border-esm-border rounded hover:bg-slate-50 disabled:opacity-50 transition-colors"
       >
         <svg
           className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`}

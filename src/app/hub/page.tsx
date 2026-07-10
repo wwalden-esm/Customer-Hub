@@ -59,7 +59,7 @@ export default async function HubDashboard() {
             {project.products.join(" + ")}
           </p>
           {project.startDate && project.goLiveDate && (
-            <p className="text-xs text-[#9E9B9E] mt-1">
+            <p className="text-xs text-esm-muted mt-1">
               {parseLocalDate(project.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               {" → "}
               {parseLocalDate(project.goLiveDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
@@ -73,7 +73,7 @@ export default async function HubDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
         {/* Team contact card */}
         {data.team.length > 0 && (
-          <div className="bg-white border border-[#E2E0E1] rounded-sm px-5 py-3 flex flex-col gap-3">
+          <div className="bg-white border border-esm-border rounded-card px-5 py-3 flex flex-col gap-3">
             {data.team.map((member) => (
               <div key={member.role} className="flex items-center gap-2.5">
                 <div
@@ -90,7 +90,7 @@ export default async function HubDashboard() {
                 {member.email && (
                   <a
                     href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
-                    className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-sm border border-[#E2E0E1] hover:bg-slate-50 transition-colors text-esm-grey"
+                    className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-card border border-esm-border hover:bg-slate-50 transition-colors text-esm-grey"
                     aria-label={`Email ${member.name}`}
                   >
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -104,7 +104,7 @@ export default async function HubDashboard() {
             {data.team[0].email && (
               <a
                 href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Meeting Request`)}&body=${encodeURIComponent(`Hi ${data.team[0].name.split(" ")[0]},\n\nI hope this message finds you well. I'd like to request a meeting to discuss our ${project.projectName} implementation. Please let me know your availability.\n\nThank you,\n${data.contactName || ""}`.trim())}`}
-                className="inline-flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-sm border hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border hover:bg-slate-50 transition-colors"
                 style={{ color: "var(--hub-accent, #F4333F)", borderColor: "var(--hub-accent, #F4333F)" }}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -118,7 +118,7 @@ export default async function HubDashboard() {
 
         {/* Timeline bar */}
         {timelinePercent !== null && totalDays !== null && daysElapsed !== null && (
-          <section className="bg-white border border-[#E2E0E1] rounded-sm p-4 flex flex-col justify-center" aria-label="Implementation timeline progress">
+          <section className="bg-white border border-esm-border rounded-card p-4 flex flex-col justify-center" aria-label="Implementation timeline progress">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
                 Implementation Timeline
@@ -136,7 +136,7 @@ export default async function HubDashboard() {
                 }}
               />
             </div>
-            <p className="text-[11px] text-[#9E9B9E] mt-1.5">{timelinePercent}% of timeline elapsed</p>
+            <p className="text-[11px] text-esm-muted mt-1.5">{timelinePercent}% of timeline elapsed</p>
           </section>
         )}
       </div>
@@ -221,7 +221,7 @@ export default async function HubDashboard() {
         <div className={`grid grid-cols-1 ${hasDeadlines && hasMeetings ? "lg:grid-cols-2" : ""} gap-5 mb-5`}>
           {hasDeadlines && <UpcomingDeadlines deadlines={data.deadlines} />}
           {hasMeetings && (
-            <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="upcoming-meetings-heading">
+            <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="upcoming-meetings-heading">
               <h2 id="upcoming-meetings-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
                 Upcoming Meetings
               </h2>
@@ -241,7 +241,7 @@ export default async function HubDashboard() {
                       <p className="text-xs text-esm-grey mt-1 leading-relaxed line-clamp-2">{m.agendaSummary}</p>
                     )}
                     {m.customerDeliverables && (
-                      <div className="mt-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-sm">
+                      <div className="mt-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-card">
                         <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Due from you</p>
                         <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">{m.customerDeliverables}</p>
                       </div>
@@ -285,7 +285,7 @@ export default async function HubDashboard() {
           {data.actionItems.length > 5 && (
             <a
               href="/hub/raid-log"
-              className="block text-center text-xs font-medium -mt-3 py-2 border border-[#E2E0E1] rounded-sm hover:bg-slate-50 transition-colors"
+              className="block text-center text-xs font-medium -mt-3 py-2 border border-esm-border rounded-card hover:bg-slate-50 transition-colors"
               style={{ color: "var(--hub-accent, #F4333F)" }}
             >
               View all {data.actionItems.length} action items
@@ -293,12 +293,12 @@ export default async function HubDashboard() {
           )}
 
           {data.integrations.length > 0 && (
-            <section className="bg-white border border-[#E2E0E1] rounded-sm overflow-hidden" aria-labelledby="integrations-heading">
-              <div className="flex justify-between items-center px-5 py-3.5 border-b border-[#E2E0E1]">
+            <section className="bg-white border border-esm-border rounded-card overflow-hidden" aria-labelledby="integrations-heading">
+              <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
                 <h2 id="integrations-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
                   Integration Status
                 </h2>
-                <div className="text-[11px] font-bold px-2.5 py-0.5 rounded-sm border bg-gray-50 text-esm-grey border-[#E2E0E1]">
+                <div className="text-[11px] font-bold px-2.5 py-0.5 rounded-card border bg-gray-50 text-esm-grey border-esm-border">
                   {data.integrations.filter((i) => { const s = i.status.toLowerCase(); return s === "complete" || s === "done" || s === "live"; }).length} of {data.integrations.length} complete
                 </div>
               </div>
@@ -323,10 +323,10 @@ export default async function HubDashboard() {
                           </svg>
                         )}
                       </span>
-                      <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-sm border ${
+                      <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-card border ${
                         isDone ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : isActive ? "bg-blue-50 text-blue-700 border-blue-200"
-                        : "bg-gray-50 text-esm-grey border-[#E2E0E1]"
+                        : "bg-gray-50 text-esm-grey border-esm-border"
                       }`}>
                         {integ.status}
                       </span>

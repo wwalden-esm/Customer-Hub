@@ -29,7 +29,7 @@ export default function GlobalLinksEditor({ initialLinks }: { initialLinks: Link
   }
 
   return (
-    <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+    <section className="bg-white rounded-card border border-esm-border p-5">
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider">Global Customer Links</h2>
       </div>
@@ -49,7 +49,7 @@ export default function GlobalLinksEditor({ initialLinks }: { initialLinks: Link
                     setSaved(false);
                   }}
                   placeholder="Label"
-                  className="flex-1 border border-[#E2E0E1] rounded px-3 py-1.5 text-sm"
+                  className="flex-1 border border-esm-border rounded px-3 py-1.5 text-sm"
                   aria-label={`Global link ${i + 1} label`}
                 />
                 <select
@@ -60,7 +60,7 @@ export default function GlobalLinksEditor({ initialLinks }: { initialLinks: Link
                     setLinks(updated);
                     setSaved(false);
                   }}
-                  className="border border-[#E2E0E1] rounded px-2 py-1.5 text-sm w-32"
+                  className="border border-esm-border rounded px-2 py-1.5 text-sm w-32"
                   aria-label={`Global link ${i + 1} icon`}
                 >
                   <option value="link">Link</option>
@@ -82,7 +82,7 @@ export default function GlobalLinksEditor({ initialLinks }: { initialLinks: Link
                   setSaved(false);
                 }}
                 placeholder="https://..."
-                className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm font-mono"
+                className="w-full border border-esm-border rounded px-3 py-1.5 text-sm font-mono"
                 aria-label={`Global link ${i + 1} URL`}
               />
             </div>

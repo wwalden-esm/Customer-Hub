@@ -22,7 +22,7 @@ export default function StatusPill({ status }: { status: Status }) {
   const m = META[status];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-sm border ${m.className}`}
+      className={`inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-card border ${m.className}`}
       role="status"
     >
       <span className={`w-[5px] h-[5px] rounded-full shrink-0 ${m.dotClass}`} aria-hidden="true" />

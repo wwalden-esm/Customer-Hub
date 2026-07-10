@@ -10,6 +10,7 @@ import HubNav from "@/components/hub/HubNav";
 import Breadcrumbs from "@/components/hub/Breadcrumbs";
 import PortalActivityTracker from "@/components/hub/PortalActivityTracker";
 import CustomerLogo from "@/components/hub/CustomerLogo";
+import { EsmLogo } from "@/components/ui";
 
 const ALL_NAV_ITEMS = [
   { href: "/hub", label: "Dashboard", key: "dashboard" },
@@ -48,9 +49,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
       <header className="bg-esm-black text-white" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-            <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold shrink-0" aria-hidden="true">
-              ESM
-            </div>
+            <EsmLogo size={48} variant="white" className="shrink-0" />
             {branding.logoUrl && (
               <CustomerLogo src={branding.logoUrl} alt={`${project.customerName} logo`} />
             )}

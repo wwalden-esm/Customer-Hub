@@ -61,7 +61,7 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
   const hasMore = filtered.length > limit;
 
   return (
-    <section className="bg-white rounded-sm border border-[#E2E0E1] p-5" aria-labelledby="activity-heading">
+    <section className="bg-white rounded-card border border-esm-border p-5" aria-labelledby="activity-heading">
       <div className="flex items-center justify-between mb-4">
         <h2 id="activity-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">Activity</h2>
         <div className="flex gap-1" role="group" aria-label="Filter activity">
@@ -83,12 +83,12 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
       </div>
 
       {visible.length === 0 ? (
-        <p className="text-sm text-[#9E9B9E] text-center py-6">No activity recorded yet.</p>
+        <p className="text-sm text-esm-muted text-center py-6">No activity recorded yet.</p>
       ) : (
         <div className="space-y-4">
           {Array.from(grouped.entries()).map(([dateLabel, items]) => (
             <div key={dateLabel}>
-              <div className="text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider mb-2">
+              <div className="text-[10px] font-medium text-esm-muted uppercase tracking-wider mb-2">
                 {dateLabel}
               </div>
               <ul className="space-y-0.5">
@@ -97,7 +97,7 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
                   return (
                     <li
                       key={event.id}
-                      className="flex items-start gap-3 py-2 px-2 rounded-sm hover:bg-slate-50 transition-colors group"
+                      className="flex items-start gap-3 py-2 px-2 rounded-card hover:bg-slate-50 transition-colors group"
                     >
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 ${style.bg} ${style.color}`} aria-hidden="true">
                         {style.icon}
@@ -106,17 +106,17 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
                         <p className="text-sm text-esm-black leading-snug">{event.title}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           {event.detail && (
-                            <span className="text-xs text-[#9E9B9E]">{event.detail}</span>
+                            <span className="text-xs text-esm-muted">{event.detail}</span>
                           )}
                           {event.actor && (
                             <>
                               <span className="text-[#E2E0E1]" aria-hidden="true">·</span>
-                              <span className="text-xs text-[#9E9B9E]">{event.actor}</span>
+                              <span className="text-xs text-esm-muted">{event.actor}</span>
                             </>
                           )}
                         </div>
                       </div>
-                      <span className="text-[10px] text-[#9E9B9E] shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[10px] text-esm-muted shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {relativeTime(event.timestamp)}
                       </span>
                     </li>
@@ -131,13 +131,13 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
       {hasMore && (
         <button
           onClick={() => setLimit((l) => l + 15)}
-          className="w-full mt-3 py-1.5 text-xs text-esm-grey hover:text-esm-black border border-[#E2E0E1] rounded-sm hover:bg-slate-50 transition-colors"
+          className="w-full mt-3 py-1.5 text-xs text-esm-grey hover:text-esm-black border border-esm-border rounded-card hover:bg-slate-50 transition-colors"
         >
           Show more ({filtered.length - limit} remaining)
         </button>
       )}
 
-      <div className="mt-3 pt-2 border-t border-[#E2E0E1] text-[10px] text-[#9E9B9E]">
+      <div className="mt-3 pt-2 border-t border-esm-border text-[10px] text-esm-muted">
         {filtered.length} event{filtered.length !== 1 ? "s" : ""}
       </div>
     </section>

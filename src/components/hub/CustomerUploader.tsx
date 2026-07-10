@@ -77,8 +77,8 @@ export default function CustomerUploader({ projectId, onUploaded }: CustomerUplo
         onClick={() => phase !== "uploading" && inputRef.current?.click()}
         onKeyDown={handleKeyDown}
         className={`
-          border-2 border-dashed rounded-sm px-5 py-4 text-center cursor-pointer transition-colors
-          ${dragOver ? "border-[var(--hub-accent)] bg-red-50" : "border-[#E2E0E1] hover:border-slate-400"}
+          border-2 border-dashed rounded-card px-5 py-4 text-center cursor-pointer transition-colors
+          ${dragOver ? "border-[var(--hub-accent)] bg-red-50" : "border-esm-border hover:border-slate-400"}
           ${phase === "uploading" ? "opacity-50 pointer-events-none" : ""}
         `}
       >
@@ -97,7 +97,7 @@ export default function CustomerUploader({ projectId, onUploaded }: CustomerUplo
             <p className="text-sm font-medium text-esm-black">
               Drop a file here or click to browse
             </p>
-            <p className="text-xs text-[#9E9B9E] mt-1">Max 25MB</p>
+            <p className="text-xs text-esm-muted mt-1">Max 25MB</p>
           </>
         )}
       </div>
@@ -105,7 +105,7 @@ export default function CustomerUploader({ projectId, onUploaded }: CustomerUplo
       {error && <p role="alert" className="text-sm" style={{ color: "var(--hub-accent)" }}>{error}</p>}
 
       {uploadedName && phase === "done" && (
-        <div role="status" className="bg-green-50 border border-green-200 rounded-sm px-4 py-3 flex items-center gap-2">
+        <div role="status" className="bg-green-50 border border-green-200 rounded-card px-4 py-3 flex items-center gap-2">
           <svg className="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>

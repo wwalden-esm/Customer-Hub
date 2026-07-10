@@ -15,22 +15,22 @@ function daysUntil(d: string): number {
 const PRI_META = {
   high: { className: "text-esm-red bg-red-50 border-esm-red/25", label: "High" },
   medium: { className: "text-esm-grey bg-gray-100 border-esm-grey/25", label: "Medium" },
-  low: { className: "text-[#9E9B9E] bg-gray-50 border-[#E2E0E1]", label: "Low" },
+  low: { className: "text-esm-muted bg-gray-50 border-esm-border", label: "Low" },
 };
 
 export default function OpenItems({ items }: { items: HubActionItem[] }) {
   return (
-    <section className="bg-white border border-[#E2E0E1] rounded-sm overflow-hidden" aria-labelledby="open-items-heading">
-      <div className="flex justify-between items-center px-5 py-3.5 border-b border-[#E2E0E1]">
+    <section className="bg-white border border-esm-border rounded-card overflow-hidden" aria-labelledby="open-items-heading">
+      <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
         <h2 id="open-items-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
           Open Action Items
         </h2>
         <Link
           href="/hub/raid-log"
-          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-sm border hover:opacity-80 transition-opacity ${
+          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-card border hover:opacity-80 transition-opacity ${
             items.length > 0
               ? "bg-red-50 text-esm-red border-esm-red/25"
-              : "bg-gray-50 text-esm-grey border-[#E2E0E1]"
+              : "bg-gray-50 text-esm-grey border-esm-border"
           }`}
           aria-label={`${items.length} open items — view RAID log`}
         >
@@ -38,7 +38,7 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
         </Link>
       </div>
       {items.length === 0 ? (
-        <div className="p-9 text-center text-[#9E9B9E] text-sm">No open action items</div>
+        <div className="p-9 text-center text-esm-muted text-sm">No open action items</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
@@ -48,7 +48,7 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
                   <th
                     key={h || "link"}
                     scope="col"
-                    className="px-[18px] py-2.5 text-[10px] font-extrabold text-esm-grey tracking-wider uppercase text-left border-b border-[#E2E0E1]"
+                    className="px-[18px] py-2.5 text-[10px] font-extrabold text-esm-grey tracking-wider uppercase text-left border-b border-esm-border"
                   >
                     {h}
                   </th>
@@ -64,7 +64,7 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
                 return (
                   <tr
                     key={item.id}
-                    className={`group ${i < items.length - 1 ? "border-b border-[#E2E0E1]" : ""} ${
+                    className={`group ${i < items.length - 1 ? "border-b border-esm-border" : ""} ${
                       urgent || overdue ? "bg-red-50/30" : "hover:bg-slate-50"
                     } transition-colors`}
                   >
@@ -91,13 +91,13 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
                     </td>
                     <td className="px-[18px] py-3">
                       <span
-                        className={`text-[10px] font-bold tracking-wide uppercase border px-2 py-0.5 rounded-sm ${pm.className}`}
+                        className={`text-[10px] font-bold tracking-wide uppercase border px-2 py-0.5 rounded-card ${pm.className}`}
                       >
                         {pm.label}
                       </span>
                     </td>
                     <td className="px-[18px] py-3">
-                      <svg className="w-3.5 h-3.5 text-[#9E9B9E] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="w-3.5 h-3.5 text-esm-muted opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                       </svg>
                     </td>

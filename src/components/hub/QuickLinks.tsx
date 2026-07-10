@@ -25,7 +25,7 @@ export default function QuickLinks({ links }: { links: HubLink[] }) {
   if (links.length === 0) return null;
 
   return (
-    <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="quick-links-heading">
+    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="quick-links-heading">
       <h2 id="quick-links-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
         Quick Links
       </h2>

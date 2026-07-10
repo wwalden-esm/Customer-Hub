@@ -25,13 +25,13 @@ function DeadlineRow({ d }: { d: HubDeadline }) {
         {dueLabel(d)}
       </span>
       <span className="text-sm text-esm-black flex-1 min-w-0 truncate">{d.name}</span>
-      <span className={`text-[9px] font-bold tracking-wide uppercase px-1.5 py-0.5 rounded-sm border shrink-0 ${src.className}`}>
+      <span className={`text-[9px] font-bold tracking-wide uppercase px-1.5 py-0.5 rounded-card border shrink-0 ${src.className}`}>
         {src.label}
       </span>
     </>
   );
 
-  const className = `flex items-center gap-2 px-3 py-2 rounded-sm transition-colors ${isOverdue ? "bg-red-50/50" : ""} ${d.href ? "hover:bg-slate-50 cursor-pointer" : ""}`;
+  const className = `flex items-center gap-2 px-3 py-2 rounded-card transition-colors ${isOverdue ? "bg-red-50/50" : ""} ${d.href ? "hover:bg-slate-50 cursor-pointer" : ""}`;
 
   if (d.href) {
     return (
@@ -51,14 +51,14 @@ export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadlin
   const nextWeek = deadlines.filter((d) => d.daysUntil > 7 && d.daysUntil <= 14);
 
   return (
-    <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="deadlines-heading">
+    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="deadlines-heading">
       <h2 id="deadlines-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
         Upcoming Deadlines
       </h2>
 
       {thisWeek.length > 0 && (
         <div className="mb-3">
-          <p className="text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider mb-1.5">This Week</p>
+          <p className="text-[10px] font-medium text-esm-muted uppercase tracking-wider mb-1.5">This Week</p>
           <ul className="space-y-1.5">
             {thisWeek.map((d) => <DeadlineRow key={d.id} d={d} />)}
           </ul>
@@ -67,7 +67,7 @@ export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadlin
 
       {nextWeek.length > 0 && (
         <div>
-          <p className="text-[10px] font-medium text-[#9E9B9E] uppercase tracking-wider mb-1.5">Next Week</p>
+          <p className="text-[10px] font-medium text-esm-muted uppercase tracking-wider mb-1.5">Next Week</p>
           <ul className="space-y-1.5">
             {nextWeek.map((d) => <DeadlineRow key={d.id} d={d} />)}
           </ul>

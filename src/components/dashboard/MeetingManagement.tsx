@@ -196,7 +196,7 @@ export default function MeetingManagement({
       )}
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-8 text-center">
+        <div className="bg-white rounded-card border border-esm-border px-6 py-8 text-center">
           <p className="text-sm text-slate-500">
             {filter === "needs-action"
               ? "All completed meetings have action items logged and recaps sent."
@@ -210,13 +210,13 @@ export default function MeetingManagement({
             const panel = activePanel?.id === meeting.id ? activePanel.type : null;
 
             return (
-              <div key={meeting.id} className="bg-white rounded-sm border border-[#E2E0E1]">
+              <div key={meeting.id} className="bg-white rounded-card border border-esm-border">
                 <button
                   onClick={() => toggle(meeting.id)}
                   className="w-full text-left px-5 py-4 flex items-center gap-4"
                 >
                   <svg
-                    className={`w-4 h-4 text-[#9E9B9E] shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                    className={`w-4 h-4 text-esm-muted shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -238,9 +238,9 @@ export default function MeetingManagement({
                 </button>
 
                 {isExpanded && (
-                  <div className="border-t border-[#E2E0E1] px-5 py-4 space-y-4">
+                  <div className="border-t border-esm-border px-5 py-4 space-y-4">
                     {meeting.agendaSummary && (
-                      <div className="pl-4 border-l-2 border-[#E2E0E1]">
+                      <div className="pl-4 border-l-2 border-esm-border">
                         <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Agenda</p>
                         <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.agendaSummary}</p>
                       </div>
@@ -273,7 +273,7 @@ export default function MeetingManagement({
                         <button
                           onClick={() => updateStatus(meeting.id, "Upcoming")}
                           disabled={statusUpdating === meeting.id}
-                          className="px-3 py-1 text-xs font-medium border border-[#E2E0E1] text-esm-grey rounded hover:bg-slate-50 transition-colors disabled:opacity-50"
+                          className="px-3 py-1 text-xs font-medium border border-esm-border text-esm-grey rounded hover:bg-slate-50 transition-colors disabled:opacity-50"
                         >
                           Revert to Upcoming
                         </button>
@@ -317,7 +317,7 @@ export default function MeetingManagement({
                         {!meeting.actionItemsLogged && (
                           <button
                             onClick={() => openPanel(meeting.id, "manual-actions")}
-                            className="px-4 py-2 text-sm font-medium border border-[#E2E0E1] text-esm-grey rounded hover:bg-slate-50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium border border-esm-border text-esm-grey rounded hover:bg-slate-50 transition-colors"
                           >
                             Log Action Items Manually
                           </button>
@@ -326,7 +326,7 @@ export default function MeetingManagement({
                         {!meeting.recapSent && (
                           <button
                             onClick={() => openPanel(meeting.id, "manual-recap")}
-                            className="px-4 py-2 text-sm font-medium border border-[#E2E0E1] text-esm-grey rounded hover:bg-slate-50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium border border-esm-border text-esm-grey rounded hover:bg-slate-50 transition-colors"
                           >
                             Send Recap Manually
                           </button>
@@ -481,7 +481,7 @@ function ProcessTranscriptPanel({
   if (result) {
     const r = result.recap;
     return (
-      <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4 space-y-4">
+      <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-4">
         <div className="flex items-center gap-3">
           <svg className="w-5 h-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -494,26 +494,26 @@ function ProcessTranscriptPanel({
 
         {/* Summary stats */}
         <div className="grid grid-cols-4 gap-2">
-          <div className="bg-white rounded border border-[#E2E0E1] px-3 py-2 text-center">
+          <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.actionItemsLogged}</p>
             <p className="text-[10px] text-esm-grey uppercase tracking-wider">Actions</p>
           </div>
-          <div className="bg-white rounded border border-[#E2E0E1] px-3 py-2 text-center">
+          <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.decisionsLogged}</p>
             <p className="text-[10px] text-esm-grey uppercase tracking-wider">Decisions</p>
           </div>
-          <div className="bg-white rounded border border-[#E2E0E1] px-3 py-2 text-center">
+          <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.risksLogged}</p>
             <p className="text-[10px] text-esm-grey uppercase tracking-wider">Risks</p>
           </div>
-          <div className="bg-white rounded border border-[#E2E0E1] px-3 py-2 text-center">
+          <div className="bg-white rounded border border-esm-border px-3 py-2 text-center">
             <p className="text-lg font-bold text-esm-black">{result.raidItemsLogged}</p>
             <p className="text-[10px] text-esm-grey uppercase tracking-wider">RAID Total</p>
           </div>
         </div>
 
         {/* Recap preview */}
-        <div className="pl-4 border-l-2 border-[#E2E0E1]">
+        <div className="pl-4 border-l-2 border-esm-border">
           <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Summary</p>
           <p className="text-sm text-esm-black">{r.summary}</p>
         </div>
@@ -560,7 +560,7 @@ function ProcessTranscriptPanel({
         )}
 
         {/* Actions */}
-        <div className="flex gap-3 pt-2 border-t border-[#E2E0E1]">
+        <div className="flex gap-3 pt-2 border-t border-esm-border">
           <button
             onClick={openRecapInOutlook}
             className="px-4 py-2 text-sm font-medium bg-esm-red text-white rounded hover:opacity-90 transition-opacity flex items-center gap-2"
@@ -572,7 +572,7 @@ function ProcessTranscriptPanel({
           </button>
           <button
             onClick={() => onDone(result.recapAttachmentId)}
-            className="px-4 py-2 text-sm font-medium border border-[#E2E0E1] text-esm-grey rounded hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium border border-esm-border text-esm-grey rounded hover:bg-slate-50 transition-colors"
           >
             Done
           </button>
@@ -582,7 +582,7 @@ function ProcessTranscriptPanel({
   }
 
   return (
-    <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4 space-y-3">
+    <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-3">
       <h4 className="text-xs font-bold text-esm-grey uppercase tracking-wider">
         Process Meeting Transcript
       </h4>
@@ -595,7 +595,7 @@ function ProcessTranscriptPanel({
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className="border-2 border-dashed border-[#E2E0E1] rounded px-4 py-6 text-center hover:border-esm-black/30 transition-colors cursor-pointer"
+        className="border-2 border-dashed border-esm-border rounded px-4 py-6 text-center hover:border-esm-black/30 transition-colors cursor-pointer"
         onClick={() => fileRef.current?.click()}
       >
         <input
@@ -618,7 +618,7 @@ function ProcessTranscriptPanel({
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
             <p className="text-sm text-esm-grey">Drop transcript file here or click to browse</p>
-            <p className="text-xs text-[#9E9B9E] mt-1">.srt, .vtt, .txt, .docx</p>
+            <p className="text-xs text-esm-muted mt-1">.srt, .vtt, .txt, .docx</p>
           </div>
         )}
       </div>
@@ -632,7 +632,7 @@ function ProcessTranscriptPanel({
           placeholder="Paste meeting transcript here..."
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
-          className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y font-mono text-xs"
+          className="w-full text-sm border border-esm-border rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y font-mono text-xs"
         />
       </div>
 
@@ -717,7 +717,7 @@ function LogActionItemsPanel({
   }
 
   return (
-    <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4 space-y-3">
+    <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-3">
       <h4 className="text-xs font-bold text-esm-grey uppercase tracking-wider">
         Log Action Items Manually
       </h4>
@@ -728,20 +728,20 @@ function LogActionItemsPanel({
             placeholder="Action item description"
             value={item.description}
             onChange={(e) => updateItem(idx, "description", e.target.value)}
-            className="text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           />
           <input
             type="text"
             placeholder="Owner"
             value={item.owner}
             onChange={(e) => updateItem(idx, "owner", e.target.value)}
-            className="text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           />
           <input
             type="date"
             value={item.dueDate}
             onChange={(e) => updateItem(idx, "dueDate", e.target.value)}
-            className="text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           />
           <button
             onClick={() => removeItem(idx)}
@@ -814,7 +814,7 @@ function SendRecapPanel({
   }
 
   return (
-    <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4 space-y-3">
+    <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-3">
       <h4 className="text-xs font-bold text-esm-grey uppercase tracking-wider">
         Send Meeting Recap
       </h4>
@@ -830,7 +830,7 @@ function SendRecapPanel({
           placeholder="Summarize action items discussed"
           value={actionItems}
           onChange={(e) => setActionItems(e.target.value)}
-          className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
+          className="w-full text-sm border border-esm-border rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
         />
       </div>
 
@@ -841,7 +841,7 @@ function SendRecapPanel({
           placeholder="Any additional context for the recap"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
+          className="w-full text-sm border border-esm-border rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
         />
       </div>
 
@@ -889,7 +889,7 @@ function ViewRecapPanel({ meetingId, projectId }: { meetingId: string; projectId
 
   if (loading) {
     return (
-      <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-6 text-center">
+      <div className="bg-slate-50 border border-esm-border rounded-card p-6 text-center">
         <svg className="w-5 h-5 animate-spin mx-auto text-esm-grey mb-2" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -901,14 +901,14 @@ function ViewRecapPanel({ meetingId, projectId }: { meetingId: string; projectId
 
   if (error || !recap) {
     return (
-      <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4">
+      <div className="bg-slate-50 border border-esm-border rounded-card p-4">
         <p className="text-xs text-esm-red">{error || "Recap not found"}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-slate-50 border border-[#E2E0E1] rounded-sm p-4 space-y-4">
+    <div className="bg-slate-50 border border-esm-border rounded-card p-4 space-y-4">
       <div className="flex items-center gap-3">
         <svg className="w-5 h-5 text-esm-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -919,7 +919,7 @@ function ViewRecapPanel({ meetingId, projectId }: { meetingId: string; projectId
         </div>
       </div>
 
-      <div className="pl-4 border-l-2 border-[#E2E0E1]">
+      <div className="pl-4 border-l-2 border-esm-border">
         <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Summary</p>
         <p className="text-sm text-esm-black">{recap.summary}</p>
       </div>
@@ -1036,7 +1036,7 @@ function AddMeetingPanel({
   }
 
   return (
-    <div className="bg-white rounded-sm border border-[#E2E0E1] p-5 mb-5 space-y-4">
+    <div className="bg-white rounded-card border border-esm-border p-5 mb-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-esm-black">Add Ad-Hoc Meeting</h3>
         <button onClick={onCancel} className="text-esm-grey hover:text-esm-black">
@@ -1054,7 +1054,7 @@ function AddMeetingPanel({
             placeholder="e.g. Ad-Hoc: Integration Review"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="w-full text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           />
         </div>
         <div>
@@ -1063,7 +1063,7 @@ function AddMeetingPanel({
             type="date"
             value={meetingDate}
             onChange={(e) => setMeetingDate(e.target.value)}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="w-full text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           />
         </div>
         <div>
@@ -1071,7 +1071,7 @@ function AddMeetingPanel({
           <select
             value={meetingTime}
             onChange={(e) => setMeetingTime(e.target.value)}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="w-full text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           >
             {TIME_OPTIONS.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
@@ -1085,7 +1085,7 @@ function AddMeetingPanel({
             placeholder="e.g. Configuration, UAT, Go-Live"
             value={phase}
             onChange={(e) => setPhase(e.target.value)}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="w-full text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           />
         </div>
         <div className="col-span-2">
@@ -1095,7 +1095,7 @@ function AddMeetingPanel({
             placeholder="Meeting agenda items..."
             value={agenda}
             onChange={(e) => setAgenda(e.target.value)}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
+            className="w-full text-sm border border-esm-border rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
           />
         </div>
         <div className="col-span-2">
@@ -1105,7 +1105,7 @@ function AddMeetingPanel({
             placeholder="Any additional notes..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
+            className="w-full text-sm border border-esm-border rounded px-3 py-2 focus:outline-none focus:border-esm-black resize-y"
           />
         </div>
       </div>
@@ -1122,7 +1122,7 @@ function AddMeetingPanel({
         </button>
         <button
           onClick={onCancel}
-          className="px-4 py-2 text-sm font-medium border border-[#E2E0E1] text-esm-grey rounded hover:bg-slate-50 transition-colors"
+          className="px-4 py-2 text-sm font-medium border border-esm-border text-esm-grey rounded hover:bg-slate-50 transition-colors"
         >
           Cancel
         </button>

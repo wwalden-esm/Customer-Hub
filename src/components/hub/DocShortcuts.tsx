@@ -35,12 +35,12 @@ export default function DocShortcuts({ projectId, documentTypes }: { projectId: 
   }
 
   return (
-    <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="doc-shortcuts-heading">
+    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="doc-shortcuts-heading">
       <h2 id="doc-shortcuts-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
         Generate Documents
       </h2>
       {message && (
-        <div className={`text-xs px-3 py-2 rounded-sm mb-3 ${
+        <div className={`text-xs px-3 py-2 rounded-card mb-3 ${
           message.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-esm-red"
         }`}>
           {message.text}
@@ -55,12 +55,12 @@ export default function DocShortcuts({ projectId, documentTypes }: { projectId: 
               key={t}
               onClick={() => generate(t)}
               disabled={generating !== null}
-              className="text-left px-3 py-2.5 border border-[#E2E0E1] rounded-sm hover:bg-slate-50 hover:border-[#C5C3C4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="text-left px-3 py-2.5 border border-esm-border rounded-card hover:bg-slate-50 hover:border-esm-border-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               <span className="text-xs font-medium text-esm-black block leading-snug">
                 {isGenerating ? "Generating..." : meta.label}
               </span>
-              <span className="text-[10px] text-[#9E9B9E] block mt-0.5">{meta.description}</span>
+              <span className="text-[10px] text-esm-muted block mt-0.5">{meta.description}</span>
             </button>
           );
         })}

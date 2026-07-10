@@ -9,7 +9,7 @@ export default async function ProjectConfigPage({ params }: { params: { projectI
 
   return (
     <main className="min-h-screen bg-esm-grey-light">
-      <div className="bg-white border-b border-[#E2E0E1]">
+      <div className="bg-white border-b border-esm-border">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center gap-2 text-sm text-esm-grey mb-2">
             <Link href="/dashboard" className="hover:text-esm-black">Dashboard</Link>

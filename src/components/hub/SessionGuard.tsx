@@ -49,7 +49,7 @@ export default function SessionGuard() {
       aria-describedby="session-expired-desc"
       onKeyDown={handleKeyDown}
     >
-      <div className="bg-white rounded-sm p-6 shadow-xl max-w-sm mx-4">
+      <div className="bg-white rounded-card p-6 shadow-xl max-w-sm mx-4">
         <h2 id="session-expired-title" className="text-lg font-bold text-esm-black mb-2">Session Expired</h2>
         <p id="session-expired-desc" className="text-sm text-esm-grey mb-4">
           Your session has expired. Please log in again to continue.

@@ -75,7 +75,7 @@ export function SsoInfoSection({ data, onChange, projectId }: Props) {
       <label className="flex items-start gap-3 p-3 border border-slate-200 rounded hover:bg-slate-50 cursor-pointer">
         <input
           type="checkbox"
-          className="mt-0.5 rounded border-slate-300"
+          className="mt-0.5 rounded border-esm-border"
           checked={Boolean(d.esmAccountsAcknowledged)}
           onChange={(e) => set({ esmAccountsAcknowledged: e.target.checked })}
         />

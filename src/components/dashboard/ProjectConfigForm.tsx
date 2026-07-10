@@ -102,7 +102,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
   return (
     <div className="space-y-6">
       {/* Branding */}
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <section className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Branding</h2>
         <div className="space-y-4">
           <div>
@@ -113,13 +113,13 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
                 type="color"
                 value={accentColor}
                 onChange={(e) => setAccentColor(e.target.value)}
-                className="w-10 h-10 border border-[#E2E0E1] rounded cursor-pointer"
+                className="w-10 h-10 border border-esm-border rounded cursor-pointer"
               />
               <input
                 type="text"
                 value={accentColor}
                 onChange={(e) => setAccentColor(e.target.value)}
-                className="border border-[#E2E0E1] rounded px-3 py-1.5 text-sm font-mono w-28"
+                className="border border-esm-border rounded px-3 py-1.5 text-sm font-mono w-28"
                 aria-label="Accent color hex value"
               />
               <div className="h-8 w-24 rounded" style={{ backgroundColor: accentColor }} />
@@ -158,7 +158,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             )}
             <label
               className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded cursor-pointer transition-colors ${
-                logoUploading ? "border-gray-200 bg-gray-50" : "border-[#E2E0E1] hover:border-esm-red/40 hover:bg-red-50/30"
+                logoUploading ? "border-gray-200 bg-gray-50" : "border-esm-border hover:border-esm-red/40 hover:bg-red-50/30"
               }`}
             >
               <input
@@ -211,7 +211,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
       </section>
 
       {/* Portal Access */}
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <section className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Portal Access</h2>
         <div>
           <label htmlFor="portal-password" className="block text-sm font-medium text-esm-black mb-1">Customer Portal Password</label>
@@ -220,14 +220,14 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             type="text"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm font-mono max-w-sm"
+            className="w-full border border-esm-border rounded px-3 py-1.5 text-sm font-mono max-w-sm"
           />
           <p className="text-xs text-esm-grey mt-1">Customers use this password to log in to their project portal.</p>
         </div>
       </section>
 
       {/* Portal Contacts */}
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <section className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Portal Contacts</h2>
         <p className="text-xs text-esm-grey mb-3">
           Add customer contacts who can access the portal. After saving, generate invite links to send them direct access (no password needed).
@@ -304,7 +304,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
               value={newContact.name}
               onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
               placeholder="Jane Smith"
-              className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm"
+              className="w-full border border-esm-border rounded px-3 py-1.5 text-sm"
             />
           </div>
           <div className="flex-1">
@@ -314,7 +314,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
               value={newContact.email}
               onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
               placeholder="jane@university.edu"
-              className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm"
+              className="w-full border border-esm-border rounded px-3 py-1.5 text-sm"
             />
           </div>
           <div className="w-36">
@@ -324,7 +324,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
               value={newContact.role}
               onChange={(e) => setNewContact({ ...newContact, role: e.target.value })}
               placeholder="Project Lead"
-              className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm"
+              className="w-full border border-esm-border rounded px-3 py-1.5 text-sm"
             />
           </div>
           <button
@@ -351,7 +351,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
       </section>
 
       {/* Hub Sections */}
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <section className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Hub Sections</h2>
         <p className="text-xs text-esm-grey mb-3">Choose which sections are visible in the customer portal. Dashboard is always shown.</p>
         <div className="space-y-2">
@@ -361,7 +361,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
                 type="checkbox"
                 checked={sectionVisibility[s.key]}
                 onChange={() => toggleSection(s.key)}
-                className="w-4 h-4 rounded border-slate-300 text-esm-red focus:ring-esm-red"
+                className="w-4 h-4 rounded border-esm-border text-esm-red focus:ring-esm-red"
               />
               <div>
                 <span className="text-sm font-medium text-esm-black">{s.label}</span>
@@ -373,7 +373,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
       </section>
 
       {/* Document Types */}
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <section className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Document Types</h2>
         <p className="text-xs text-esm-grey mb-3">Choose which document types are available for generation on this project.</p>
         <div className="space-y-2">
@@ -383,7 +383,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
                 type="checkbox"
                 checked={docTypes[dt.key]}
                 onChange={() => toggleDocType(dt.key)}
-                className="w-4 h-4 rounded border-slate-300 text-esm-red focus:ring-esm-red"
+                className="w-4 h-4 rounded border-esm-border text-esm-red focus:ring-esm-red"
               />
               <div>
                 <span className="text-sm font-medium text-esm-black">{dt.label}</span>
@@ -395,7 +395,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
       </section>
 
       {/* Customer Links */}
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <section className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Customer Links</h2>
         <p className="text-xs text-esm-grey mb-3">Add links that will appear in the customer portal sidebar (e.g. training resources, SharePoint, Smartsheet views).</p>
         <div className="space-y-3">
@@ -412,7 +412,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
                       setLinks(updated);
                     }}
                     placeholder="Label"
-                    className="flex-1 border border-[#E2E0E1] rounded px-3 py-1.5 text-sm"
+                    className="flex-1 border border-esm-border rounded px-3 py-1.5 text-sm"
                     aria-label={`Link ${i + 1} label`}
                   />
                   <select
@@ -422,7 +422,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
                       updated[i] = { ...updated[i], icon: e.target.value };
                       setLinks(updated);
                     }}
-                    className="border border-[#E2E0E1] rounded px-2 py-1.5 text-sm w-32"
+                    className="border border-esm-border rounded px-2 py-1.5 text-sm w-32"
                     aria-label={`Link ${i + 1} icon`}
                   >
                     <option value="link">Link</option>
@@ -443,7 +443,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
                     setLinks(updated);
                   }}
                   placeholder="https://..."
-                  className="w-full border border-[#E2E0E1] rounded px-3 py-1.5 text-sm font-mono"
+                  className="w-full border border-esm-border rounded px-3 py-1.5 text-sm font-mono"
                   aria-label={`Link ${i + 1} URL`}
                 />
               </div>
@@ -473,7 +473,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
       </section>
 
       {/* Smartsheet IDs (read-only) */}
-      <section className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <section className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Smartsheet Configuration</h2>
         {project.smartsheetConfig && Object.keys(project.smartsheetConfig).length > 0 ? (
           <div className="space-y-2 text-sm">

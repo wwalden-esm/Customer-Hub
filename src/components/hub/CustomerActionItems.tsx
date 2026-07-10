@@ -19,16 +19,16 @@ export default function CustomerActionItems({ items, contactName }: { items: Hub
 
   return (
     <section
-      className="bg-white border border-[#E2E0E1] rounded-sm overflow-hidden"
+      className="bg-white border border-esm-border rounded-card overflow-hidden"
       style={{ borderLeftWidth: "4px", borderLeftColor: overdue.length > 0 ? "#F4333F" : "var(--hub-accent, #F4333F)" }}
       aria-labelledby="customer-actions-heading"
     >
-      <div className="flex justify-between items-center px-5 py-3.5 border-b border-[#E2E0E1]">
+      <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
         <h2 id="customer-actions-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
           Your Action Items
         </h2>
         <div
-          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-sm border ${
+          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-card border ${
             overdue.length > 0
               ? "bg-red-50 text-esm-red border-esm-red/25"
               : "bg-amber-50 text-amber-700 border-amber-200"
@@ -50,7 +50,7 @@ export default function CustomerActionItems({ items, contactName }: { items: Hub
                     ? "border-emerald-500 bg-emerald-500"
                     : isOverdue
                       ? "border-esm-red"
-                      : "border-[#E2E0E1]"
+                      : "border-esm-border"
                 }`}
               >
                 {item.status === "done" && (
@@ -63,7 +63,7 @@ export default function CustomerActionItems({ items, contactName }: { items: Hub
                 <p className="text-sm text-esm-black leading-snug">{item.description}</p>
                 <div className="flex items-center gap-2 mt-1">
                   {item.dueDate && (
-                    <span className={`text-xs ${isOverdue ? "text-esm-red font-medium" : isSoon ? "text-amber-600" : "text-[#9E9B9E]"}`}>
+                    <span className={`text-xs ${isOverdue ? "text-esm-red font-medium" : isSoon ? "text-amber-600" : "text-esm-muted"}`}>
                       {isOverdue ? `Overdue (${fmt(item.dueDate)})` : isSoon ? `Due ${fmt(item.dueDate)}` : `Due ${fmt(item.dueDate)}`}
                     </span>
                   )}
@@ -73,14 +73,14 @@ export default function CustomerActionItems({ items, contactName }: { items: Hub
                       {contactName && item.owner.toLowerCase().includes(contactName.toLowerCase()) ? (
                         <span className="text-xs font-medium text-[var(--hub-accent,#1E3A5F)]">You</span>
                       ) : (
-                        <span className="text-xs text-[#9E9B9E]">{item.owner}</span>
+                        <span className="text-xs text-esm-muted">{item.owner}</span>
                       )}
                     </>
                   )}
                 </div>
               </div>
               {item.priority === "high" && (
-                <span className="text-[9px] font-bold tracking-wide uppercase text-esm-red bg-red-50 border border-esm-red/25 px-1.5 py-0.5 rounded-sm shrink-0">
+                <span className="text-[9px] font-bold tracking-wide uppercase text-esm-red bg-red-50 border border-esm-red/25 px-1.5 py-0.5 rounded-card shrink-0">
                   High
                 </span>
               )}

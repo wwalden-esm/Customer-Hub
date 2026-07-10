@@ -88,7 +88,7 @@ function RecapPanel({ meetingId, projectId }: { meetingId: string; projectId: st
   }
 
   return (
-    <div className="space-y-3 mt-3 pt-3 border-t border-[#E2E0E1]">
+    <div className="space-y-3 mt-3 pt-3 border-t border-esm-border">
       <div>
         <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Meeting Summary</p>
         <p className="text-sm text-esm-black">{recap.summary}</p>
@@ -177,12 +177,12 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
 
   if (meetings.length === 0) {
     return (
-      <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-8 text-center">
+      <div className="bg-white rounded-card border border-esm-border px-6 py-8 text-center">
         <svg className="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
         </svg>
         <p className="text-sm text-slate-500">No meetings scheduled yet.</p>
-        <p className="text-xs text-[#9E9B9E] mt-1">Weekly implementation meetings will appear here once scheduled.</p>
+        <p className="text-xs text-esm-muted mt-1">Weekly implementation meetings will appear here once scheduled.</p>
       </div>
     );
   }
@@ -191,7 +191,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
     <>
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5" role="group" aria-label="Meeting summary">
-        <div className="bg-white rounded-sm border border-[#E2E0E1] px-4 py-3 text-center">
+        <div className="bg-white rounded-card border border-esm-border px-4 py-3 text-center">
           <p className="text-2xl font-semibold text-esm-black">{counts.total}</p>
           <p className="text-xs text-esm-grey">Total</p>
         </div>
@@ -208,8 +208,8 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
               key={s}
               onClick={() => setStatusFilter(statusFilter === s ? "All" : s)}
               aria-pressed={statusFilter === s}
-              className={`rounded-sm border px-4 py-3 text-center transition-colors ${
-                statusFilter === s ? c.active : "border-[#E2E0E1] bg-white hover:border-slate-300"
+              className={`rounded-card border px-4 py-3 text-center transition-colors ${
+                statusFilter === s ? c.active : "border-esm-border bg-white hover:border-esm-border"
               }`}
             >
               <p className={`text-2xl font-semibold ${c.count}`}>{counts[s.toLowerCase() as keyof typeof counts]}</p>
@@ -247,7 +247,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
               id="phase-filter"
               value={phaseFilter}
               onChange={(e) => setPhaseFilter(e.target.value)}
-              className="text-xs border border-[#E2E0E1] rounded-sm px-2 py-1 text-esm-black"
+              className="text-xs border border-esm-border rounded-card px-2 py-1 text-esm-black"
             >
               {phases.map((p) => (
                 <option key={p} value={p}>{p === "All" ? "All Phases" : shortPhase(p)}</option>
@@ -258,7 +258,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
       </div>
 
       {/* Meeting list */}
-      <div className="bg-white rounded-sm border border-[#E2E0E1] divide-y divide-[#E2E0E1]">
+      <div className="bg-white rounded-card border border-esm-border divide-y divide-esm-border">
         {filtered.length === 0 ? (
           <div className="px-5 py-6 text-center text-sm text-slate-500">
             No meetings match the selected filters.
@@ -280,7 +280,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
                   className="w-full text-left flex items-start gap-3"
                 >
                   <svg
-                    className={`w-4 h-4 text-[#9E9B9E] mt-0.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                    className={`w-4 h-4 text-esm-muted mt-0.5 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -318,7 +318,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
                 {isExpanded && (
                   <div id={contentId} className="ml-7 mt-3 space-y-3">
                     {meeting.agendaSummary && (
-                      <div className="pl-4 border-l-2 border-[#E2E0E1]">
+                      <div className="pl-4 border-l-2 border-esm-border">
                         <p className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-1">Agenda</p>
                         <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.agendaSummary}</p>
                       </div>
@@ -368,7 +368,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
         )}
       </div>
 
-      <p className="text-xs text-[#9E9B9E] mt-3" aria-live="polite">
+      <p className="text-xs text-esm-muted mt-3" aria-live="polite">
         Showing {filtered.length} of {meetings.length} meetings
       </p>
     </>

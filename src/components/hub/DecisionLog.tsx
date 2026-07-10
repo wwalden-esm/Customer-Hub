@@ -9,12 +9,12 @@ export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubD
   if (decisions.length === 0) return null;
 
   return (
-    <section className="bg-white border border-[#E2E0E1] rounded-sm overflow-hidden" aria-labelledby="decisions-heading">
-      <div className="flex justify-between items-center px-5 py-3.5 border-b border-[#E2E0E1]">
+    <section className="bg-white border border-esm-border rounded-card overflow-hidden" aria-labelledby="decisions-heading">
+      <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
         <h2 id="decisions-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">
           Decision Log
         </h2>
-        <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-sm border bg-gray-50 text-esm-grey border-[#E2E0E1]">
+        <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-card border bg-gray-50 text-esm-grey border-esm-border">
           {decisions.length} recorded
         </span>
       </div>
@@ -25,11 +25,11 @@ export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubD
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-esm-black leading-snug">{d.item}</p>
                 {d.notes && (
-                  <p className="text-xs text-[#9E9B9E] mt-1 leading-relaxed line-clamp-2">{d.notes}</p>
+                  <p className="text-xs text-esm-muted mt-1 leading-relaxed line-clamp-2">{d.notes}</p>
                 )}
               </div>
               <div className="text-right shrink-0">
-                <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-sm border ${
+                <span className={`text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-card border ${
                   d.status === "Complete"
                     ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                     : "bg-blue-50 text-blue-700 border-blue-200"
@@ -37,7 +37,7 @@ export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubD
                   {d.status}
                 </span>
                 {d.date && (
-                  <p className="text-[10px] text-[#9E9B9E] mt-1">{fmt(d.date)}</p>
+                  <p className="text-[10px] text-esm-muted mt-1">{fmt(d.date)}</p>
                 )}
               </div>
             </div>
@@ -45,7 +45,7 @@ export default function DecisionLog({ decisions, raidLogUrl }: { decisions: HubD
         ))}
       </ul>
       {(decisions.length > 5 || raidLogUrl) && (
-        <div className="px-5 py-2.5 border-t border-[#E2E0E1] bg-gray-50">
+        <div className="px-5 py-2.5 border-t border-esm-border bg-gray-50">
           <a
             href={raidLogUrl ?? "/hub/raid-log"}
             {...(raidLogUrl ? { target: "_blank", rel: "noopener noreferrer" } : {})}

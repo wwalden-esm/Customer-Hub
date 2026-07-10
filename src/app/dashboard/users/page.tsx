@@ -102,7 +102,7 @@ export default function UsersPage() {
 
   return (
     <main className="min-h-screen bg-esm-grey-light">
-      <header className="bg-white border-b border-[#E2E0E1]">
+      <header className="bg-white border-b border-esm-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">
@@ -122,7 +122,7 @@ export default function UsersPage() {
       <div className="max-w-4xl mx-auto px-6 py-6">
         {/* Created user banner */}
         {createdUser && (
-          <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-sm p-4" role="alert">
+          <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-card p-4" role="alert">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-emerald-800">
@@ -159,7 +159,7 @@ export default function UsersPage() {
 
         {/* Reset password banner */}
         {resetResult && (
-          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-sm p-4" role="alert">
+          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-card p-4" role="alert">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm font-medium text-blue-800">
@@ -196,14 +196,14 @@ export default function UsersPage() {
           <h2 className="text-sm font-semibold text-esm-black">ESM Staff Accounts</h2>
           <button
             onClick={() => { setShowForm(!showForm); setError(null); }}
-            className="bg-esm-red hover:bg-esm-red-dark text-white text-sm font-medium px-4 py-2 rounded-sm transition-colors"
+            className="bg-esm-red hover:bg-esm-red-dark text-white text-sm font-medium px-4 py-2 rounded-card transition-colors"
           >
             {showForm ? "Cancel" : "Add User"}
           </button>
         </div>
 
         {showForm && (
-          <form onSubmit={handleAdd} className="mb-6 bg-white rounded-sm border border-[#E2E0E1] p-5">
+          <form onSubmit={handleAdd} className="mb-6 bg-white rounded-card border border-esm-border p-5">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="new-name" className="block text-sm font-medium text-esm-black mb-1">
@@ -215,7 +215,7 @@ export default function UsersPage() {
                   required
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full rounded-sm border border-[#E2E0E1] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50"
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50"
                   placeholder="Jane Smith"
                 />
               </div>
@@ -229,7 +229,7 @@ export default function UsersPage() {
                   required
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  className="w-full rounded-sm border border-[#E2E0E1] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50"
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50"
                   placeholder="jsmith@esmsolutions.com"
                 />
               </div>
@@ -241,7 +241,7 @@ export default function UsersPage() {
                   id="new-role"
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
-                  className="w-full rounded-sm border border-[#E2E0E1] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50 bg-white"
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50 bg-white"
                 >
                   <option value="SC">Solutions Consultant</option>
                   <option value="PM">Project Manager</option>
@@ -255,7 +255,7 @@ export default function UsersPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="bg-esm-red hover:bg-esm-red-dark disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-sm transition-colors"
+                className="bg-esm-red hover:bg-esm-red-dark disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-card transition-colors"
               >
                 {saving ? "Creating..." : "Create User"}
               </button>
@@ -264,7 +264,7 @@ export default function UsersPage() {
         )}
 
         {/* Users table */}
-        <div className="bg-white rounded-sm border border-[#E2E0E1] overflow-hidden">
+        <div className="bg-white rounded-card border border-esm-border overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-sm text-esm-grey">Loading users...</div>
           ) : users.length === 0 ? (
@@ -273,7 +273,7 @@ export default function UsersPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#E2E0E1] bg-slate-50">
+                  <tr className="border-b border-esm-border bg-slate-50">
                     <th scope="col" className="text-left px-5 py-3 font-medium text-esm-grey">Name</th>
                     <th scope="col" className="text-left px-5 py-3 font-medium text-esm-grey">Email</th>
                     <th scope="col" className="text-left px-5 py-3 font-medium text-esm-grey">Role</th>
@@ -282,11 +282,11 @@ export default function UsersPage() {
                 </thead>
                 <tbody>
                   {users.map((u) => (
-                    <tr key={u.email} className="border-b border-[#E2E0E1] last:border-0">
+                    <tr key={u.email} className="border-b border-esm-border last:border-0">
                       <td className="px-5 py-3 text-esm-black font-medium">{u.name}</td>
                       <td className="px-5 py-3 text-esm-grey">{u.email}</td>
                       <td className="px-5 py-3">
-                        <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-700 text-xs font-medium rounded-sm">
+                        <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-700 text-xs font-medium rounded-card">
                           {u.role === "SC" ? "Solutions Consultant" : u.role === "PM" ? "Project Manager" : "Admin"}
                         </span>
                       </td>

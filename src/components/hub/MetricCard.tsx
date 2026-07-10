@@ -37,14 +37,14 @@ export default function MetricCard({ label, value, sub, percent, color, href }: 
           >
             {value}
           </div>
-          {sub && <div className="text-[11px] text-[#9E9B9E] mt-1.5 leading-snug">{sub}</div>}
+          {sub && <div className="text-[11px] text-esm-muted mt-1.5 leading-snug">{sub}</div>}
         </div>
       </div>
     </>
   );
 
-  const className = "bg-white border border-[#E2E0E1] rounded-sm p-[18px_20px] flex-1 min-w-[150px]"
-    + (href ? " hover:shadow-md hover:border-[#C5C3C4] transition-shadow cursor-pointer" : "");
+  const className = "bg-white border border-esm-border rounded-card p-[18px_20px] flex-1 min-w-[150px]"
+    + (href ? " hover:shadow-md hover:border-esm-border-hover transition-shadow cursor-pointer" : "");
 
   if (href) {
     const isExternal = href.startsWith("http");

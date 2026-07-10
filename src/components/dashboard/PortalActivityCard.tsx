@@ -30,7 +30,7 @@ export default function PortalActivityCard({ projectId }: { projectId: string })
 
   if (loading) {
     return (
-      <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <div className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Portal Activity</h2>
         <p className="text-xs text-esm-grey">Loading...</p>
       </div>
@@ -39,7 +39,7 @@ export default function PortalActivityCard({ projectId }: { projectId: string })
 
   if (!data || data.totalVisits === 0) {
     return (
-      <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+      <div className="bg-white rounded-card border border-esm-border p-5">
         <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Portal Activity</h2>
         <p className="text-xs text-esm-grey">No customer portal visits recorded yet.</p>
       </div>
@@ -59,7 +59,7 @@ export default function PortalActivityCard({ projectId }: { projectId: string })
   }
 
   return (
-    <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+    <div className="bg-white rounded-card border border-esm-border p-5">
       <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Portal Activity</h2>
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="text-center">

@@ -43,7 +43,7 @@ export default function LinkSheetsButton({ projectId, hasSheets }: LinkSheetsBut
       <button
         onClick={handleClick}
         disabled={loading}
-        className="text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+        className="text-xs px-2 py-1 rounded border border-esm-border hover:bg-slate-50 disabled:opacity-50 transition-colors"
         title={hasSheets ? "Re-link sheets from Smartsheet workspace" : "Link sheets from Smartsheet workspace"}
       >
         {loading ? "Linking..." : hasSheets ? "Re-link" : "Link Sheets"}

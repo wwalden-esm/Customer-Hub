@@ -12,7 +12,7 @@ export default function HubNav({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white border-b border-[#E2E0E1] overflow-x-auto">
+    <nav className="bg-white border-b border-esm-border overflow-x-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-4 sm:gap-6">
         {items.map((item) => {
           const isActive =

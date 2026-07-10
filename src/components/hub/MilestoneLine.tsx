@@ -17,7 +17,7 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
   };
 
   return (
-    <section className="bg-white border border-[#E2E0E1] rounded-sm px-6 pt-6 pb-7 mb-5" aria-labelledby="milestones-heading">
+    <section className="bg-white border border-esm-border rounded-card px-6 pt-6 pb-7 mb-5" aria-labelledby="milestones-heading">
       <h2 id="milestones-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-7">
         Project Milestones
       </h2>
@@ -52,12 +52,12 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
                   ? { backgroundColor: "#eff6ff", borderColor: "#93c5fd" }
                   : {};
 
-            const cardCls = !isC && !isI && !isH ? "bg-gray-50 border-[#E2E0E1]" : "";
+            const cardCls = !isC && !isI && !isH ? "bg-gray-50 border-esm-border" : "";
 
             const statusText = isC ? "Complete" : isI ? "Active" : isH ? "On Hold" : "Upcoming";
             const label = isC ? "✓ Done" : isI ? "Active" : isH ? "On Hold" : "Upcoming";
             const labelStyle: React.CSSProperties = isC || isI ? { color: "var(--hub-accent)" } : {};
-            const labelCls = isC || isI ? "" : isH ? "text-blue-600" : "text-[#9E9B9E]";
+            const labelCls = isC || isI ? "" : isH ? "text-blue-600" : "text-esm-muted";
 
             return (
               <div key={m.id} className="flex flex-col items-center w-[140px] shrink-0" role="listitem" aria-label={`${m.name}: ${statusText}${m.date ? `, ${fmtShort(m.date)}` : ""}`}>
@@ -66,7 +66,7 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
                   <div className="w-3.5 h-3.5 rounded-full border-2 shrink-0" style={dotStyle} aria-hidden="true" />
                   <div className="flex-1" />
                 </div>
-                <div className={`border rounded-sm p-2.5 w-[118px] text-center ${cardCls}`} style={cardStyle}>
+                <div className={`border rounded-card p-2.5 w-[118px] text-center ${cardCls}`} style={cardStyle}>
                   <div className="flex items-center justify-center gap-1 mb-1">
                     {m.health && m.health !== "Green" && (
                       <span
@@ -90,7 +90,7 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
                     </div>
                   )}
                   {m.phase && (
-                    <span className="inline-block mt-1 text-[9px] text-esm-grey bg-black/5 rounded-sm px-1.5 py-px">
+                    <span className="inline-block mt-1 text-[9px] text-esm-grey bg-black/5 rounded-card px-1.5 py-px">
                       {m.phase}
                     </span>
                   )}

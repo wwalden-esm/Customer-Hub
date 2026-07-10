@@ -13,7 +13,7 @@ export default function NotFound() {
           <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-white bg-esm-red rounded hover:opacity-90 transition-opacity">
             ESM Dashboard
           </Link>
-          <Link href="/hub" className="px-4 py-2 text-sm font-medium text-esm-black border border-slate-300 rounded hover:bg-slate-50 transition-colors">
+          <Link href="/hub" className="px-4 py-2 text-sm font-medium text-esm-black border border-esm-border rounded hover:bg-slate-50 transition-colors">
             Customer Portal
           </Link>
         </div>

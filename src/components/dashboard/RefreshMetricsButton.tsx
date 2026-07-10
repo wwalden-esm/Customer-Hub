@@ -36,7 +36,7 @@ export default function RefreshMetricsButton({ projectId }: { projectId: string 
       <button
         onClick={handleClick}
         disabled={loading}
-        className="text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+        className="text-xs px-2 py-1 rounded border border-esm-border hover:bg-slate-50 disabled:opacity-50 transition-colors"
       >
         {loading ? "Refreshing..." : "Refresh Metrics"}
       </button>

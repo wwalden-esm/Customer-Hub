@@ -162,13 +162,13 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
             placeholder="Search projects..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-[#E2E0E1] rounded"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-esm-border rounded"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="border border-[#E2E0E1] rounded px-3 py-2 text-sm text-esm-black"
+          className="border border-esm-border rounded px-3 py-2 text-sm text-esm-black"
         >
           <option value="all">All statuses</option>
           <option value="ON_TRACK">On Track</option>
@@ -215,7 +215,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
         </div>
       )}
 
-      <div className="bg-white rounded-sm border border-[#E2E0E1] overflow-hidden">
+      <div className="bg-white rounded-card border border-esm-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-left text-esm-grey">
@@ -225,7 +225,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
                     type="checkbox"
                     checked={allVisibleSelected}
                     onChange={toggleAll}
-                    className="w-4 h-4 rounded border-slate-300 text-esm-red focus:ring-esm-red"
+                    className="w-4 h-4 rounded border-esm-border text-esm-red focus:ring-esm-red"
                     aria-label="Select all projects"
                   />
                 </th>
@@ -256,7 +256,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleOne(p.id)}
-                        className="w-4 h-4 rounded border-slate-300 text-esm-red focus:ring-esm-red"
+                        className="w-4 h-4 rounded border-esm-border text-esm-red focus:ring-esm-red"
                         aria-label={`Select ${p.customerName}`}
                       />
                     </td>

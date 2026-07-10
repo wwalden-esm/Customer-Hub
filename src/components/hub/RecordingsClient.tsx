@@ -86,7 +86,7 @@ export default function RecordingsClient({ files, configured, sharepointFolderUr
 
   if (!configured) {
     return (
-      <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-10 text-center">
+      <div className="bg-white rounded-card border border-esm-border px-6 py-10 text-center">
         <div className="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4">
           <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
@@ -103,7 +103,7 @@ export default function RecordingsClient({ files, configured, sharepointFolderUr
 
   if (files.length === 0) {
     return (
-      <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-10 text-center">
+      <div className="bg-white rounded-card border border-esm-border px-6 py-10 text-center">
         <div className="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4">
           <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
@@ -145,7 +145,7 @@ export default function RecordingsClient({ files, configured, sharepointFolderUr
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search recordings"
-            className="pl-9 pr-3 py-2 text-sm border border-[#E2E0E1] rounded-sm w-full sm:w-72"
+            className="pl-9 pr-3 py-2 text-sm border border-esm-border rounded-card w-full sm:w-72"
           />
         </div>
         {sharepointFolderUrl && (
@@ -165,7 +165,7 @@ export default function RecordingsClient({ files, configured, sharepointFolderUr
         )}
       </div>
 
-      <div className="bg-white rounded-sm border border-[#E2E0E1] divide-y divide-[#E2E0E1]">
+      <div className="bg-white rounded-card border border-esm-border divide-y divide-esm-border">
         {filtered.length === 0 ? (
           <div className="px-5 py-6 text-center text-sm text-slate-500">
             No recordings match &ldquo;{search}&rdquo;
@@ -182,7 +182,7 @@ export default function RecordingsClient({ files, configured, sharepointFolderUr
                 aria-label={`${file.name} — ${fmtSize(file.size)}, opens in new tab`}
                 className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors"
               >
-                <div className={`w-10 h-10 rounded-sm flex items-center justify-center shrink-0 ${ICON_COLORS[icon]}`}>
+                <div className={`w-10 h-10 rounded-card flex items-center justify-center shrink-0 ${ICON_COLORS[icon]}`}>
                   <FileIconSvg type={icon} />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -192,7 +192,7 @@ export default function RecordingsClient({ files, configured, sharepointFolderUr
                     <span>{fmtSize(file.size)}</span>
                   </div>
                 </div>
-                <svg className="w-4 h-4 text-[#9E9B9E] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <svg className="w-4 h-4 text-esm-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                 </svg>
               </a>
@@ -201,7 +201,7 @@ export default function RecordingsClient({ files, configured, sharepointFolderUr
         )}
       </div>
 
-      <p className="text-xs text-[#9E9B9E] mt-3">
+      <p className="text-xs text-esm-muted mt-3">
         {filtered.length} recording{filtered.length !== 1 ? "s" : ""}
         {search && ` matching "${search}"`}
       </p>

@@ -81,7 +81,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
 
   return (
     <main className="min-h-screen bg-esm-grey-light">
-      <div className="bg-white border-b border-[#E2E0E1]">
+      <div className="bg-white border-b border-esm-border">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center gap-2 text-sm text-esm-grey mb-2">
             <Link href="/dashboard" className="hover:text-esm-black">Dashboard</Link>
@@ -106,7 +106,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
       <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-3 gap-6">
         {/* Project info */}
         <div className="col-span-2 space-y-6">
-          <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+          <div className="bg-white rounded-card border border-esm-border p-5">
             <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Project Details</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <InfoRow label="Go-Live" value={fmtDate(project.goLiveDate)} />
@@ -132,7 +132,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
           />
 
           {/* Milestone list */}
-          <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+          <div className="bg-white rounded-card border border-esm-border p-5">
             <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-4">Milestones</h2>
             <div className="space-y-1">
               {milestones.map((m) => (
@@ -158,7 +158,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+          <div className="bg-white rounded-card border border-esm-border p-5">
             <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider mb-3">Quick Stats</h2>
             <div className="space-y-2.5 text-sm">
               {daysToGoLive !== null && (
@@ -204,7 +204,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
 
           {/* Meeting recap alerts */}
           {meetingsMissingRecap.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-sm p-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-card p-4">
               <h3 className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">Recaps Needed</h3>
               <ul className="space-y-1.5">
                 {meetingsMissingRecap.map((m) => (
@@ -226,7 +226,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
 
           {/* RAID breakdown */}
           {raidItems.length > 0 && (
-            <div className="bg-white rounded-sm border border-[#E2E0E1] p-5">
+            <div className="bg-white rounded-card border border-esm-border p-5">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="text-sm font-bold text-esm-grey uppercase tracking-wider">RAID Log</h2>
                 {config.raidLogSheetId && (

@@ -72,7 +72,7 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
 
   if (result) {
     return (
-      <div className="bg-emerald-50 border border-emerald-200 rounded-sm p-4">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-card p-4">
         <p className="text-sm font-medium text-emerald-800 mb-1">
           Generated {result.generated} meetings
         </p>
@@ -107,7 +107,7 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
   }
 
   return (
-    <div className="bg-white border border-[#E2E0E1] rounded-sm p-4">
+    <div className="bg-white border border-esm-border rounded-card p-4">
       <h3 className="text-xs font-bold text-esm-grey uppercase tracking-wider mb-3">
         Generate Meeting Schedule
       </h3>
@@ -121,7 +121,7 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
           <select
             value={meetingDay}
             onChange={(e) => setMeetingDay(Number(e.target.value))}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="w-full text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           >
             {DAY_OPTIONS.map((d) => (
               <option key={d.value} value={d.value}>{d.label}</option>
@@ -133,7 +133,7 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
           <select
             value={meetingTime}
             onChange={(e) => setMeetingTime(e.target.value)}
-            className="w-full text-sm border border-[#E2E0E1] rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
+            className="w-full text-sm border border-esm-border rounded px-3 py-1.5 focus:outline-none focus:border-esm-black"
           >
             {TIME_OPTIONS.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
@@ -156,7 +156,7 @@ export default function GenerateMeetingsButton({ projectId }: { projectId: strin
         </button>
         <button
           onClick={() => { setOpen(false); setError(null); }}
-          className="px-3 py-2 text-sm text-esm-grey border border-[#E2E0E1] rounded hover:bg-slate-50 transition-colors"
+          className="px-3 py-2 text-sm text-esm-grey border border-esm-border rounded hover:bg-slate-50 transition-colors"
         >
           Cancel
         </button>

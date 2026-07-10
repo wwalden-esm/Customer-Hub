@@ -113,7 +113,7 @@ export default function ActionItemsClient({
             className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
               filter === f.key
                 ? "bg-esm-black text-white"
-                : "bg-white text-esm-grey border border-[#E2E0E1] hover:border-esm-black"
+                : "bg-white text-esm-grey border border-esm-border hover:border-esm-black"
             }`}
           >
             {f.label}
@@ -123,7 +123,7 @@ export default function ActionItemsClient({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-sm border border-[#E2E0E1] p-8 text-center">
+        <div className="bg-white rounded-card border border-esm-border p-8 text-center">
           <p className="text-sm text-esm-grey">
             {filter === "overdue"
               ? "No overdue items — nice work!"
@@ -133,10 +133,10 @@ export default function ActionItemsClient({
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-sm border border-[#E2E0E1] overflow-hidden">
+        <div className="bg-white rounded-card border border-esm-border overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#E2E0E1] bg-gray-50">
+              <tr className="border-b border-esm-border bg-gray-50">
                 <th className="text-left px-4 py-3 text-[10px] font-bold text-esm-grey uppercase tracking-wider">
                   Description
                 </th>
@@ -192,7 +192,7 @@ export default function ActionItemsClient({
                           value={item.status.toLowerCase()}
                           disabled={busy}
                           onChange={(e) => updateStatus(item.id, e.target.value)}
-                          className={`text-xs border border-[#E2E0E1] rounded px-2 py-1 bg-white focus:outline-none focus:border-esm-black ${busy ? "opacity-50" : ""}`}
+                          className={`text-xs border border-esm-border rounded px-2 py-1 bg-white focus:outline-none focus:border-esm-black ${busy ? "opacity-50" : ""}`}
                         >
                           <option value="open">Open</option>
                           <option value="in-progress">In Progress</option>

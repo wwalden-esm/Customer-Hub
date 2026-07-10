@@ -16,7 +16,7 @@ export default function HealthTrend({ history, currentStatus }: Props) {
   const gap = 6;
 
   return (
-    <section className="bg-white border border-[#E2E0E1] rounded-sm p-5" aria-labelledby="health-trend-heading">
+    <section className="bg-white border border-esm-border rounded-card p-5" aria-labelledby="health-trend-heading">
       <h2 id="health-trend-heading" className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">
         Health Trend
       </h2>
@@ -35,11 +35,11 @@ export default function HealthTrend({ history, currentStatus }: Props) {
           </div>
         ))}
       </div>
-      <div className="flex justify-between text-[10px] text-[#9E9B9E]">
+      <div className="flex justify-between text-[10px] text-esm-muted">
         <span>{history[0].week}</span>
         <span>{history[history.length - 1].week}</span>
       </div>
-      <div className="mt-3 flex items-center gap-3 text-[10px] text-[#9E9B9E]">
+      <div className="mt-3 flex items-center gap-3 text-[10px] text-esm-muted">
         {(["ON_TRACK", "AT_RISK", "OFF_TRACK"] as const).map((s) => {
           const count = history.filter((h) => h.status === s).length;
           if (count === 0) return null;

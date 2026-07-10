@@ -2,6 +2,10 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { EsmLogo } from "@/components/ui";
 
 function LoginForm() {
   const params = useSearchParams();
@@ -39,47 +43,47 @@ function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md bg-white rounded-lg shadow p-8">
+    <Card padding="lg" className="w-full max-w-md">
       <div className="flex items-center gap-3 mb-1">
-        <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">
-          ESM
-        </div>
+        <EsmLogo size={48} variant="red" />
         <h1 className="text-2xl font-semibold text-esm-black">Customer Hub</h1>
       </div>
       <p className="text-sm text-esm-grey mt-1">ESM internal sign-in</p>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <div>
           <label className="block text-sm font-medium text-esm-black">Email</label>
-          <input
+          <Input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50"
             autoComplete="email"
+            className="mt-1"
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-esm-black">Password</label>
-          <input
+          <Input
             type="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-esm-red/50"
             autoComplete="current-password"
+            className="mt-1"
           />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
+        <Button
           type="submit"
+          variant="primary"
+          size="md"
           disabled={loading}
-          className="w-full bg-esm-red hover:bg-esm-red-dark disabled:opacity-50 text-white font-medium py-2 rounded transition-colors"
+          className="w-full"
         >
           {loading ? "Signing in..." : "Sign in"}
-        </button>
+        </Button>
       </form>
-    </div>
+    </Card>
   );
 }
 

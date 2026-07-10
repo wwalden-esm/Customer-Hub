@@ -28,7 +28,7 @@ export function WorkshopPanel({ description, data, onChange }: WorkshopPanelProp
       <label className="flex items-start gap-3 p-3 border border-slate-200 rounded hover:bg-slate-50 cursor-pointer">
         <input
           type="checkbox"
-          className="mt-0.5 rounded border-slate-300"
+          className="mt-0.5 rounded border-esm-border"
           checked={Boolean(data.acknowledged)}
           onChange={(e) => onChange({ ...data, acknowledged: e.target.checked })}
         />
@@ -224,7 +224,7 @@ export function YntSelector({ value, onChange, name }: YntSelectorProps) {
             value={o.value}
             checked={value === o.value}
             onChange={() => onChange(o.value)}
-            className="border-slate-300"
+            className="border-esm-border"
           />
           <span>{o.label}</span>
         </label>
@@ -269,7 +269,7 @@ export function AttachmentUpload({ sectionKey, projectId, hint, uploaded, onUplo
   }
 
   return (
-    <div className="rounded border border-dashed border-slate-300 bg-slate-50 p-4">
+    <div className="rounded border border-dashed border-esm-border bg-slate-50 p-4">
       <label className="flex items-center gap-3 cursor-pointer">
         <input
           type="file"

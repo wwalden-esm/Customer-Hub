@@ -50,7 +50,7 @@ export function SuccessCriteriaSection({ data, onChange }: Props) {
         <label className="mt-4 flex items-start gap-3 p-3 border border-slate-200 rounded hover:bg-slate-50 cursor-pointer">
           <input
             type="checkbox"
-            className="mt-0.5 rounded border-slate-300"
+            className="mt-0.5 rounded border-esm-border"
             checked={Boolean(d.dodAccepted)}
             onChange={(e) => set({ dodAccepted: e.target.checked })}
           />

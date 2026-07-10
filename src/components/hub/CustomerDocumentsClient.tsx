@@ -71,7 +71,7 @@ export default function CustomerDocumentsClient({
 
   return (
     <>
-      <div className="bg-white rounded-sm border border-[#E2E0E1] px-5 py-4 mb-6">
+      <div className="bg-white rounded-card border border-esm-border px-5 py-4 mb-6">
         <h2 className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase mb-3">Upload a Document</h2>
         <CustomerUploader projectId={projectId} onUploaded={refreshDocs} />
       </div>
@@ -89,7 +89,7 @@ export default function CustomerDocumentsClient({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               aria-label="Search documents"
-              className="w-full pl-9 pr-3 py-2 text-sm border border-[#E2E0E1] rounded-sm"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-esm-border rounded-card"
             />
           </div>
           <label htmlFor="doc-type-filter" className="sr-only">Filter by document type</label>
@@ -97,7 +97,7 @@ export default function CustomerDocumentsClient({
             id="doc-type-filter"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="border border-[#E2E0E1] rounded-sm px-3 py-2 text-sm text-esm-black"
+            className="border border-esm-border rounded-card px-3 py-2 text-sm text-esm-black"
           >
             <option value="all">All types</option>
             {types.map((t) => (
@@ -108,28 +108,28 @@ export default function CustomerDocumentsClient({
       )}
 
       {docs.length === 0 ? (
-        <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-8 text-center">
+        <div className="bg-white rounded-card border border-esm-border px-6 py-8 text-center">
           <svg className="w-10 h-10 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
           </svg>
           <p className="text-sm text-slate-500">No documents available yet.</p>
-          <p className="text-xs text-[#9E9B9E] mt-1">Your ESM team will publish documents here as they become ready.</p>
+          <p className="text-xs text-esm-muted mt-1">Your ESM team will publish documents here as they become ready.</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-sm border border-[#E2E0E1] px-6 py-8 text-center">
+        <div className="bg-white rounded-card border border-esm-border px-6 py-8 text-center">
           <p className="text-sm text-slate-500">No documents match your search.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-sm border border-[#E2E0E1] divide-y divide-[#E2E0E1]">
+        <div className="bg-white rounded-card border border-esm-border divide-y divide-esm-border">
           {refreshing && (
-            <div className="px-5 py-2 text-xs text-[#9E9B9E] text-center" aria-live="polite">Refreshing…</div>
+            <div className="px-5 py-2 text-xs text-esm-muted text-center" aria-live="polite">Refreshing…</div>
           )}
           {filtered.map((doc) => (
             <div key={doc.id} className="px-5 py-4 flex items-center justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-esm-black">{doc.name}</p>
                 <p className="text-xs text-esm-grey mt-0.5">
-                  <span className="inline-block bg-gray-100 text-esm-grey rounded-sm px-1.5 py-px mr-2 text-[10px] font-medium uppercase">
+                  <span className="inline-block bg-gray-100 text-esm-grey rounded-card px-1.5 py-px mr-2 text-[10px] font-medium uppercase">
                     {docType(doc.name)}
                   </span>
                   {doc.generatedAt && parseLocalDate(doc.generatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
@@ -142,7 +142,7 @@ export default function CustomerDocumentsClient({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Open ${doc.name} in new tab`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white rounded-sm transition-colors shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white rounded-card transition-colors shrink-0"
                   style={{ backgroundColor: "var(--hub-accent)" }}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -154,7 +154,7 @@ export default function CustomerDocumentsClient({
                 <a
                   href={`/api/projects/${projectId}/documents/${doc.id}/download`}
                   aria-label={`Download ${doc.name}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white rounded-sm transition-colors shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white rounded-card transition-colors shrink-0"
                   style={{ backgroundColor: "var(--hub-accent)" }}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

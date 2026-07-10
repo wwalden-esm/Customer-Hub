@@ -88,8 +88,8 @@ export default function FileUploader({ projectId, onUploadComplete }: FileUpload
         onClick={() => !busy && inputRef.current?.click()}
         onKeyDown={handleKeyDown}
         className={`
-          border-2 border-dashed rounded-sm p-6 text-center cursor-pointer transition-colors
-          ${dragOver ? "border-[var(--hub-accent)] bg-red-50" : "border-[#E2E0E1] hover:border-slate-400"}
+          border-2 border-dashed rounded-card p-6 text-center cursor-pointer transition-colors
+          ${dragOver ? "border-[var(--hub-accent)] bg-red-50" : "border-esm-border hover:border-slate-400"}
           ${busy ? "opacity-50 pointer-events-none" : ""}
         `}
       >
@@ -102,7 +102,7 @@ export default function FileUploader({ projectId, onUploadComplete }: FileUpload
           aria-label="Choose file to upload"
           tabIndex={-1}
         />
-        <svg className="w-8 h-8 mx-auto text-[#9E9B9E] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <svg className="w-8 h-8 mx-auto text-esm-muted mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
         {phase === "uploading" && (
@@ -111,7 +111,7 @@ export default function FileUploader({ projectId, onUploadComplete }: FileUpload
         {phase === "processing" && (
           <div className="space-y-1" aria-live="polite">
             <p className="text-sm font-medium" style={{ color: "var(--hub-accent)" }}>Processing with AI…</p>
-            <p className="text-xs text-[#9E9B9E]">Extracting data and generating workflow documents</p>
+            <p className="text-xs text-esm-muted">Extracting data and generating workflow documents</p>
           </div>
         )}
         {(phase === "idle" || phase === "done" || phase === "error") && (
@@ -119,7 +119,7 @@ export default function FileUploader({ projectId, onUploadComplete }: FileUpload
             <p className="text-sm font-medium text-esm-black">
               Drop a file here or click to browse
             </p>
-            <p className="text-xs text-[#9E9B9E] mt-1">
+            <p className="text-xs text-esm-muted mt-1">
               PDF, DOCX, XLSX, TXT, CSV — max 25MB
             </p>
           </>
@@ -131,7 +131,7 @@ export default function FileUploader({ projectId, onUploadComplete }: FileUpload
       )}
 
       {result && phase === "done" && (
-        <div role="status" className="bg-green-50 border border-green-200 rounded-sm px-4 py-3 space-y-1">
+        <div role="status" className="bg-green-50 border border-green-200 rounded-card px-4 py-3 space-y-1">
           <div className="flex items-center gap-2 text-sm text-green-700">
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

@@ -16,7 +16,7 @@ export default function RefreshButton() {
   return (
     <button
       onClick={handleRefresh}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-esm-grey border border-[#E2E0E1] rounded hover:bg-slate-50 transition-colors"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-esm-grey border border-esm-border rounded hover:bg-slate-50 transition-colors"
       aria-label="Refresh dashboard data"
     >
       <svg

@@ -40,7 +40,7 @@ function formatMultiselect(value: string): string[] {
 
 function FieldDisplay({ field }: { field: IntakeField }) {
   if (!field.value) {
-    return <span className="text-[#9E9B9E] italic">Not provided</span>;
+    return <span className="text-esm-muted italic">Not provided</span>;
   }
 
   if (field.type === "date") {
@@ -102,7 +102,7 @@ export default async function IntakePage() {
             Sourced from HubSpot
           </span>
           {intakeData && (
-            <span className="text-xs text-[#9E9B9E]">
+            <span className="text-xs text-esm-muted">
               Last updated: {parseLocalDate(intakeData.updatedAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
@@ -116,13 +116,13 @@ export default async function IntakePage() {
       </div>
 
       {error && (
-        <div role="alert" className="bg-amber-50 border border-amber-200 rounded-sm p-4 text-sm text-amber-800">
+        <div role="alert" className="bg-amber-50 border border-amber-200 rounded-card p-4 text-sm text-amber-800">
           {error}
         </div>
       )}
 
       {intakeData && (
-        <div className="bg-white rounded-sm border border-[#E2E0E1] divide-y divide-[#E2E0E1]">
+        <div className="bg-white rounded-card border border-esm-border divide-y divide-esm-border">
           {intakeData.fields.map((field) => (
             <div key={field.key} className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
               <dt className="text-sm font-medium text-esm-grey sm:w-56 shrink-0">
