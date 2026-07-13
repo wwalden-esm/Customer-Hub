@@ -19,26 +19,29 @@ const PRI_META: Record<string, { variant: BadgeVariant; label: string }> = {
   low: { variant: "neutral", label: "Low" },
 };
 
-export default function OpenItems({ items }: { items: HubActionItem[] }) {
+export default function OpenItems({ items, totalCount, hideTitle }: { items: HubActionItem[]; totalCount?: number; hideTitle?: boolean }) {
+  const total = totalCount ?? items.length;
   return (
     <section aria-labelledby="open-items-heading">
       <Card padding="sm" className="!p-0 overflow-hidden">
-      <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
-        <SectionLabel><h2 id="open-items-heading">
-          Open Action Items
-        </h2></SectionLabel>
-        <Link
-          href="/hub/raid-log"
-          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-card border hover:opacity-80 transition-opacity ${
-            items.length > 0
-              ? "bg-red-50 text-esm-red border-esm-red/25"
-              : "bg-gray-50 text-esm-grey border-esm-border"
-          }`}
-          aria-label={`${items.length} open items — view RAID log`}
-        >
-          {items.length} open
-        </Link>
-      </div>
+      {!hideTitle && (
+        <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
+          <SectionLabel><h2 id="open-items-heading">
+            Open Action Items
+          </h2></SectionLabel>
+          <Link
+            href="/hub/raid-log"
+            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-card border hover:opacity-80 transition-opacity ${
+              items.length > 0
+                ? "bg-red-50 text-esm-red border-esm-red/25"
+                : "bg-gray-50 text-esm-grey border-esm-border"
+            }`}
+            aria-label={`${items.length} open items — view RAID log`}
+          >
+            {total} open
+          </Link>
+        </div>
+      )}
       {items.length === 0 ? (
         <div className="p-9 text-center text-esm-muted text-sm">No open action items</div>
       ) : (
@@ -106,6 +109,17 @@ export default function OpenItems({ items }: { items: HubActionItem[] }) {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+      {total > items.length && (
+        <div className="px-5 py-2.5 border-t border-esm-border bg-gray-50">
+          <Link
+            href="/hub/raid-log"
+            className="text-xs font-medium hover:underline"
+            style={{ color: "var(--hub-accent, #F4333F)" }}
+          >
+            See all action items ({total}) →
+          </Link>
         </div>
       )}
       </Card>

@@ -23,18 +23,25 @@ function persist(collapsed: Set<string>) {
 interface CollapsibleSectionProps {
   id: string;
   title: string;
+  subtitle?: string;
   children: ReactNode;
   className?: string;
+  defaultExpanded?: boolean;
 }
 
-export default function CollapsibleSection({ id, title, children, className }: CollapsibleSectionProps) {
+export default function CollapsibleSection({ id, title, subtitle, children, className, defaultExpanded }: CollapsibleSectionProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setIsCollapsed(getCollapsed().has(id));
+    const stored = getCollapsed();
+    if (defaultExpanded && !stored.has(id)) {
+      setIsCollapsed(false);
+    } else {
+      setIsCollapsed(stored.has(id));
+    }
     setHydrated(true);
-  }, [id]);
+  }, [id, defaultExpanded]);
 
   function toggle() {
     setIsCollapsed((prev) => {
@@ -59,6 +66,11 @@ export default function CollapsibleSection({ id, title, children, className }: C
         <span className="text-label font-extrabold tracking-[0.09em] uppercase text-esm-grey">
           {title}
         </span>
+        {subtitle && (
+          <span className="text-xs font-normal normal-case tracking-normal text-esm-muted ml-3">
+            {subtitle}
+          </span>
+        )}
         <svg
           className={`w-4 h-4 text-esm-muted transition-transform duration-200 group-hover:text-esm-grey ${
             isCollapsed ? "-rotate-90" : ""

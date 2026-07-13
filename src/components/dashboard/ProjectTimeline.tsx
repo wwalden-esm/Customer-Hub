@@ -17,6 +17,10 @@ interface ProjectTimelineProps {
   milestones: TimelineMilestone[];
   projectStart?: string;
   projectEnd?: string;
+  daysElapsed?: number | null;
+  totalDays?: number | null;
+  timelinePercent?: number | null;
+  hideTitle?: boolean;
 }
 
 const STATUS_COLORS: Record<string, { bar: string; bg: string; text: string }> = {
@@ -46,7 +50,7 @@ function monthsBetween(start: Date, end: Date): Date[] {
   return months;
 }
 
-export default function ProjectTimeline({ milestones, projectStart, projectEnd }: ProjectTimelineProps) {
+export default function ProjectTimeline({ milestones, projectStart, projectEnd, daysElapsed, totalDays, timelinePercent, hideTitle }: ProjectTimelineProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const { items, rangeStart, rangeEnd, months } = useMemo(() => {
@@ -107,7 +111,16 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
   return (
     <section aria-labelledby="timeline-heading">
     <Card padding="md">
-      <SectionLabel className="mb-4"><h2 id="timeline-heading">Project Timeline</h2></SectionLabel>
+      {!hideTitle && (
+        <div className="flex items-center justify-between mb-4">
+          <SectionLabel><h2 id="timeline-heading">Project Timeline</h2></SectionLabel>
+          {daysElapsed != null && totalDays != null && timelinePercent != null && (
+            <span className="text-xs text-esm-grey">
+              Day {daysElapsed} of {totalDays} · {timelinePercent}% elapsed
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="overflow-x-auto">
         <div className="min-w-[700px]">
@@ -181,8 +194,13 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd }
                       />
                     )}
                     {item.widthPct > 12 && (
-                      <span className="absolute inset-0 flex items-center px-2 text-[10px] font-medium text-white truncate">
-                        {item.name}
+                      <span className="absolute inset-0 flex items-center justify-between px-2 text-[10px] font-medium text-white">
+                        <span className="truncate">{item.name}</span>
+                        {(item.status === "in-progress" || item.status === "current") && daysElapsed != null && totalDays != null && timelinePercent != null && item.widthPct > 25 && (
+                          <span className="shrink-0 ml-2 text-white/80 text-[9px]">
+                            Day {daysElapsed}/{totalDays} · {timelinePercent}%
+                          </span>
+                        )}
                       </span>
                     )}
                   </div>

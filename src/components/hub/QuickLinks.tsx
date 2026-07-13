@@ -31,7 +31,7 @@ export default function QuickLinks({ links }: { links: HubLink[] }) {
       <SectionLabel className="mb-3"><h2 id="quick-links-heading">
         Quick Links
       </h2></SectionLabel>
-      <ul className="space-y-1.5">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5">
         {links.map((link, i) => (
           <li key={i}>
             <a

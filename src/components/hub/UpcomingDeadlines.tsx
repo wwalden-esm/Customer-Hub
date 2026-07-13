@@ -45,18 +45,21 @@ function DeadlineRow({ d }: { d: HubDeadline }) {
   return <li className={className}>{content}</li>;
 }
 
-export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadline[] }) {
+export default function UpcomingDeadlines({ deadlines, hideTitle, maxItems }: { deadlines: HubDeadline[]; hideTitle?: boolean; maxItems?: number }) {
   if (deadlines.length === 0) return null;
 
-  const thisWeek = deadlines.filter((d) => d.daysUntil >= -7 && d.daysUntil <= 7);
-  const nextWeek = deadlines.filter((d) => d.daysUntil > 7 && d.daysUntil <= 14);
+  const limited = maxItems ? deadlines.slice(0, maxItems) : deadlines;
+  const thisWeek = limited.filter((d) => d.daysUntil >= -7 && d.daysUntil <= 7);
+  const nextWeek = limited.filter((d) => d.daysUntil > 7 && d.daysUntil <= 14);
 
   return (
     <section aria-labelledby="deadlines-heading">
       <Card padding="md">
-      <SectionLabel className="mb-3"><h2 id="deadlines-heading">
-        Upcoming Deadlines
-      </h2></SectionLabel>
+      {!hideTitle && (
+        <SectionLabel className="mb-3"><h2 id="deadlines-heading">
+          Upcoming Deadlines
+        </h2></SectionLabel>
+      )}
 
       {thisWeek.length > 0 && (
         <div className="mb-3">
@@ -73,6 +76,17 @@ export default function UpcomingDeadlines({ deadlines }: { deadlines: HubDeadlin
           <ul className="space-y-1.5">
             {nextWeek.map((d) => <DeadlineRow key={d.id} d={d} />)}
           </ul>
+        </div>
+      )}
+      {maxItems && deadlines.length > maxItems && (
+        <div className="mt-3 pt-2 border-t border-esm-border">
+          <Link
+            href="/hub/raid-log"
+            className="text-xs font-medium hover:underline"
+            style={{ color: "var(--hub-accent, #F4333F)" }}
+          >
+            See all deadlines ({deadlines.length}) →
+          </Link>
         </div>
       )}
       </Card>

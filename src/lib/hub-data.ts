@@ -153,8 +153,11 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
   ];
 
   const team: { name: string; role: string; email?: string }[] = [];
-  if (project.scName) team.push({ name: project.scName, role: "Solutions Consultant", email: project.scEmail });
+  if (project.executiveSponsorName) team.push({ name: project.executiveSponsorName, role: "Executive Sponsor", email: project.executiveSponsorEmail });
+  if (project.projectChampionName) team.push({ name: project.projectChampionName, role: "Project Champion", email: project.projectChampionEmail });
   if (project.pmName) team.push({ name: project.pmName, role: "Project Manager", email: project.pmEmail });
+  if (project.scName) team.push({ name: project.scName, role: "Solution Consultant", email: project.scEmail });
+  if (project.saName) team.push({ name: project.saName, role: "Solution Architect", email: project.saEmail });
 
   // --- Decisions from RAID log ---
   let decisions: HubDecision[] = [];
@@ -178,6 +181,7 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
   const esmNames: string[] = [
     project.scName?.toLowerCase(),
     project.pmName?.toLowerCase(),
+    project.saName?.toLowerCase(),
     "esm", "esm solutions",
   ].filter((n): n is string => Boolean(n));
 

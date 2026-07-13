@@ -16,6 +16,7 @@ import path from "path";
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/svg+xml", "image/webp", "image/gif"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const configPath = path.join(process.cwd(), "config", "projects.json");
+const logosDir = path.join(process.cwd(), "public", "logos");
 
 export async function POST(
   req: NextRequest,
@@ -91,6 +92,14 @@ export async function POST(
       buffer,
     );
 
+    // Save a local copy so the logo renders even if Smartsheet is unavailable
+    if (!fs.existsSync(logosDir)) fs.mkdirSync(logosDir, { recursive: true });
+    // Remove any existing local logos for this project
+    for (const f of fs.readdirSync(logosDir)) {
+      if (f.startsWith(`${projectId}.`)) fs.unlinkSync(path.join(logosDir, f));
+    }
+    fs.writeFileSync(path.join(logosDir, `${projectId}.${ext}`), buffer);
+
     // Save the attachment ID in the project config so we can resolve it later
     const raw = fs.readFileSync(configPath, "utf-8");
     const projects = JSON.parse(raw);
@@ -113,12 +122,45 @@ export async function POST(
   }
 }
 
+const MIME_BY_EXT: Record<string, string> = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  svg: "image/svg+xml",
+  webp: "image/webp",
+  gif: "image/gif",
+};
+
+function findLocalLogo(projectId: string): { filePath: string; contentType: string } | null {
+  if (!fs.existsSync(logosDir)) return null;
+  for (const f of fs.readdirSync(logosDir)) {
+    if (f.startsWith(`${projectId}.`)) {
+      const ext = f.split(".").pop()?.toLowerCase() ?? "png";
+      return { filePath: path.join(logosDir, f), contentType: MIME_BY_EXT[ext] || "image/png" };
+    }
+  }
+  return null;
+}
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: projectId } = await params;
 
+  // Try local file first
+  const local = findLocalLogo(projectId);
+  if (local) {
+    const body = fs.readFileSync(local.filePath);
+    return new NextResponse(body, {
+      headers: {
+        "Content-Type": local.contentType,
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+  }
+
+  // Fall back to Smartsheet attachment
   const raw = fs.readFileSync(configPath, "utf-8");
   const projects = JSON.parse(raw);
   const branding = projects[projectId]?.branding;
@@ -137,6 +179,12 @@ export async function GET(
 
     const contentType = upstream.headers.get("content-type") || "image/png";
     const body = await upstream.arrayBuffer();
+    const buffer = Buffer.from(body);
+
+    // Cache locally for next time
+    if (!fs.existsSync(logosDir)) fs.mkdirSync(logosDir, { recursive: true });
+    const ext = contentType.split("/")[1]?.replace("svg+xml", "svg") || "png";
+    fs.writeFileSync(path.join(logosDir, `${projectId}.${ext}`), buffer);
 
     return new NextResponse(body, {
       headers: {
@@ -172,6 +220,10 @@ export async function DELETE(
       // Attachment may already be gone
     }
   }
+
+  // Remove local file
+  const local = findLocalLogo(projectId);
+  if (local) fs.unlinkSync(local.filePath);
 
   if (projects[projectId]) {
     delete projects[projectId].branding?.logoAttachmentId;

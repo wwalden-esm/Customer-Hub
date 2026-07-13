@@ -80,7 +80,7 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
       </button>
       {open && (
         <div
-          className="absolute right-0 top-8 w-80 bg-white rounded-card border border-esm-border shadow-lg z-50 max-h-80 overflow-y-auto"
+          className="absolute right-0 sm:right-0 top-8 w-[calc(100vw-2rem)] sm:w-80 max-w-80 bg-white rounded-card border border-esm-border shadow-lg z-50 max-h-80 overflow-y-auto"
           role="region"
           aria-label="Notifications"
         >

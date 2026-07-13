@@ -31,6 +31,12 @@ export interface Project {
   scEmail: string;
   pmName?: string;
   pmEmail?: string;
+  saName?: string;
+  saEmail?: string;
+  executiveSponsorName?: string;
+  executiveSponsorEmail?: string;
+  projectChampionName?: string;
+  projectChampionEmail?: string;
   startDate?: string;
   goLiveDate?: string;
   currentPhase: string;

@@ -53,7 +53,7 @@ function groupByDate(events: ActivityEvent[]): Map<string, ActivityEvent[]> {
   return groups;
 }
 
-export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
+export default function ActivityFeed({ events, totalCount }: { events: ActivityEvent[]; totalCount?: number }) {
   const [filter, setFilter] = useState("all");
   const [limit, setLimit] = useState(15);
 
@@ -142,8 +142,20 @@ export default function ActivityFeed({ events }: { events: ActivityEvent[] }) {
         </Button>
       )}
 
-      <div className="mt-3 pt-2 border-t border-esm-border text-[10px] text-esm-muted">
-        {filtered.length} event{filtered.length !== 1 ? "s" : ""}
+      <div className="mt-3 pt-2 border-t border-esm-border flex items-center justify-between">
+        <span className="text-[10px] text-esm-muted">
+          {filtered.length} event{filtered.length !== 1 ? "s" : ""}
+          {totalCount && totalCount > filtered.length ? ` of ${totalCount}` : ""}
+        </span>
+        {totalCount && totalCount > filtered.length && (
+          <a
+            href="/hub/raid-log"
+            className="text-xs font-medium hover:underline"
+            style={{ color: "var(--hub-accent, #F4333F)" }}
+          >
+            View all activity →
+          </a>
+        )}
       </div>
     </Card>
     </section>

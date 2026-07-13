@@ -21,7 +21,6 @@ import DecisionLog from "@/components/hub/DecisionLog";
 import UpcomingDeadlines from "@/components/hub/UpcomingDeadlines";
 import HealthTrend from "@/components/hub/HealthTrend";
 import TrainingProgress from "@/components/hub/TrainingProgress";
-import DocShortcuts from "@/components/hub/DocShortcuts";
 import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import QuickLinks from "@/components/hub/QuickLinks";
@@ -72,82 +71,76 @@ export default async function HubDashboard() {
         <RefreshButton />
       </div>
 
-      {/* ── Team + Timeline row ── */}
+      {/* ── Licensed Products + Team row ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-        {/* Team contact card */}
-        {data.team.length > 0 && (
-          <Card className="!px-5 !py-3 flex flex-col gap-3">
-            {data.team.map((member) => (
-              <div key={member.role} className="flex items-center gap-2.5">
-                <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-                  style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
-                  aria-hidden="true"
-                >
-                  {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                </div>
-                <div className="text-sm">
-                  <span className="font-medium text-esm-black">{member.name}</span>
-                  <span className="text-esm-grey">{" · "}{member.role}</span>
-                </div>
-                {member.email && (
-                  <a
-                    href={`mailto:${member.email}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
-                    className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-card border border-esm-border hover:bg-slate-50 transition-colors text-esm-grey"
-                    aria-label={`Email ${member.name}`}
-                  >
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Email
-                  </a>
-                )}
-              </div>
+        {/* Licensed products */}
+        <Card className="!px-5 !py-4">
+          <SectionLabel className="mb-3">Licensed Products</SectionLabel>
+          <div className="flex flex-wrap gap-2">
+            {project.products.map((product) => (
+              <span
+                key={product}
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-card border-2"
+                style={{ borderColor: "var(--hub-accent, #F4333F)", color: "var(--hub-accent, #F4333F)" }}
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                </svg>
+                {product}
+              </span>
             ))}
-            {data.team[0].email && (
+          </div>
+        </Card>
+
+        {/* Implementation team */}
+        {data.team.length > 0 && (
+          <Card className="!px-5 !py-4 flex flex-col">
+            <SectionLabel className="mb-3">Implementation Team</SectionLabel>
+            <div className="flex flex-col gap-2 flex-1">
+              {data.team.map((member) => (
+                <div key={member.role} className="flex items-center gap-2.5">
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                    style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+                    aria-hidden="true"
+                  >
+                    {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                  </div>
+                  <div className="text-sm min-w-0">
+                    <span className="font-medium text-esm-black">{member.name}</span>
+                    <span className="text-esm-muted">{" · "}{member.role}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2 mt-3 pt-3 border-t border-esm-border">
               <a
-                href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Meeting Request`)}&body=${encodeURIComponent(`Hi ${data.team[0].name.split(" ")[0]},\n\nI hope this message finds you well. I'd like to request a meeting to discuss our ${project.projectName} implementation. Please let me know your availability.\n\nThank you,\n${data.contactName || ""}`.trim())}`}
-                className="inline-flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border hover:bg-slate-50 transition-colors"
+                href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Question`)}`}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border hover:bg-slate-50 transition-colors"
+                style={{ color: "var(--hub-accent, #F4333F)", borderColor: "var(--hub-accent, #F4333F)" }}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Email Team
+              </a>
+              <a
+                href={`mailto:${data.team.map((t) => t.email).filter(Boolean).join(",")}?subject=${encodeURIComponent(`${project.projectName} — Meeting Request`)}&body=${encodeURIComponent(`Hi team,\n\nI'd like to request a meeting to discuss our ${project.projectName} implementation. Please let me know your availability.\n\nThank you,\n${data.contactName || ""}`.trim())}`}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border hover:bg-slate-50 transition-colors"
                 style={{ color: "var(--hub-accent, #F4333F)", borderColor: "var(--hub-accent, #F4333F)" }}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Request a meeting
+                Request a Meeting
               </a>
-            )}
+            </div>
           </Card>
-        )}
-
-        {/* Timeline bar */}
-        {timelinePercent !== null && totalDays !== null && daysElapsed !== null && (
-          <section aria-label="Implementation timeline progress">
-            <Card padding="sm" className="flex flex-col justify-center">
-            <div className="flex items-center justify-between mb-2">
-              <SectionLabel>
-                Implementation Timeline
-              </SectionLabel>
-              <span className="text-xs text-esm-grey">
-                Day {daysElapsed} of {totalDays}
-              </span>
-            </div>
-            <div className="w-full h-2 bg-[#E2E0E1] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${timelinePercent}%`,
-                  backgroundColor: timelinePercent > 90 ? "#F4333F" : "var(--hub-accent, #F4333F)",
-                }}
-              />
-            </div>
-            <p className="text-[11px] text-esm-muted mt-1.5">{timelinePercent}% of timeline elapsed</p>
-            </Card>
-          </section>
         )}
       </div>
 
       {/* ── Health + Metrics ── */}
-      <CollapsibleSection id="health" title="Project Health" className="mb-5">
+      <CollapsibleSection id="health" title="Project Health" className="mb-5" defaultExpanded>
         <HealthBanner data={data} />
 
         <section aria-label="Key metrics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mt-4">
@@ -217,69 +210,8 @@ export default async function HubDashboard() {
         </section>
       </CollapsibleSection>
 
-      {/* ══════════════════════════════════════════════
-          ZONE 1 — What needs your attention now
-          ══════════════════════════════════════════════ */}
-
-      {data.customerActionItems.length > 0 && (
-        <CollapsibleSection id="action-items" title="Your Action Items" className="mb-5">
-          <CustomerActionItems items={data.customerActionItems} contactName={data.contactName} />
-        </CollapsibleSection>
-      )}
-
-      {(hasDeadlines || hasMeetings) && (
-        <CollapsibleSection id="deadlines-meetings" title="Upcoming" className="mb-5">
-          <div className={`grid grid-cols-1 ${hasDeadlines && hasMeetings ? "lg:grid-cols-2" : ""} gap-5`}>
-            {hasDeadlines && <UpcomingDeadlines deadlines={data.deadlines} />}
-            {hasMeetings && (
-              <section aria-labelledby="upcoming-meetings-heading">
-                <Card padding="md">
-                <SectionLabel className="mb-3"><h2 id="upcoming-meetings-heading">
-                  Upcoming Meetings
-                </h2></SectionLabel>
-                <ul className="space-y-4">
-                  {upcomingMeetings.map((m) => (
-                    <li key={m.id} className="border-l-2 pl-3" style={{ borderColor: "var(--hub-accent, #F4333F)" }}>
-                      <p className="text-sm font-medium text-esm-black">{m.week}</p>
-                      {m.milestone && (
-                        <p className="text-xs text-esm-grey mt-0.5">{m.milestone}</p>
-                      )}
-                      {m.meetingDate && (
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          {parseLocalDate(m.meetingDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                        </p>
-                      )}
-                      {m.agendaSummary && (
-                        <p className="text-xs text-esm-grey mt-1 leading-relaxed line-clamp-2">{m.agendaSummary}</p>
-                      )}
-                      {m.customerDeliverables && (
-                        <div className="mt-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-card">
-                          <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Due from you</p>
-                          <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">{m.customerDeliverables}</p>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-                <a href="/hub/meetings" aria-label="View all meetings" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--hub-accent, #F4333F)" }}>
-                  View all meetings →
-                </a>
-                </Card>
-              </section>
-            )}
-          </div>
-        </CollapsibleSection>
-      )}
-
-      {/* ══════════════════════════════════════════════
-          ZONE 2 — Project progress
-          ══════════════════════════════════════════════ */}
-
-      <CollapsibleSection id="milestones" title="Project Milestones" className="mb-5">
-        <MilestoneLine milestones={data.milestones.filter((m) => m.isMilestone || m.level === 1)} />
-      </CollapsibleSection>
-
-      <CollapsibleSection id="timeline" title="Project Timeline" className="mb-5">
+      {/* ── Project Timeline ── */}
+      <CollapsibleSection id="timeline" title="Project Timeline" defaultExpanded subtitle={timelinePercent != null && daysElapsed != null && totalDays != null ? `Day ${daysElapsed} of ${totalDays} · ${timelinePercent}% elapsed` : undefined} className="mb-5">
         <ProjectTimeline
           milestones={data.milestones
             .filter((m) => (m.level === 1 || m.level === 2) && (m.startDate || m.endDate))
@@ -292,75 +224,122 @@ export default async function HubDashboard() {
               percentComplete: m.percentComplete,
             }))}
           projectEnd={project.goLiveDate ?? undefined}
+          daysElapsed={daysElapsed}
+          totalDays={totalDays}
+          timelinePercent={timelinePercent}
+          hideTitle
         />
       </CollapsibleSection>
 
-      <CollapsibleSection id="progress-details" title="Progress Details" className="mb-5">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2 space-y-5">
-            <OpenItems items={data.actionItems.slice(0, 5)} />
-            {data.actionItems.length > 5 && (
-              <a
-                href="/hub/raid-log"
-                className="block text-center text-xs font-medium -mt-3 py-2 border border-esm-border rounded-card hover:bg-slate-50 transition-colors"
-                style={{ color: "var(--hub-accent, #F4333F)" }}
-              >
-                View all {data.actionItems.length} action items
-              </a>
-            )}
+      {/* ══════════════════════════════════════════════
+          ZONE 1 — What needs your attention now
+          ══════════════════════════════════════════════ */}
 
-            {data.integrations.length > 0 && (
-              <section aria-labelledby="integrations-heading">
-                <Card padding="sm" className="!p-0 overflow-hidden">
-                <div className="flex justify-between items-center px-5 py-3.5 border-b border-esm-border">
-                  <SectionLabel><h2 id="integrations-heading">
-                    Integration Status
-                  </h2></SectionLabel>
-                  <Badge variant="neutral" className="text-[11px] font-bold">
-                    {data.integrations.filter((i) => { const s = i.status.toLowerCase(); return s === "complete" || s === "done" || s === "live"; }).length} of {data.integrations.length} complete
+      {data.customerActionItems.length > 0 && (
+        <CollapsibleSection id="action-items" title="Your Action Items" className="mb-5">
+          <CustomerActionItems items={data.customerActionItems} contactName={data.contactName} />
+        </CollapsibleSection>
+      )}
+
+      {hasDeadlines && (
+        <CollapsibleSection id="upcoming-deadlines" title="Upcoming Deadlines" className="mb-5">
+          <UpcomingDeadlines deadlines={data.deadlines} hideTitle maxItems={7} />
+        </CollapsibleSection>
+      )}
+
+      {hasMeetings && (
+        <CollapsibleSection id="upcoming-meetings" title="Upcoming Meetings" className="mb-5">
+          <Card padding="md">
+          <ul className="space-y-4">
+            {upcomingMeetings.map((m) => (
+              <li key={m.id} className="border-l-2 pl-3" style={{ borderColor: "var(--hub-accent, #F4333F)" }}>
+                <p className="text-sm font-medium text-esm-black">{m.week}</p>
+                {m.milestone && (
+                  <p className="text-xs text-esm-grey mt-0.5">{m.milestone}</p>
+                )}
+                {m.meetingDate && (
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {parseLocalDate(m.meetingDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                  </p>
+                )}
+                {m.agendaSummary && (
+                  <p className="text-xs text-esm-grey mt-1 leading-relaxed line-clamp-2">{m.agendaSummary}</p>
+                )}
+                {m.customerDeliverables && (
+                  <div className="mt-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-card">
+                    <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Due from you</p>
+                    <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">{m.customerDeliverables}</p>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+          <a href="/hub/meetings" aria-label="View all meetings" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--hub-accent, #F4333F)" }}>
+            View all meetings →
+          </a>
+          </Card>
+        </CollapsibleSection>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          ZONE 2 — Project progress
+          ══════════════════════════════════════════════ */}
+
+      <CollapsibleSection id="milestones" title="Project Milestones" className="mb-5">
+        <MilestoneLine milestones={data.milestones.filter((m) => m.isMilestone || m.level === 1)} />
+      </CollapsibleSection>
+
+      <CollapsibleSection id="open-actions" title="Open Action Items" subtitle={`${data.actionItems.length} open`} className="mb-5">
+        <OpenItems items={data.actionItems.slice(0, 3)} totalCount={data.actionItems.length} hideTitle />
+      </CollapsibleSection>
+
+      {data.integrations.length > 0 && (
+        <CollapsibleSection id="integration-status" title="Integration Status" subtitle={`${data.integrations.filter((i) => { const s = i.status.toLowerCase(); return s === "complete" || s === "done" || s === "live"; }).length} of ${data.integrations.length} complete`} className="mb-5">
+          <Card padding="sm" className="!p-0 overflow-hidden">
+          <div className="divide-y divide-gray-100">
+            {data.integrations.map((integ) => {
+              const s = integ.status.toLowerCase();
+              const isDone = s === "complete" || s === "done" || s === "live";
+              const isActive = s.includes("progress") || s === "in progress";
+              const integSheetUrl = pl.integrationTrackerSheetId;
+              const Row = integSheetUrl ? "a" : "div";
+              const integBadgeVariant: BadgeVariant = isDone ? "success" : isActive ? "info" : "neutral";
+              return (
+                <Row
+                  key={integ.id}
+                  {...(integSheetUrl ? { href: integSheetUrl, target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className={`px-5 py-2.5 flex items-center justify-between${integSheetUrl ? " hover:bg-gray-50 transition-colors no-underline" : ""}`}
+                >
+                  <span className="text-sm text-esm-black flex items-center gap-1.5">
+                    {integ.name}
+                    {integSheetUrl && (
+                      <svg className="w-3 h-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    )}
+                  </span>
+                  <Badge variant={integBadgeVariant} className="text-[10px] font-bold tracking-wide uppercase">
+                    {integ.status}
                   </Badge>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {data.integrations.map((integ) => {
-                    const s = integ.status.toLowerCase();
-                    const isDone = s === "complete" || s === "done" || s === "live";
-                    const isActive = s.includes("progress") || s === "in progress";
-                    const integSheetUrl = pl.integrationTrackerSheetId;
-                    const Row = integSheetUrl ? "a" : "div";
-                    const integBadgeVariant: BadgeVariant = isDone ? "success" : isActive ? "info" : "neutral";
-                    return (
-                      <Row
-                        key={integ.id}
-                        {...(integSheetUrl ? { href: integSheetUrl, target: "_blank", rel: "noopener noreferrer" } : {})}
-                        className={`px-5 py-2.5 flex items-center justify-between${integSheetUrl ? " hover:bg-gray-50 transition-colors no-underline" : ""}`}
-                      >
-                        <span className="text-sm text-esm-black flex items-center gap-1.5">
-                          {integ.name}
-                          {integSheetUrl && (
-                            <svg className="w-3 h-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          )}
-                        </span>
-                        <Badge variant={integBadgeVariant} className="text-[10px] font-bold tracking-wide uppercase">
-                          {integ.status}
-                        </Badge>
-                      </Row>
-                    );
-                  })}
-                </div>
-                </Card>
-              </section>
-            )}
+                </Row>
+              );
+            })}
           </div>
-          <div className="space-y-5">
-            <GoLiveReadiness items={data.goLiveReadiness} daysToGoLive={daysToGoLive} />
-            {data.trainingProgress && (
-              <TrainingProgress completed={data.trainingProgress.completed} total={data.trainingProgress.total} />
-            )}
-            <DecisionLog decisions={data.decisions} raidLogUrl={pl.raidLogSheetId} />
-          </div>
+          </Card>
+        </CollapsibleSection>
+      )}
+
+      <CollapsibleSection id="go-live-readiness" title="Go-Live Readiness" className="mb-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <GoLiveReadiness items={data.goLiveReadiness} daysToGoLive={daysToGoLive} />
+          {data.trainingProgress && (
+            <TrainingProgress completed={data.trainingProgress.completed} total={data.trainingProgress.total} />
+          )}
         </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection id="decision-log" title="Decision Log" subtitle={`${data.decisions.length} recorded`} className="mb-5">
+        <DecisionLog decisions={data.decisions} raidLogUrl={pl.raidLogSheetId} hideTitle />
       </CollapsibleSection>
 
       {/* ══════════════════════════════════════════════
@@ -368,20 +347,19 @@ export default async function HubDashboard() {
           ══════════════════════════════════════════════ */}
 
       <CollapsibleSection id="resources" title="Resources" className="mb-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <QuickLinks links={data.links} />
-          <DocShortcuts projectId={project.id} documentTypes={data.documentTypes} />
-        </div>
+        <QuickLinks links={data.links} />
       </CollapsibleSection>
 
       {/* ══════════════════════════════════════════════
           ZONE 4 — History & trends (lower priority)
           ══════════════════════════════════════════════ */}
 
-      <CollapsibleSection id="activity" title="Activity & Trends">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <ActivityFeed events={data.activity} />
-          <HealthTrend history={data.healthHistory} currentStatus={project.status} />
+      <CollapsibleSection id="activity" title={data.healthHistory.length >= 2 ? "Activity & Trends" : "Activity"}>
+        <div className={`grid grid-cols-1 ${data.healthHistory.length >= 2 ? "lg:grid-cols-2" : ""} gap-5`}>
+          <ActivityFeed events={data.activity.slice(0, 3)} totalCount={data.activity.length} />
+          {data.healthHistory.length >= 2 && (
+            <HealthTrend history={data.healthHistory.slice(-3)} currentStatus={project.status} />
+          )}
         </div>
       </CollapsibleSection>
     </>
