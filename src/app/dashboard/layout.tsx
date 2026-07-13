@@ -39,6 +39,12 @@ export default async function DashboardLayout({
                 Projects
               </a>
               <a
+                href="/dashboard/analytics"
+                className="text-sm text-esm-grey hover:text-esm-black px-2.5 py-1.5 rounded-card hover:bg-slate-50 transition-colors"
+              >
+                Analytics
+              </a>
+              <a
                 href="/dashboard/meeting-guide"
                 className="text-sm text-esm-grey hover:text-esm-black px-2.5 py-1.5 rounded-card hover:bg-slate-50 transition-colors"
               >

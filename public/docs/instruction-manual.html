@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESM Implementation Customer Hub — Instruction Manual</title>
+<style>
+  :root {
+    --esm-red: #F4333F;
+    --esm-black: #2D2826;
+    --body-text: #3D3835;
+    --muted: #7A706B;
+    --border: #DDD8D5;
+    --surface: #F6F4F3;
+    --callout-bg: #FEF6F0;
+    --callout-border: #F4A261;
+    --tip-bg: #F0F7EE;
+    --tip-border: #5A9E4B;
+    --warn-bg: #FFF8E7;
+    --warn-border: #D4A937;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--body-text);
+    line-height: 1.65;
+    font-size: 15px;
+    background: #fff;
+  }
+
+  .doc-header {
+    background: var(--esm-black);
+    color: #fff;
+    padding: 48px 40px 44px;
+  }
+
+  .doc-header .badge {
+    display: inline-block;
+    background: var(--esm-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+  }
+
+  .doc-header h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    text-wrap: balance;
+    color: #fff;
+  }
+
+  .doc-header .subtitle {
+    font-size: 15px;
+    color: #B5AFAC;
+    max-width: 560px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 0;
+  }
+
+  .toc {
+    padding: 32px 20px 40px 24px;
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    font-size: 12.5px;
+  }
+
+  .toc-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+
+  .toc li {
+    margin-bottom: 6px;
+  }
+
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    display: block;
+    padding: 3px 0;
+    transition: color 0.15s;
+  }
+
+  .toc a:hover, .toc a:focus { color: var(--esm-red); }
+
+  .toc .sub { padding-left: 14px; font-size: 11.5px; }
+
+  .content {
+    padding: 40px 48px 80px 40px;
+    max-width: 740px;
+  }
+
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--esm-black);
+    margin-top: 52px;
+    margin-bottom: 8px;
+    padding-top: 24px;
+    border-top: 2px solid var(--border);
+    text-wrap: balance;
+  }
+
+  h2:first-of-type { margin-top: 0; border-top: none; padding-top: 0; }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--esm-black);
+    margin-top: 32px;
+    margin-bottom: 6px;
+  }
+
+  h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--esm-black);
+    margin-top: 24px;
+    margin-bottom: 4px;
+  }
+
+  p { margin-bottom: 14px; }
+
+  .lead {
+    font-size: 15.5px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  ol, ul {
+    margin-bottom: 14px;
+    padding-left: 24px;
+  }
+
+  li { margin-bottom: 6px; }
+  li > ol, li > ul { margin-top: 6px; margin-bottom: 0; }
+
+  strong { color: var(--esm-black); }
+
+  code {
+    font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+    font-size: 13px;
+    background: var(--surface);
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: var(--esm-black);
+  }
+
+  .callout {
+    border-left: 3px solid var(--callout-border);
+    background: var(--callout-bg);
+    padding: 14px 18px;
+    margin: 18px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+
+  .callout.tip {
+    border-color: var(--tip-border);
+    background: var(--tip-bg);
+  }
+
+  .callout.warn {
+    border-color: var(--warn-border);
+    background: var(--warn-bg);
+  }
+
+  .callout-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--callout-border);
+    margin-bottom: 4px;
+  }
+
+  .callout.tip .callout-label { color: var(--tip-border); }
+  .callout.warn .callout-label { color: var(--warn-border); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+    background: var(--surface);
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .table-wrap { overflow-x: auto; }
+
+  .step-grid {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 4px 14px;
+    margin: 16px 0;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    background: var(--esm-red);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-body { padding-bottom: 16px; }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  .flow-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .flow-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .flow-box.accent {
+    background: var(--esm-red);
+    color: #fff;
+    border-color: var(--esm-red);
+  }
+
+  .flow-arrow { color: var(--muted); font-size: 16px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+
+  .info-card h4 {
+    margin-top: 0;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .info-card p { font-size: 13px; margin-bottom: 0; }
+
+  .role-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+
+  .role-admin { background: #EDE9FE; color: #6B21A8; }
+  .role-sc { background: #E0F2FE; color: #0369A1; }
+  .role-pm { background: #FEF3C7; color: #92400E; }
+
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc { display: none; }
+    .content { padding: 24px 20px 60px; }
+    .doc-header { padding: 32px 20px; }
+    .doc-header h1 { font-size: 24px; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    .toc { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    .doc-header { padding: 24px; background: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    h2 { break-before: page; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="badge">Internal Reference</div>
+  <h1>ESM Implementation Customer Hub</h1>
+  <p class="subtitle">Complete instruction manual for Solutions Consultants, Project Managers, and Administrators. Covers every feature of the staff dashboard and customer portal.</p>
+</div>
+
+<div class="layout">
+<nav class="toc">
+  <div class="toc-label">Contents</div>
+  <ol>
+    <li><a href="#overview">System Overview</a></li>
+    <li><a href="#login">Logging In</a>
+      <ol>
+        <li class="sub"><a href="#staff-login">Staff Login</a></li>
+        <li class="sub"><a href="#customer-login">Customer Login</a></li>
+      </ol>
+    </li>
+    <li><a href="#dashboard">Staff Dashboard</a>
+      <ol>
+        <li class="sub"><a href="#portfolio">Portfolio View</a></li>
+        <li class="sub"><a href="#project-detail">Project Detail</a></li>
+        <li class="sub"><a href="#documents">Documents</a></li>
+        <li class="sub"><a href="#meetings">Meetings</a></li>
+        <li class="sub"><a href="#config">Configure Hub</a></li>
+      </ol>
+    </li>
+    <li><a href="#admin">Administration</a>
+      <ol>
+        <li class="sub"><a href="#users">User Management</a></li>
+        <li class="sub"><a href="#settings">Global Settings</a></li>
+      </ol>
+    </li>
+    <li><a href="#provisioning">Provisioning Projects</a></li>
+    <li><a href="#customer-portal">Customer Portal</a></li>
+    <li><a href="#doc-gen">Document Generation</a></li>
+    <li><a href="#integrations">Integrations</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a></li>
+  </ol>
+</nav>
+
+<div class="content">
+
+<h2 id="overview">System Overview</h2>
+
+<p class="lead">The Customer Hub is a unified web application that replaces the separate welcome portal and workflow customizer with a single platform for managing ESM implementations.</p>
+
+<p>The system has two sides:</p>
+
+<div class="two-col">
+  <div class="info-card">
+    <h4>ESM Staff Dashboard</h4>
+    <p>Portfolio management, document generation, meeting tracking, configuration, and project oversight. Accessed at <code>/dashboard</code>.</p>
+  </div>
+  <div class="info-card">
+    <h4>Customer Portal</h4>
+    <p>Branded, read-only view of their implementation. Milestones, action items, documents, meetings, and RAID log. Accessed at <code>/hub</code>.</p>
+  </div>
+</div>
+
+<h3>How data flows</h3>
+<p>The hub does not store project data locally. All data lives in your existing systems and is read on every page load:</p>
+
+<div class="flow-diagram">
+  <span class="flow-box">Smartsheet</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-box">Milestones, Action Items, RAID, Meetings, Documents</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-box accent">Customer Hub</span>
+</div>
+<div class="flow-diagram">
+  <span class="flow-box">HubSpot</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-box">Intake / Onboarding Data</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-box accent">Customer Hub</span>
+</div>
+
+<p>When you update a milestone in Smartsheet, it appears in the hub on the next page refresh. There is no sync delay or batch process.</p>
+
+<h3>Roles</h3>
+<p>Three ESM staff roles control what you can see and do:</p>
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Role</th><th>Dashboard Access</th><th>Capabilities</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="role-badge role-admin">Admin</span></td>
+      <td>All projects</td>
+      <td>Everything: user management, global settings, all project configs, document generation, meeting management</td>
+    </tr>
+    <tr>
+      <td><span class="role-badge role-sc">SC</span></td>
+      <td>Assigned projects only</td>
+      <td>Project configuration, document generation, meeting management, customer contact management</td>
+    </tr>
+    <tr>
+      <td><span class="role-badge role-pm">PM</span></td>
+      <td>Assigned projects only</td>
+      <td>View project details, manage meetings, view documents. Cannot modify project configuration.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="login">Logging In</h2>
+
+<h3 id="staff-login">Staff Login</h3>
+<p>Navigate to the hub URL and click <strong>Sign in</strong>. Enter your ESM email and password. You'll land on the Staff Dashboard.</p>
+
+<div class="callout tip">
+  <div class="callout-label">Tip</div>
+  Your session lasts 8 hours. After that, you'll be redirected to the login page automatically. A warning appears 5 minutes before expiry.
+</div>
+
+<p>If you've forgotten your password, ask an Admin to reset it from the Users page. The system generates a new random password that you'll need to copy and save.</p>
+
+<h3 id="customer-login">Customer Login</h3>
+<p>Customers access their portal through a password-based login followed by contact selection:</p>
+
+<div class="step-grid">
+  <div class="step-num">1</div>
+  <div class="step-body"><p>Customer visits the portal URL and enters their <strong>project password</strong> (set by the SC in project configuration).</p></div>
+  <div class="step-num">2</div>
+  <div class="step-body"><p>If the project has multiple contacts, the customer selects their name from the list. This identifies who is accessing the portal.</p></div>
+  <div class="step-num">3</div>
+  <div class="step-body"><p>A magic link email is sent to the selected contact. Clicking the link creates a <strong>30-day session</strong>.</p></div>
+  <div class="step-num">4</div>
+  <div class="step-body"><p>The customer lands on their branded portal with full access to their implementation data.</p></div>
+</div>
+
+<div class="callout warn">
+  <div class="callout-label">Important</div>
+  Only email addresses listed in the project's <strong>Contacts</strong> section can log in. If a customer can't access the portal, verify their email is added in the project configuration.
+</div>
+
+<h2 id="dashboard">Staff Dashboard</h2>
+
+<h3 id="portfolio">Portfolio View</h3>
+<p>The main dashboard (<code>/dashboard</code>) shows all your assigned projects in a paginated table. Each row displays:</p>
+<ul>
+  <li><strong>Customer name</strong> and <strong>project name</strong></li>
+  <li><strong>Status</strong> &mdash; On Track (green), At Risk (amber), Off Track (red)</li>
+  <li><strong>Current phase</strong> derived from Smartsheet milestones</li>
+  <li><strong>Go-live date</strong> and <strong>days remaining</strong></li>
+  <li><strong>SC</strong> and <strong>PM</strong> assignments</li>
+  <li><strong>Sheet status</strong> &mdash; whether Smartsheet sheets are linked</li>
+</ul>
+
+<p>Click any project row to open the project detail view.</p>
+
+<h4>Quick actions from the portfolio</h4>
+<ul>
+  <li><strong>Sync HubSpot</strong> &mdash; Pull the latest intake records from HubSpot and provision any new projects marked "Create Customer Hub = Yes"</li>
+  <li><strong>Send Notifications</strong> &mdash; Batch send notification emails to customer contacts across projects</li>
+</ul>
+
+<h3 id="project-detail">Project Detail</h3>
+<p>The project detail page (<code>/dashboard/[projectId]</code>) is your command center for a single implementation. It has two columns:</p>
+
+<h4>Main area (left)</h4>
+<ul>
+  <li><strong>Project details card</strong> &mdash; Go-live date, current phase, products, SC/PM assignments</li>
+  <li><strong>Timeline / Gantt chart</strong> &mdash; Visual bar chart of all milestones from Smartsheet, color-coded by status, with completion percentages</li>
+  <li><strong>Milestone list</strong> &mdash; Detailed table of every milestone with dates, status, and percent complete</li>
+</ul>
+
+<h4>Sidebar (right)</h4>
+<ul>
+  <li><strong>Quick Stats</strong> &mdash; Days to go-live, milestones completed, integrations done, open action items, RAID items, meetings held, document count</li>
+  <li><strong>Recaps Needed</strong> &mdash; Amber alert showing meetings marked complete that still need recap emails sent</li>
+  <li><strong>RAID Log summary</strong> &mdash; Breakdown of Risks, Actions, Issues, and Decisions with open counts</li>
+  <li><strong>Action buttons</strong> &mdash; Manage Meetings, Documents, Configure Hub, SharePoint Folder, Refresh Metrics, Generate Meetings</li>
+  <li><strong>Portal Activity</strong> &mdash; When customers last logged in and which pages they viewed</li>
+  <li><strong>Activity Feed</strong> &mdash; Recent changes across all project data</li>
+</ul>
+
+<h4>Changing project status</h4>
+<p>The status badge at the top of the project detail page is a dropdown. Click it to change between <strong>On Track</strong>, <strong>At Risk</strong>, and <strong>Off Track</strong>. The change is saved immediately.</p>
+
+<h4>Exporting a project report</h4>
+<p>Click the <strong>Export Report</strong> button to generate a print-friendly summary of the project. This opens your browser's print dialog with a clean layout that hides navigation and buttons.</p>
+
+<h3 id="documents">Documents</h3>
+<p>The Documents page (<code>/dashboard/[projectId]/documents</code>) manages all generated and uploaded documents for a project.</p>
+
+<h4>Generating documents</h4>
+<p>Click <strong>Generate</strong> next to any enabled document type. The hub uses Claude AI to assemble the document from your project's Smartsheet data and intake information. Generation typically takes 10&ndash;30 seconds. Available types:</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Document</th><th>Format</th><th>Source Data</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Workflow Data Template</strong></td><td>XLSX</td><td>Customer-uploaded procurement docs (extracted by AI)</td></tr>
+    <tr><td><strong>Workflow Guide</strong></td><td>DOCX</td><td>Same extracted workflow data, narrated as prose</td></tr>
+    <tr><td><strong>UAT Tracker</strong></td><td>XLSX</td><td>Project scope and milestones from Smartsheet</td></tr>
+    <tr><td><strong>UAT Completion Guide</strong></td><td>DOCX</td><td>Project scope, with testing instructions</td></tr>
+    <tr><td><strong>Project Charter</strong></td><td>DOCX</td><td>HubSpot intake + Smartsheet milestones + project config</td></tr>
+    <tr><td><strong>Training Guide</strong></td><td>DOCX</td><td>Module scope and customer process data</td></tr>
+    <tr><td><strong>Go-Live Checklist</strong></td><td>DOCX</td><td>Phase data, integration status, UAT results</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Once generated, documents are stored as attachments in the Smartsheet Document Repository sheet. Customers can download them from their portal.</p>
+
+<h4>Processing customer uploads</h4>
+<p>When a customer uploads a procurement document (PDF or DOCX) through their portal, the system automatically:</p>
+<ol>
+  <li>Extracts text from the file</li>
+  <li>Sends the text to Claude AI for structured workflow extraction</li>
+  <li>Generates the Workflow Data Template (XLSX) and Workflow Guide (DOCX)</li>
+  <li>Uploads both to Smartsheet</li>
+</ol>
+<p>You can also upload files on behalf of a customer from the staff Documents view.</p>
+
+<h4>Document preview</h4>
+<p>Click the <strong>Preview</strong> button next to any document to see its metadata: name, type, status, file size, generation date, and download count. For documents with a link URL, an "Open in New Tab" link is provided.</p>
+
+<h3 id="meetings">Meetings</h3>
+<p>The Meetings page (<code>/dashboard/[projectId]/meetings</code>) manages the full meeting lifecycle for a project.</p>
+
+<h4>Generating a meeting schedule</h4>
+<p>Click <strong>Generate Meetings</strong> on the project detail page. The system creates a weekly meeting schedule from the project start date to the go-live date, writing rows to the Smartsheet Meeting Tracker sheet.</p>
+
+<h4>Managing meetings</h4>
+<p>The meetings list supports two views:</p>
+<ul>
+  <li><strong>List view</strong> &mdash; Table of all meetings with week, date, status, and action buttons</li>
+  <li><strong>Calendar view</strong> &mdash; Monthly grid with color-coded dots for each meeting</li>
+</ul>
+
+<p>Use the search bar to filter meetings by week name, date, or status. Filter by "Needs Action" to see meetings that are missing action items or recaps.</p>
+
+<h4>Meeting actions</h4>
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Action</th><th>What it does</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Process Transcript</strong></td><td>Paste or drag-drop a meeting transcript (.srt, .vtt, or plain text). Claude AI extracts a structured recap with summary, discussion points, decisions, and action items.</td></tr>
+    <tr><td><strong>Log Action Items</strong></td><td>Manually enter action items from the meeting. Each item gets an owner, due date, and description.</td></tr>
+    <tr><td><strong>Send Recap</strong></td><td>Emails the meeting recap to all customer contacts. Includes summary, action items, and notes.</td></tr>
+    <tr><td><strong>Mark Status</strong></td><td>Change the meeting status (Scheduled, Complete, Skipped, Cancelled).</td></tr>
+    <tr><td><strong>View Recap</strong></td><td>View the stored recap for a completed meeting.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="config">Configure Hub</h3>
+<p>The configuration page (<code>/dashboard/[projectId]/config</code>) controls how the customer's portal looks and behaves. Changes are saved with the <strong>Save Configuration</strong> button at the bottom.</p>
+
+<div class="callout">
+  <div class="callout-label">Note</div>
+  A yellow "Unsaved changes" indicator appears when you've modified the form. If you try to navigate away with unsaved changes, the browser will prompt you to confirm.
+</div>
+
+<h4>Branding</h4>
+<ul>
+  <li><strong>Accent color</strong> &mdash; Sets the color used for nav, buttons, badges, and metric cards in the customer portal. Use the color picker or enter a hex value.</li>
+  <li><strong>Customer logo</strong> &mdash; Upload a PNG, JPEG, SVG, WebP, or GIF (max 5 MB). The logo appears alongside the ESM logo in the customer portal header. Stored in Smartsheet.</li>
+</ul>
+
+<h4>Portal access</h4>
+<ul>
+  <li><strong>Customer portal password</strong> &mdash; The password customers enter to access their portal. Displayed in plain text so you can share it with the customer.</li>
+</ul>
+
+<h4>Portal contacts</h4>
+<p>Add customer contacts who can access the portal. Each contact needs a name, email, and optional role. Only listed contacts can log in via magic link.</p>
+<ul>
+  <li><strong>Add individually</strong> &mdash; Fill in the name, email, and role fields and click <strong>Add</strong></li>
+  <li><strong>Import from CSV</strong> &mdash; Click <strong>Import CSV</strong> and select a file with columns: name, email, role (header row optional). Duplicates are skipped.</li>
+  <li><strong>Get Invite Link</strong> &mdash; Generate a 24-hour direct access link for a specific contact (no password needed)</li>
+</ul>
+
+<h4>Hub sections</h4>
+<p>Toggle which sections are visible in the customer portal. The Dashboard is always shown. Toggle on/off: Intake, RAID Log, Meetings, Documents, Recordings.</p>
+
+<h4>Document types</h4>
+<p>Choose which document types are available for generation. Disabling a type hides it from both the staff Documents page and the customer portal.</p>
+
+<h4>Customer links</h4>
+<p>Add links that appear in the customer portal sidebar. Each link has a label, URL, and icon type (Link, Smartsheet, SharePoint, Document, Video, Calendar, Training).</p>
+
+<h4>Smartsheet configuration</h4>
+<p>Read-only display of linked Smartsheet sheet IDs. Use the <strong>Link Sheets</strong> button on the project detail page to connect or reconnect sheets.</p>
+
+<h2 id="admin">Administration</h2>
+
+<h3 id="users">User Management</h3>
+<p>Navigate to <strong>Users</strong> from the dashboard header (Admin only). This page manages ESM staff accounts.</p>
+
+<h4>Adding a user</h4>
+<div class="step-grid">
+  <div class="step-num">1</div>
+  <div class="step-body"><p>Click <strong>Add User</strong> and fill in full name, email, and role (SC, PM, or Admin).</p></div>
+  <div class="step-num">2</div>
+  <div class="step-body"><p>Click <strong>Create User</strong>. A random password is generated and displayed in a green banner.</p></div>
+  <div class="step-num">3</div>
+  <div class="step-body"><p><strong>Copy the password immediately</strong> &mdash; it will not be shown again. Passwords are stored as bcrypt hashes.</p></div>
+</div>
+
+<h4>Managing users</h4>
+<ul>
+  <li><strong>Edit role</strong> &mdash; Click the role badge in the table to change a user's role via dropdown</li>
+  <li><strong>Reset password</strong> &mdash; Click <strong>Reset Password</strong> to generate a new random password. A confirmation dialog appears first.</li>
+  <li><strong>Remove user</strong> &mdash; Click <strong>Remove</strong> to delete the account. You cannot remove your own account. A confirmation dialog appears first.</li>
+</ul>
+
+<h3 id="settings">Global Settings</h3>
+<p>Navigate to <strong>Settings</strong> from the dashboard header. Available settings include email integration configuration and feature flags for the application.</p>
+
+<h2 id="provisioning">Provisioning New Projects</h2>
+
+<p class="lead">New projects are created automatically from HubSpot. No manual configuration is required.</p>
+
+<h3>Automatic provisioning (recommended)</h3>
+
+<div class="step-grid">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <p><strong>Create the intake record in HubSpot.</strong> Fill in the key fields:</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>HubSpot Field</th><th>Maps To</th></tr></thead>
+      <tbody>
+        <tr><td>Customer / Institution Legal Name</td><td>Customer name in the hub</td></tr>
+        <tr><td>Implementation Project Name</td><td>Project name</td></tr>
+        <tr><td>Modules in Scope</td><td>Product list (semicolon-separated)</td></tr>
+        <tr><td>ESM Solution Consultant</td><td>SC assignment (resolved from HubSpot owner ID)</td></tr>
+        <tr><td>Target Go-Live</td><td>Go-live date</td></tr>
+        <tr><td>Project Template</td><td>Determines which Smartsheet template sheets are copied</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <p><strong>Set "Create Customer Hub" to Yes.</strong> This triggers automatic provisioning:</p>
+    <ul>
+      <li>Creates the project entry with all HubSpot data</li>
+      <li>Copies Smartsheet template sheets into a new customer folder</li>
+      <li>Seeds the Project Info sheet with customer details and portal password</li>
+      <li>Sets default dates on the Project Plan from the start date</li>
+      <li>Creates a SharePoint folder (if configured)</li>
+      <li>Generates a customer portal password automatically</li>
+    </ul>
+  </div>
+  <div class="step-num">3</div>
+  <div class="step-body"><p><strong>Verify in the dashboard.</strong> The project appears in your list. Click into it to confirm Smartsheet sheets are linked and data is populating.</p></div>
+  <div class="step-num">4</div>
+  <div class="step-body"><p><strong>Add customer contacts</strong> in the project configuration page. Only listed contacts can access the portal.</p></div>
+  <div class="step-num">5</div>
+  <div class="step-body"><p><strong>Share the portal URL and password</strong> with the customer's project lead.</p></div>
+</div>
+
+<h3>Manual sync</h3>
+<p>If the HubSpot webhook didn't fire (network issue, timing, etc.), click the <strong>Sync HubSpot</strong> button on the dashboard. This finds all intake records marked for hub creation that haven't been provisioned yet and processes them.</p>
+
+<h2 id="customer-portal">Customer Portal</h2>
+
+<p class="lead">This section describes what your customers see when they access their portal, so you can guide them and answer questions.</p>
+
+<h3>Portal pages</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Page</th><th>What the Customer Sees</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Dashboard</strong></td><td>Health banner with project status, team contact strip (SC/PM with email and meeting links), go-live countdown, milestone timeline, key metric cards (days to go-live, intake %, open items, meetings, integrations), action items assigned to them, and quick links</td></tr>
+    <tr><td><strong>Intake</strong></td><td>Read-only view of their onboarding form data from HubSpot. Shows 20+ intake fields organized by section with completion progress.</td></tr>
+    <tr><td><strong>Documents</strong></td><td>Download generated documents. Upload procurement/workflow documents for AI processing. Request new document generation via the "Request a Document" link.</td></tr>
+    <tr><td><strong>Meetings</strong></td><td>Meeting schedule with week, date, agenda summary, status, and meeting prep checklists (customer deliverables due before each meeting).</td></tr>
+    <tr><td><strong>RAID Log</strong></td><td>Read-only view of Risks, Actions, Issues, and Decisions. Filterable by type and status.</td></tr>
+    <tr><td><strong>Recordings</strong></td><td>Links to meeting recordings stored in SharePoint (only visible if recordings are configured).</td></tr>
+    <tr><td><strong>Notifications</strong></td><td>Activity feed of the last 30 days of project changes and events.</td></tr>
+    <tr><td><strong>Help</strong></td><td>10 pre-loaded FAQs, portal navigation guide, and contact information for their ESM team.</td></tr>
+    <tr><td><strong>Profile</strong></td><td>Their role, organization, project details, and team contact list.</td></tr>
+    <tr><td><strong>Ask a Question</strong></td><td>Form to send messages to their SC. Messages are emailed with category, sender info, and project context.</td></tr>
+    <tr><td><strong>Export Report</strong></td><td>Print-friendly project status summary with milestones, action items, and decisions.</td></tr>
+    <tr><td><strong>Search</strong></td><td>Full-text search across all project data: milestones, action items, documents, RAID log.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Portal branding</h3>
+<p>Each customer portal uses the accent color and logo configured in the project settings. The accent color applies to the navigation bar, buttons, badges, milestone bars, and metric cards. The customer's logo appears next to the ESM logo in the header.</p>
+
+<h3>Customer actions</h3>
+<p>While the portal is primarily read-only, customers can:</p>
+<ul>
+  <li><strong>Update action item status</strong> &mdash; Mark items as "In Progress" or "Complete" inline</li>
+  <li><strong>Add comments</strong> on action items</li>
+  <li><strong>Upload documents</strong> for AI processing (procurement workflows)</li>
+  <li><strong>Ask questions</strong> via the messaging form (routed to SC email)</li>
+  <li><strong>Download documents</strong> from the document library</li>
+  <li><strong>Export</strong> a print-friendly status report</li>
+  <li><strong>Search</strong> across all their project data</li>
+  <li><strong>Toggle dark mode</strong></li>
+</ul>
+
+<h2 id="doc-gen">Document Generation Deep Dive</h2>
+
+<p class="lead">The hub generates seven document types using Claude AI. Each type follows the same pattern: collect source data from Smartsheet/HubSpot, send to Claude with a specialized prompt, and format the result into XLSX or DOCX.</p>
+
+<h3>How it works</h3>
+<div class="flow-diagram">
+  <span class="flow-box">Source Data</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-box accent">Claude AI</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-box">XLSX / DOCX</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-box">Smartsheet</span>
+</div>
+
+<h4>Workflow extraction (customer uploads)</h4>
+<p>When a customer uploads a procurement document, the system runs a specialized extraction pipeline:</p>
+<ol>
+  <li>Text is extracted from the PDF or DOCX file</li>
+  <li>Claude receives the full text with a system prompt instructing it to identify approval workflows, spending thresholds, approver chains, and business rules</li>
+  <li>Claude returns structured JSON with up to 15 workflow steps, each containing threshold ranges, approver sequences, and rule details</li>
+  <li>The JSON is used to populate both the XLSX template (structured data) and the DOCX guide (narrative form)</li>
+</ol>
+
+<h4>Tips for best results</h4>
+<ul>
+  <li>Ensure Smartsheet sheets have data populated before generating &mdash; empty sheets produce empty documents</li>
+  <li>For Project Charter, make sure HubSpot intake data is filled in (customer profile, scope, team contacts)</li>
+  <li>Customer uploads should be clean PDFs or Word docs &mdash; scanned images without OCR will not extract properly</li>
+  <li>You can regenerate any document at any time. Each generation creates a new version; previous versions remain in Smartsheet.</li>
+</ul>
+
+<h2 id="integrations">Integrations</h2>
+
+<h3>Smartsheet</h3>
+<p>The primary data source. Every project links to multiple Smartsheet sheets:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Sheet</th><th>Data Provided</th></tr></thead>
+  <tbody>
+    <tr><td>Project Plan</td><td>Milestones, phases, timeline, percent complete</td></tr>
+    <tr><td>Action Items</td><td>Tasks with owner, due date, status, priority</td></tr>
+    <tr><td>RAID Log</td><td>Risks, actions, issues, decisions with status and owner</td></tr>
+    <tr><td>Meeting Tracker</td><td>Weekly meeting schedule, status, agenda, recap attachments</td></tr>
+    <tr><td>Integration Tracker</td><td>Integration name, status, dates</td></tr>
+    <tr><td>Document Repository</td><td>Generated/uploaded document attachments</td></tr>
+    <tr><td>Metrics</td><td>KPI values and completion percentages (optional)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Columns are mapped by title, not column ID. If a column is renamed in Smartsheet, the hub will no longer find it. Standard column names are set during provisioning.</p>
+
+<h3>HubSpot</h3>
+<p>Provides customer intake/onboarding data. The hub reads from a custom object type containing 20+ fields covering institutional profile, procurement guidelines, approval workflows, catalog data, and project team contacts.</p>
+
+<p>The integration is read-only &mdash; the hub never writes back to HubSpot. Changes to intake data are made in HubSpot and reflected in the hub on the next page load.</p>
+
+<h3>Email (Resend)</h3>
+<p>Handles all transactional email: magic link login emails, meeting recap distribution, question routing from customers, and bulk notification sends.</p>
+
+<h3>SharePoint (optional)</h3>
+<p>If configured, the hub creates customer folders in SharePoint during provisioning and can link to meeting recordings stored in SharePoint. This is optional and the hub works fully without it.</p>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Problem</th><th>Cause</th><th>Solution</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Customer can't log in</strong></td>
+      <td>Email not in project contacts, or Resend not configured</td>
+      <td>Verify their email is listed in project configuration (case-insensitive match). Check that the Resend API key is set.</td>
+    </tr>
+    <tr>
+      <td><strong>Project data isn't updating</strong></td>
+      <td>Normal &mdash; data is fetched live</td>
+      <td>Refresh the page. If data still looks wrong, check the Smartsheet sheet directly to confirm the data is there.</td>
+    </tr>
+    <tr>
+      <td><strong>Document generation fails</strong></td>
+      <td>Empty Smartsheet sheets or Anthropic API issue</td>
+      <td>Ensure the linked sheets have data. Check that the Anthropic API key is valid and has credits.</td>
+    </tr>
+    <tr>
+      <td><strong>Missing project in dashboard</strong></td>
+      <td>Role-based filtering</td>
+      <td>You only see projects where your email matches the SC or PM field. Ask an Admin to verify the assignment, or log in with an Admin account.</td>
+    </tr>
+    <tr>
+      <td><strong>Smartsheet sheets not linked</strong></td>
+      <td>Provisioning incomplete or sheets moved</td>
+      <td>Click <strong>Link Sheets</strong> on the project detail page to reconnect. You'll need the Smartsheet sheet IDs.</td>
+    </tr>
+    <tr>
+      <td><strong>"Unsaved changes" won't go away</strong></td>
+      <td>Form state tracking</td>
+      <td>Click <strong>Save Configuration</strong> to persist changes, or refresh the page to discard.</td>
+    </tr>
+    <tr>
+      <td><strong>Meeting recap email not received</strong></td>
+      <td>Resend configuration or spam filter</td>
+      <td>Verify Resend API key is set. Check the customer's spam/junk folder. The from address must be verified in Resend.</td>
+    </tr>
+    <tr>
+      <td><strong>Dark mode looks wrong</strong></td>
+      <td>Some elements may not have dark mode styles</td>
+      <td>Toggle dark mode off. If specific elements are unreadable in dark mode, report it for a CSS fix.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout tip">
+  <div class="callout-label">Need help?</div>
+  For application issues not covered here, refer to the Technical Hosting Guide for environment configuration, or contact the application administrator.
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
