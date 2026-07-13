@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "ESM Customer Hub",
-    template: "%s | ESM Customer Hub",
+    default: "ESM Implementation Customer Hub",
+    template: "%s | ESM Implementation Customer Hub",
   },
   description: "ESM Solutions implementation portal",
 };

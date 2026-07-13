@@ -7,7 +7,7 @@ function getResend(): Resend {
 }
 
 function getFrom(): string {
-  return process.env.EMAIL_FROM || "ESM Customer Hub <hub@esmsolutions.com>";
+  return process.env.EMAIL_FROM || "ESM Implementation Customer Hub <hub@esmsolutions.com>";
 }
 
 export async function sendMagicLinkEmail(to: string, customerName: string, link: string) {
@@ -18,7 +18,7 @@ export async function sendMagicLinkEmail(to: string, customerName: string, link:
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
-          <span style="color: white; font-weight: bold; font-size: 18px;">ESM Customer Hub</span>
+          <span style="color: white; font-weight: bold; font-size: 18px;">ESM Implementation Customer Hub</span>
         </div>
         <div style="background: #ffffff; padding: 24px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 8px 8px;">
           <p>Click the link below to access the <strong>${customerName}</strong> implementation hub.</p>

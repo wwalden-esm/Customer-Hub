@@ -44,7 +44,7 @@ function VerifyToken() {
         <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold" aria-hidden="true">
           ESM
         </div>
-        <h1 className="text-2xl font-semibold text-esm-black">Customer Hub</h1>
+        <h1 className="text-2xl font-semibold text-esm-black">Implementation Customer Hub</h1>
       </div>
 
       {status === "verifying" && (

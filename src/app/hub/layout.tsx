@@ -46,7 +46,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
         Skip to main content
       </a>
 
-      <header className="bg-esm-black text-white" role="banner">
+      <header className="bg-[#3D3A3C] text-white" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <EsmLogo size={48} variant="white" className="shrink-0" />

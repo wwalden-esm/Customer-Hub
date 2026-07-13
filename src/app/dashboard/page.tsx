@@ -55,7 +55,7 @@ export default async function DashboardPage() {
               ESM
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-esm-black">Customer Hub</h1>
+              <h1 className="text-lg font-semibold text-esm-black">Implementation Customer Hub</h1>
               <p className="text-xs text-esm-grey">
                 {userEmail} ({userRole})
               </p>

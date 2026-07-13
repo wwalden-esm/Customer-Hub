@@ -120,7 +120,7 @@ function buildRecapHtml(data: {
   return `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
       <div style="background:#F4333F;padding:16px 24px;border-radius:8px 8px 0 0;">
-        <span style="color:white;font-weight:bold;font-size:18px;">ESM Customer Hub</span>
+        <span style="color:white;font-weight:bold;font-size:18px;">ESM Implementation Customer Hub</span>
       </div>
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;">
         <tr>
@@ -136,7 +136,7 @@ function buildRecapHtml(data: {
         ${section("Additional Notes", data.additionalNotes)}
         <tr>
           <td style="padding:16px 24px 24px;font-size:13px;color:#686468;border-top:1px solid #e5e7eb;">
-            Sent by ${data.scName} via ESM Customer Hub
+            Sent by ${data.scName} via ESM Implementation Customer Hub
           </td>
         </tr>
       </table>

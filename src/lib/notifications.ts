@@ -107,7 +107,7 @@ function buildEmailHtml(project: Project, items: ClassifiedItem[]): string {
   return `
     <div style="font-family: sans-serif; max-width: 640px; margin: 0 auto;">
       <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
-        <span style="color: white; font-weight: bold; font-size: 18px;">ESM Customer Hub</span>
+        <span style="color: white; font-weight: bold; font-size: 18px;">ESM Implementation Customer Hub</span>
       </div>
       <div style="background: #ffffff; padding: 24px; border: 1px solid #E5E7EB; border-top: 0; border-radius: 0 0 8px 8px;">
         <p style="margin: 0 0 4px; font-size: 16px; font-weight: 600; color: #1F2937;">${project.customerName}</p>
@@ -116,7 +116,7 @@ function buildEmailHtml(project: Project, items: ClassifiedItem[]): string {
           You have <strong>${items.length}</strong> action item${items.length === 1 ? "" : "s"} that need${items.length === 1 ? "s" : ""} attention.
         </p>
         ${sections}
-        <p style="margin: 24px 0 0; font-size: 13px; color: #9CA3AF;">This notification was sent from ESM Customer Hub.</p>
+        <p style="margin: 24px 0 0; font-size: 13px; color: #9CA3AF;">This notification was sent from ESM Implementation Customer Hub.</p>
       </div>
     </div>`;
 }

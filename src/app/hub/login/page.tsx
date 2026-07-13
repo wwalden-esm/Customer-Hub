@@ -148,7 +148,7 @@ function CustomerLoginForm() {
     <Card padding="lg" className="w-full max-w-md">
       <div className="flex items-center gap-3 mb-1">
         <EsmLogo size={48} variant="red" />
-        <h1 className="text-2xl font-semibold text-esm-black">Customer Hub</h1>
+        <h1 className="text-2xl font-semibold text-esm-black">Implementation Customer Hub</h1>
       </div>
       <p className="text-sm text-esm-grey mt-1">Sign in to your project portal</p>
       <form onSubmit={onSubmit} className="mt-6 space-y-4" aria-busy={loading} noValidate>
