@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
 import { Badge, type BadgeVariant, Card } from "@/components/ui";
+import MeetingPrepChecklist from "@/components/hub/MeetingPrepChecklist";
 
 interface Meeting {
   id: string;
@@ -331,9 +332,8 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
                       </div>
                     )}
                     {meeting.customerDeliverables && (
-                      <div className="pl-4 border-l-2 border-blue-200">
-                        <p className="text-[10px] font-extrabold text-blue-600 tracking-[0.09em] uppercase mb-1">Customer Deliverables Due</p>
-                        <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.customerDeliverables}</p>
+                      <div>
+                        <MeetingPrepChecklist meetingId={meeting.id} deliverables={meeting.customerDeliverables} />
                       </div>
                     )}
                     {meeting.notes && (

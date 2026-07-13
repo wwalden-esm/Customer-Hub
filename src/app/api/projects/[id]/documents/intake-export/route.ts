@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { generateIntakeDocx } from "@/lib/documents/intake-export";
 import { getCustomerSession } from "@/lib/magic-link";
@@ -9,9 +10,10 @@ export async function GET(
 ) {
   const { id: projectId } = await ctx.params;
 
-  const session = await getCustomerSession();
-  if (!session || session.projectId !== projectId) {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  const staffSession = await auth();
+  const customerSession = await getCustomerSession();
+  if (!staffSession?.user && (!customerSession || customerSession.projectId !== projectId)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const project = getProjectById(projectId);

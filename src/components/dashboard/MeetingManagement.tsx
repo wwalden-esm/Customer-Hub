@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
-import { Badge, type BadgeVariant, SectionLabel, Card } from "@/components/ui";
+import { Badge, type BadgeVariant, SectionLabel, Card, useToast } from "@/components/ui";
+import Pagination from "./Pagination";
 
 interface Meeting {
   id: string;
@@ -68,10 +69,15 @@ export default function MeetingManagement({
   meetings: Meeting[];
   projectId: string;
 }) {
+  const { toast } = useToast();
   const [meetings, setMeetings] = useState(initialMeetings);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [activePanel, setActivePanel] = useState<{ id: string; type: "transcript" | "manual-actions" | "manual-recap" | "view-recap" } | null>(null);
   const [filter, setFilter] = useState<"all" | "needs-action">("needs-action");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const isPastMeeting = (m: Meeting) => {
     if (!m.meetingDate) return false;
@@ -85,9 +91,24 @@ export default function MeetingManagement({
     m.status !== "Skipped" && isPastMeeting(m) && (!m.actionItemsLogged || !m.recapSent);
 
   const filtered = useMemo(() => {
-    if (filter === "needs-action") return meetings.filter(needsActionFilter);
-    return meetings;
-  }, [meetings, filter]);
+    let list = filter === "needs-action" ? meetings.filter(needsActionFilter) : meetings;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (m) =>
+          m.week.toLowerCase().includes(q) ||
+          (m.meetingDate && fmtDate(m.meetingDate).toLowerCase().includes(q)) ||
+          m.status.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meetings, filter, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const paginatedMeetings = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  useEffect(() => { setCurrentPage(1); }, [filter, searchQuery]);
 
   const needsAction = meetings.filter(needsActionFilter).length;
 
@@ -152,7 +173,7 @@ export default function MeetingManagement({
 
   return (
     <>
-      <div className="flex items-center gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-3">
         <button
           onClick={() => setFilter("needs-action")}
           className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
@@ -174,6 +195,26 @@ export default function MeetingManagement({
           All Meetings ({meetings.length})
         </button>
         <div className="flex-1" />
+        <div className="flex items-center border border-esm-border rounded overflow-hidden">
+          <button
+            onClick={() => setViewMode("list")}
+            className={`px-2.5 py-1.5 text-xs font-medium ${viewMode === "list" ? "bg-esm-black text-white" : "text-esm-grey hover:bg-gray-100"}`}
+            aria-label="List view"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setViewMode("calendar")}
+            className={`px-2.5 py-1.5 text-xs font-medium ${viewMode === "calendar" ? "bg-esm-black text-white" : "text-esm-grey hover:bg-gray-100"}`}
+            aria-label="Calendar view"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
         <button
           onClick={() => setShowAddForm((p) => !p)}
           className="px-3 py-1.5 text-xs font-medium bg-esm-red text-white rounded hover:opacity-90 transition-opacity flex items-center gap-1.5"
@@ -185,28 +226,55 @@ export default function MeetingManagement({
         </button>
       </div>
 
+      {/* Search */}
+      <div className="relative mb-5">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search meetings by name, date, or status..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-3 py-2 text-sm border border-esm-border rounded"
+        />
+      </div>
+
       {showAddForm && (
         <AddMeetingPanel
           projectId={projectId}
           onAdded={(m) => {
             setMeetings((prev) => [...prev, m]);
             setShowAddForm(false);
+            toast("Meeting added", "success");
           }}
           onCancel={() => setShowAddForm(false)}
         />
       )}
 
-      {filtered.length === 0 ? (
+      {meetings.length === 0 ? (
+        <Card padding="sm" className="!px-6 !py-16 text-center">
+          <svg className="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <h3 className="text-sm font-semibold text-esm-black mb-1">No meetings yet</h3>
+          <p className="text-sm text-slate-500 max-w-sm mx-auto">
+            Use the &quot;Generate Meetings&quot; button on the project dashboard to create a meeting schedule from the project plan, or add meetings manually.
+          </p>
+        </Card>
+      ) : viewMode === "calendar" ? (
+        <MeetingCalendar meetings={filtered} />
+      ) : filtered.length === 0 ? (
         <Card padding="sm" className="!px-6 !py-8 text-center">
           <p className="text-sm text-slate-500">
             {filter === "needs-action"
               ? "All completed meetings have action items logged and recaps sent."
-              : "No meetings found."}
+              : "No meetings match your search."}
           </p>
         </Card>
       ) : (
         <div className="space-y-3">
-          {filtered.map((meeting) => {
+          {paginatedMeetings.map((meeting) => {
             const isExpanded = expanded === meeting.id;
             const panel = activePanel?.id === meeting.id ? activePanel.type : null;
 
@@ -339,7 +407,6 @@ export default function MeetingManagement({
                       <ProcessTranscriptPanel
                         meetingId={meeting.id}
                         projectId={projectId}
-                        meeting={meeting}
                         onDone={(attachmentId) => markBoth(meeting.id, attachmentId)}
                         onRecapOpened={() => markRecapSent(meeting.id)}
                       />
@@ -357,7 +424,6 @@ export default function MeetingManagement({
                       <SendRecapPanel
                         meetingId={meeting.id}
                         projectId={projectId}
-                        meeting={meeting}
                         onDone={() => markRecapSent(meeting.id)}
                       />
                     )}
@@ -370,9 +436,85 @@ export default function MeetingManagement({
               </Card>
             );
           })}
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       )}
     </>
+  );
+}
+
+function MeetingCalendar({ meetings }: { meetings: Meeting[] }) {
+  const [monthOffset, setMonthOffset] = useState(0);
+  const today = new Date();
+  const viewDate = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const monthName = viewDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const meetingsByDay = new Map<number, Meeting[]>();
+  for (const m of meetings) {
+    if (!m.meetingDate) continue;
+    const d = parseLocalDate(m.meetingDate);
+    if (d.getFullYear() === year && d.getMonth() === month) {
+      const day = d.getDate();
+      if (!meetingsByDay.has(day)) meetingsByDay.set(day, []);
+      meetingsByDay.get(day)!.push(m);
+    }
+  }
+
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <Card padding="md">
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={() => setMonthOffset((p) => p - 1)} className="px-2 py-1 text-sm border border-esm-border rounded hover:bg-slate-50">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <span className="text-sm font-semibold text-esm-black">{monthName}</span>
+        <button onClick={() => setMonthOffset((p) => p + 1)} className="px-2 py-1 text-sm border border-esm-border rounded hover:bg-slate-50">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-px">
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+          <div key={d} className="text-center text-[10px] font-medium text-esm-grey py-1">{d}</div>
+        ))}
+        {cells.map((day, i) => {
+          const dayMeetings = day ? meetingsByDay.get(day) : undefined;
+          const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+          return (
+            <div
+              key={i}
+              className={`min-h-[60px] border border-gray-100 p-1 ${day ? "" : "bg-gray-50/50"} ${isToday ? "bg-blue-50" : ""}`}
+            >
+              {day && (
+                <>
+                  <span className={`text-xs ${isToday ? "font-bold text-esm-blue" : "text-esm-grey"}`}>{day}</span>
+                  {dayMeetings?.map((m) => (
+                    <div
+                      key={m.id}
+                      className={`mt-0.5 text-[10px] leading-tight px-1 py-0.5 rounded truncate ${
+                        m.status === "Complete" ? "bg-emerald-100 text-emerald-700" :
+                        m.status === "Skipped" ? "bg-gray-100 text-gray-500" :
+                        "bg-amber-100 text-amber-700"
+                      }`}
+                      title={m.week}
+                    >
+                      {m.week}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
 
@@ -398,16 +540,15 @@ function StatusBadge({ done, label }: { done: boolean; label: string }) {
 function ProcessTranscriptPanel({
   meetingId,
   projectId,
-  meeting,
   onDone,
   onRecapOpened,
 }: {
   meetingId: string;
   projectId: string;
-  meeting: Meeting;
   onDone: (recapAttachmentId?: number | null) => void;
   onRecapOpened: () => void;
 }) {
+  const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [transcript, setTranscript] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -453,8 +594,11 @@ function ProcessTranscriptPanel({
       }
       const data: TranscriptResult = await res.json();
       setResult(data);
+      toast("Transcript processed successfully", "success");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Processing failed");
+      const msg = err instanceof Error ? err.message : "Processing failed";
+      setError(msg);
+      toast(msg, "error");
     } finally {
       setProcessing(false);
     }
@@ -667,6 +811,7 @@ function LogActionItemsPanel({
   projectId: string;
   onDone: () => void;
 }) {
+  const { toast } = useToast();
   const [items, setItems] = useState<ActionItemDraft[]>([
     { description: "", owner: "", dueDate: "" },
   ]);
@@ -705,9 +850,12 @@ function LogActionItemsPanel({
         const data = await res.json();
         throw new Error(data.error || "Failed to log action items");
       }
+      toast("Action items logged", "success");
       onDone();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save");
+      const msg = err instanceof Error ? err.message : "Failed to save";
+      setError(msg);
+      toast(msg, "error");
     } finally {
       setSaving(false);
     }
@@ -773,14 +921,13 @@ function LogActionItemsPanel({
 function SendRecapPanel({
   meetingId,
   projectId,
-  meeting,
   onDone,
 }: {
   meetingId: string;
   projectId: string;
-  meeting: Meeting;
   onDone: () => void;
 }) {
+  const { toast } = useToast();
   const [actionItems, setActionItems] = useState("");
   const [notes, setNotes] = useState("");
   const [sending, setSending] = useState(false);
@@ -802,9 +949,12 @@ function SendRecapPanel({
         const data = await res.json();
         throw new Error(data.error || "Failed to send recap");
       }
+      toast("Recap sent", "success");
       onDone();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send");
+      const msg = err instanceof Error ? err.message : "Failed to send";
+      setError(msg);
+      toast(msg, "error");
     } finally {
       setSending(false);
     }

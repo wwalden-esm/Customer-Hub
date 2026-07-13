@@ -27,7 +27,19 @@ export default async function DocumentsPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold text-esm-black mb-6">Documents</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-esm-black">Documents</h1>
+        <a
+          href="/hub/ask?category=Document+Request"
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border transition-colors hover:opacity-80"
+          style={{ borderColor: "var(--hub-accent, #F4333F)", color: "var(--hub-accent, #F4333F)" }}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Request a Document
+        </a>
+      </div>
       <CustomerDocumentsClient
         projectId={session.projectId}
         initialDocs={readyDocs}

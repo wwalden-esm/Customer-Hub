@@ -41,6 +41,13 @@ function relativeTime(ts: string): string {
   return new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+const TYPE_LINKS: Record<string, string> = {
+  milestone: "/hub/raid-log",
+  document: "/hub/documents",
+  raid: "/hub/raid-log",
+  upload: "/hub/documents",
+};
+
 function groupByDate(events: ActivityEvent[]): Map<string, ActivityEvent[]> {
   const groups = new Map<string, ActivityEvent[]>();
   for (const e of events) {
@@ -97,31 +104,35 @@ export default function ActivityFeed({ events, totalCount }: { events: ActivityE
               <ul className="space-y-0.5">
                 {items.map((event) => {
                   const style = TYPE_ICONS[event.type] || TYPE_ICONS.system;
+                  const href = TYPE_LINKS[event.type];
+                  const Wrapper = href ? "a" : "div";
                   return (
-                    <li
-                      key={event.id}
-                      className="flex items-start gap-3 py-2 px-2 rounded-card hover:bg-slate-50 transition-colors group"
-                    >
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 ${style.bg} ${style.color}`} aria-hidden="true">
-                        {style.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-esm-black leading-snug">{event.title}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          {event.detail && (
-                            <span className="text-xs text-esm-muted">{event.detail}</span>
-                          )}
-                          {event.actor && (
-                            <>
-                              <span className="text-[#E2E0E1]" aria-hidden="true">·</span>
-                              <span className="text-xs text-esm-muted">{event.actor}</span>
-                            </>
-                          )}
+                    <li key={event.id}>
+                      <Wrapper
+                        {...(href ? { href } : {})}
+                        className={`flex items-start gap-3 py-2 px-2 rounded-card hover:bg-slate-50 transition-colors group ${href ? "no-underline" : ""}`}
+                      >
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 ${style.bg} ${style.color}`} aria-hidden="true">
+                          {style.icon}
                         </div>
-                      </div>
-                      <span className="text-[10px] text-esm-muted shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {relativeTime(event.timestamp)}
-                      </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-esm-black leading-snug">{event.title}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {event.detail && (
+                              <span className="text-xs text-esm-muted">{event.detail}</span>
+                            )}
+                            {event.actor && (
+                              <>
+                                <span className="text-[#E2E0E1]" aria-hidden="true">·</span>
+                                <span className="text-xs text-esm-muted">{event.actor}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-esm-muted shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {relativeTime(event.timestamp)}
+                        </span>
+                      </Wrapper>
                     </li>
                   );
                 })}
@@ -149,7 +160,7 @@ export default function ActivityFeed({ events, totalCount }: { events: ActivityE
         </span>
         {totalCount && totalCount > filtered.length && (
           <a
-            href="/hub/raid-log"
+            href="/hub/activity"
             className="text-xs font-medium hover:underline"
             style={{ color: "var(--hub-accent, #F4333F)" }}
           >

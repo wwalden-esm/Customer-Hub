@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ALL_DOC_TYPES } from "./EsmDocumentsClient";
-import { SectionLabel, Card } from "@/components/ui";
+import { SectionLabel, Card, useToast } from "@/components/ui";
 
 interface ProjectLink {
   label: string;
@@ -39,8 +39,9 @@ const HUB_SECTIONS = [
 ];
 
 export default function ProjectConfigForm({ project }: { project: Project }) {
+  const { toast } = useToast();
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [accentColor, setAccentColor] = useState(project.branding?.accentColor || "#1E3A5F");
   const [logoUrl, setLogoUrl] = useState(project.branding?.logoUrl || "");
   const [logoUploading, setLogoUploading] = useState(false);
@@ -70,17 +71,33 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
     return result;
   });
 
+  const csvInputRef = useRef<HTMLInputElement>(null);
+
+  function markDirty() { setIsDirty(true); }
+
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
+
   function toggleSection(key: string) {
     setSectionVisibility((prev) => ({ ...prev, [key]: !prev[key] }));
+    markDirty();
   }
 
   function toggleDocType(key: string) {
     setDocTypes((prev) => ({ ...prev, [key]: !prev[key] }));
+    markDirty();
   }
 
   async function handleSave() {
     setSaving(true);
-    setSaved(false);
     try {
       const res = await fetch(`/api/projects/${project.id}/config`, {
         method: "PUT",
@@ -94,7 +111,14 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
           contacts,
         }),
       });
-      if (res.ok) setSaved(true);
+      if (res.ok) {
+        toast("Configuration saved", "success");
+        setIsDirty(false);
+      } else {
+        toast("Failed to save configuration", "error");
+      }
+    } catch {
+      toast("Failed to save configuration", "error");
     } finally {
       setSaving(false);
     }
@@ -113,13 +137,13 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
                 id="accent-color"
                 type="color"
                 value={accentColor}
-                onChange={(e) => setAccentColor(e.target.value)}
+                onChange={(e) => { setAccentColor(e.target.value); markDirty(); }}
                 className="w-10 h-10 border border-esm-border rounded cursor-pointer"
               />
               <input
                 type="text"
                 value={accentColor}
-                onChange={(e) => setAccentColor(e.target.value)}
+                onChange={(e) => { setAccentColor(e.target.value); markDirty(); }}
                 className="border border-esm-border rounded px-3 py-1.5 text-sm font-mono w-28"
                 aria-label="Accent color hex value"
               />
@@ -220,7 +244,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
             id="portal-password"
             type="text"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); markDirty(); }}
             className="w-full border border-esm-border rounded px-3 py-1.5 text-sm font-mono max-w-sm"
           />
           <p className="text-xs text-esm-grey mt-1">Customers use this password to log in to their project portal.</p>
@@ -340,10 +364,58 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
               setContacts([...contacts, { name: newContact.name.trim(), email: newContact.email.trim(), role: newContact.role.trim() || undefined, addedAt: new Date().toISOString() }]);
               setNewContact({ name: "", email: "", role: "" });
               setContactError(null);
+              markDirty();
             }}
             className="shrink-0 px-4 py-1.5 text-sm font-medium text-white bg-esm-red rounded hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             Add
+          </button>
+          <input
+            ref={csvInputRef}
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => {
+                const text = reader.result as string;
+                const lines = text.split(/\r?\n/).filter((l) => l.trim());
+                if (lines.length === 0) return;
+                const firstLine = lines[0].toLowerCase();
+                const hasHeader = firstLine.includes("name") || firstLine.includes("email");
+                const dataLines = hasHeader ? lines.slice(1) : lines;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const newEntries: ContactEntry[] = [];
+                const existingEmails = new Set(contacts.map((c) => c.email.toLowerCase()));
+                for (const line of dataLines) {
+                  const parts = line.split(",").map((s) => s.trim().replace(/^["']|["']$/g, ""));
+                  if (parts.length < 2) continue;
+                  const [name, email, role] = parts;
+                  if (!name || !email || !emailRegex.test(email)) continue;
+                  if (existingEmails.has(email.toLowerCase())) continue;
+                  existingEmails.add(email.toLowerCase());
+                  newEntries.push({ name, email, role: role || undefined, addedAt: new Date().toISOString() });
+                }
+                if (newEntries.length > 0) {
+                  setContacts((prev) => [...prev, ...newEntries]);
+                  markDirty();
+                  toast(`Imported ${newEntries.length} contact${newEntries.length !== 1 ? "s" : ""}`, "success");
+                } else {
+                  toast("No valid contacts found in CSV", "error");
+                }
+              };
+              reader.readAsText(file);
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => csvInputRef.current?.click()}
+            className="shrink-0 px-4 py-1.5 text-sm font-medium text-esm-red border border-esm-red/30 rounded hover:bg-red-50 transition-colors"
+          >
+            Import CSV
           </button>
         </div>
         {contactError && (
@@ -499,7 +571,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
         >
           {saving ? "Saving..." : "Save Configuration"}
         </button>
-        {saved && <span className="text-sm text-emerald-600">Saved successfully</span>}
+        {isDirty && <span className="text-xs text-amber-600">Unsaved changes</span>}
       </div>
     </div>
   );

@@ -19,18 +19,16 @@ import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import RefreshMetricsButton from "@/components/dashboard/RefreshMetricsButton";
 import PortalActivityCard from "@/components/dashboard/PortalActivityCard";
 import GenerateMeetingsButton from "@/components/dashboard/GenerateMeetingsButton";
-import { SectionLabel, Badge, Card, type BadgeVariant } from "@/components/ui";
+import StatusChanger from "@/components/dashboard/StatusChanger";
+import ExportProjectButton from "@/components/dashboard/ExportProjectButton";
+import { SectionLabel, Card } from "@/components/ui";
+import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
   return parseLocalDate(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
-const STATUS_BADGE: Record<string, { variant: BadgeVariant; label: string }> = {
-  ON_TRACK: { variant: "success", label: "On Track" },
-  AT_RISK: { variant: "warning", label: "At Risk" },
-  OFF_TRACK: { variant: "danger", label: "Off Track" },
-};
 
 export default async function ProjectDetailPage({ params }: { params: { projectId: string } }) {
   const project = getProjectById(params.projectId);
@@ -76,30 +74,21 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
     ? Math.ceil((parseLocalDate(project.goLiveDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
-  const badge = STATUS_BADGE[project.status] || STATUS_BADGE.ON_TRACK;
   const dataTimestamp = new Date().toISOString();
   const ssUrl = (id?: string) => id ? `https://app.smartsheet.com/sheets/${id}` : undefined;
 
   return (
-    <main className="min-h-screen bg-esm-grey-light">
-      <div className="bg-white border-b border-esm-border">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center gap-2 text-sm text-esm-grey mb-2">
-            <Link href="/dashboard" className="hover:text-esm-black">Dashboard</Link>
-            <span>/</span>
-            <span className="text-esm-black">{project.customerName}</span>
+    <div>
+      <DashboardBreadcrumb items={[{ label: project.customerName }]} />
+      <div className="max-w-7xl mx-auto px-6 py-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-esm-black">{project.customerName}</h1>
+            <p className="text-sm text-esm-grey">{project.projectName} — {project.scName}</p>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-semibold text-esm-black">{project.customerName}</h1>
-              <p className="text-sm text-esm-grey">{project.projectName} — {project.scName}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <SyncStatusBar dataTimestamp={dataTimestamp} />
-              <Badge variant={badge.variant} pill>
-                {badge.label}
-              </Badge>
-            </div>
+          <div className="flex items-center gap-4">
+            <SyncStatusBar dataTimestamp={dataTimestamp} />
+            <StatusChanger projectId={project.id} currentStatus={project.status} />
           </div>
         </div>
       </div>
@@ -275,6 +264,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             )}
             <RefreshMetricsButton projectId={project.id} />
             <GenerateMeetingsButton projectId={project.id} />
+            <ExportProjectButton />
           </div>
 
           <PortalActivityCard projectId={project.id} />
@@ -282,7 +272,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
           <ActivityFeed events={activity} />
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 

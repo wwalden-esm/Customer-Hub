@@ -22,7 +22,6 @@ export interface NotificationSummary {
 
 function classifyActionItems(items: ActionItem[], now: Date): ClassifiedItem[] {
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const threeDaysOut = new Date(todayStart.getTime() + 3 * 24 * 60 * 60 * 1000);
   const classified: ClassifiedItem[] = [];
 
   for (const item of items) {

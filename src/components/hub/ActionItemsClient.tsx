@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { parseLocalDate } from "@/lib/date-utils";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, useToast } from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
 
 interface ActionItem {
@@ -26,6 +26,20 @@ export default function ActionItemsClient({
   const [items, setItems] = useState(initialItems);
   const [filter, setFilter] = useState<Filter>("open");
   const [updating, setUpdating] = useState<Set<string>>(new Set());
+  const [expandedNote, setExpandedNote] = useState<string | null>(null);
+  const [notes, setNotes] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = localStorage.getItem("hub-action-item-notes");
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  });
+
+  function saveNote(itemId: string, text: string) {
+    const next = { ...notes, [itemId]: text };
+    setNotes(next);
+    try { localStorage.setItem("hub-action-item-notes", JSON.stringify(next)); } catch { /* ignore */ }
+  }
 
   const now = new Date();
   now.setHours(0, 0, 0, 0);
@@ -57,6 +71,8 @@ export default function ActionItemsClient({
     complete: items.filter((i) => !isOpen(i)).length,
   };
 
+  const { toast } = useToast();
+
   async function updateStatus(itemId: string, status: string) {
     setUpdating((s) => new Set(s).add(itemId));
     try {
@@ -69,8 +85,10 @@ export default function ActionItemsClient({
       setItems((prev) =>
         prev.map((i) => (i.id === itemId ? { ...i, status } : i)),
       );
+      const label = status === "complete" ? "marked complete" : `updated to ${status}`;
+      toast(`Action item ${label}`, "success");
     } catch {
-      // silently fail — item stays in previous state
+      toast("Failed to update status. Please try again.", "error");
     } finally {
       setUpdating((s) => {
         const next = new Set(s);
@@ -166,13 +184,37 @@ export default function ActionItemsClient({
                     className={`border-b border-gray-100 last:border-0 ${overdue ? "bg-red-50/50" : ""}`}
                   >
                     <td className="px-4 py-3">
-                      <span className={open ? "text-esm-black" : "text-esm-grey line-through"}>
-                        {item.description}
-                      </span>
-                      {overdue && (
-                        <Badge variant="danger" className="ml-2 text-[10px]">
-                          Overdue
-                        </Badge>
+                      <button
+                        onClick={() => setExpandedNote(expandedNote === item.id ? null : item.id)}
+                        className="text-left group"
+                      >
+                        <span className={open ? "text-esm-black" : "text-esm-grey line-through"}>
+                          {item.description}
+                        </span>
+                        {overdue && (
+                          <Badge variant="danger" className="ml-2 text-[10px]">
+                            Overdue
+                          </Badge>
+                        )}
+                        {notes[item.id] && (
+                          <svg className="inline-block w-3 h-3 ml-1.5 text-esm-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                          </svg>
+                        )}
+                        <span className="text-[10px] text-esm-muted ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {expandedNote === item.id ? "hide note" : "add note"}
+                        </span>
+                      </button>
+                      {expandedNote === item.id && (
+                        <div className="mt-2">
+                          <textarea
+                            value={notes[item.id] || ""}
+                            onChange={(e) => saveNote(item.id, e.target.value)}
+                            placeholder="Add a note or question..."
+                            rows={2}
+                            className="w-full text-xs border border-esm-border rounded px-2 py-1.5 bg-gray-50 focus:outline-none focus:border-esm-black resize-y"
+                          />
+                        </div>
                       )}
                     </td>
                     <td className="px-4 py-3 text-esm-grey">{item.owner || "—"}</td>

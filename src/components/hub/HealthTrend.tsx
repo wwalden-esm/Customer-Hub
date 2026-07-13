@@ -11,7 +11,7 @@ interface Props {
   currentStatus: "ON_TRACK" | "AT_RISK" | "OFF_TRACK";
 }
 
-export default function HealthTrend({ history, currentStatus }: Props) {
+export default function HealthTrend({ history }: Props) {
   if (history.length < 2) return null;
 
   const dotSize = 10;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { isSharePointConfigured, listCustomerFolderFiles } from "@/lib/sharepoint";
@@ -7,8 +8,9 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const session = await getCustomerSession();
-  if (!session || session.projectId !== params.id) {
+  const staffSession = await auth();
+  const customerSession = await getCustomerSession();
+  if (!staffSession?.user && (!customerSession || customerSession.projectId !== params.id)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

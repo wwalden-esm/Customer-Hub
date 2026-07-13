@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getSmartsheetConfig, getProjectActivity } from "@/lib/smartsheet-data";
 
 export async function GET(req: NextRequest) {
-  const session = await getCustomerSession();
-  if (!session) {
+  const session = await auth();
+  const customerSession = await getCustomerSession();
+  if (!session?.user && !customerSession) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

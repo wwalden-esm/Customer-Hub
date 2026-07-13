@@ -6,6 +6,71 @@ import FileUploader from "@/components/hub/FileUploader";
 import { Card, Badge, type BadgeVariant } from "@/components/ui";
 import { Button } from "@/components/ui/Button";
 
+function DocumentPreviewModal({ doc, onClose }: { doc: DocRecord; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-esm-black">Document Preview</h3>
+          <button onClick={onClose} className="text-esm-grey hover:text-esm-black">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-sm text-esm-grey">Name</span>
+            <span className="text-sm font-medium text-esm-black">{doc.name}</span>
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-sm text-esm-grey">Type</span>
+            <span className="text-sm text-esm-black">{doc.type}</span>
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-sm text-esm-grey">Status</span>
+            <Badge variant={STATUS_VARIANTS[doc.status] ?? "neutral"} pill>{doc.status}</Badge>
+          </div>
+          {doc.fileSize && (
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-sm text-esm-grey">File Size</span>
+              <span className="text-sm text-esm-black">{(doc.fileSize / 1024).toFixed(0)} KB</span>
+            </div>
+          )}
+          {doc.generatedAt && (
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-sm text-esm-grey">Generated</span>
+              <span className="text-sm text-esm-black">
+                {parseLocalDate(doc.generatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-sm text-esm-grey">Downloads</span>
+            <span className="text-sm text-esm-black">{doc.downloads}</span>
+          </div>
+        </div>
+        {doc.linkUrl && (
+          <div className="mt-4">
+            <a
+              href={doc.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-esm-red rounded hover:opacity-90 transition-opacity"
+            >
+              Open in New Tab
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface DocRecord {
   id: string;
   type: string;
@@ -49,6 +114,7 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
   const [error, setError] = useState<string | null>(null);
   const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number } | null>(null);
   const [bulkSummary, setBulkSummary] = useState<{ succeeded: number; failed: number } | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<DocRecord | null>(null);
 
   const handleBulkGenerate = useCallback(async (regenerateAll: boolean) => {
     setError(null);
@@ -253,7 +319,13 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">All Documents</h2>
         <Card padding="sm" className="!p-0 divide-y divide-slate-200">
           {documents.length === 0 ? (
-            <div className="px-6 py-4 text-sm text-slate-500">No documents generated yet.</div>
+            <div className="px-6 py-12 text-center">
+              <svg className="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+              <p className="text-sm font-medium text-esm-black mb-1">No documents generated yet</p>
+              <p className="text-sm text-slate-500">Use the Generate buttons above to create project documents.</p>
+            </div>
           ) : (
             documents.map((d) => (
               <div key={d.id} className="px-6 py-3 flex items-center justify-between">
@@ -264,28 +336,40 @@ export default function EsmDocumentsClient({ projectId, documents: initialDocs, 
                     {d.fileSize && <> · {(d.fileSize / 1024).toFixed(0)} KB</>}
                   </p>
                 </div>
-                {d.linkUrl ? (
-                  <a
-                    href={d.linkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-esm-red hover:underline"
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPreviewDoc(d)}
+                    className="text-sm text-esm-grey hover:text-esm-black hover:underline"
                   >
-                    Open
-                  </a>
-                ) : d.status === "READY" ? (
-                  <a
-                    href={`/api/projects/${projectId}/documents/${d.id}/download`}
-                    className="text-sm text-esm-red hover:underline"
-                  >
-                    Download
-                  </a>
-                ) : null}
+                    Preview
+                  </button>
+                  {d.linkUrl ? (
+                    <a
+                      href={d.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-esm-red hover:underline"
+                    >
+                      Open
+                    </a>
+                  ) : d.status === "READY" ? (
+                    <a
+                      href={`/api/projects/${projectId}/documents/${d.id}/download`}
+                      className="text-sm text-esm-red hover:underline"
+                    >
+                      Download
+                    </a>
+                  ) : null}
+                </div>
               </div>
             ))
           )}
         </Card>
       </section>
+
+      {previewDoc && (
+        <DocumentPreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
+      )}
     </div>
   );
 }

@@ -1,10 +1,9 @@
-import { auth, signOut } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { parseLocalDate } from "@/lib/date-utils";
 import { getProjectList, getSmartsheetConfig, getProjectMilestones, deriveCurrentPhase } from "@/lib/smartsheet-data";
 import SyncHubSpotButton from "@/components/dashboard/SyncHubSpotButton";
 import SendNotificationsButton from "@/components/dashboard/SendNotificationsButton";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
-// LinkSheetsButton imported by ProjectTable directly
 import ProjectTable from "@/components/dashboard/ProjectTable";
 
 export const dynamic = "force-dynamic";
@@ -47,54 +46,15 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <main className="min-h-screen bg-esm-grey-light">
-      <header className="bg-white border-b border-esm-border">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">
-              ESM
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-esm-black">Implementation Customer Hub</h1>
-              <p className="text-xs text-esm-grey">
-                {userEmail} ({userRole})
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="/dashboard/meeting-guide" className="text-sm text-esm-grey hover:text-esm-black">
-              Meeting Guide
-            </a>
-            <a href="/dashboard/settings" className="text-sm text-esm-grey hover:text-esm-black">
-              Settings
-            </a>
-            <a href="/dashboard/users" className="text-sm text-esm-grey hover:text-esm-black">
-              Manage Users
-            </a>
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/login" });
-              }}
-            >
-              <button type="submit" className="text-sm text-esm-grey hover:text-esm-black">
-                Sign out
-              </button>
-            </form>
-          </div>
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <SyncHubSpotButton />
+          <SendNotificationsButton />
         </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <SyncHubSpotButton />
-            <SendNotificationsButton />
-          </div>
-          <SyncStatusBar dataTimestamp={dataTimestamp} />
-        </div>
-        <ProjectTable projects={projectRows} />
+        <SyncStatusBar dataTimestamp={dataTimestamp} />
       </div>
-    </main>
+      <ProjectTable projects={projectRows} />
+    </div>
   );
 }

@@ -54,7 +54,6 @@ export async function POST(
 
   const meetingWeek = mtgVal("Week");
   const meetingDate = mtgVal("Meeting Date");
-  const meetingPhase = mtgVal("Phase");
 
   // Parse subtitle formats (SRT/VTT) into plain text
   const transcript = rawTranscript.includes("-->") ? parseTranscriptFile(rawTranscript) : rawTranscript;

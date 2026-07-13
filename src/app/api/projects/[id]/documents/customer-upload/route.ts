@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { getCustomerSession } from "@/lib/magic-link";
 import { getSmartsheetConfig } from "@/lib/smartsheet-data";
 import { attachFileToSheet } from "@/lib/smartsheet";
 
@@ -20,6 +22,12 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const session = await auth();
+  const customerSession = await getCustomerSession();
+  if (!session?.user && !customerSession) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
 
   const config = getSmartsheetConfig(id);

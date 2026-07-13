@@ -25,6 +25,7 @@ import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import QuickLinks from "@/components/hub/QuickLinks";
 import RefreshButton from "@/components/hub/RefreshButton";
+import MeetingPrepChecklist from "@/components/hub/MeetingPrepChecklist";
 import CollapsibleSection from "@/components/hub/CollapsibleSection";
 import { Badge, Card, SectionLabel } from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
@@ -68,7 +69,18 @@ export default async function HubDashboard() {
             </p>
           )}
         </div>
-        <RefreshButton />
+        <div className="flex items-center gap-2">
+          <a
+            href="/hub/export"
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border border-esm-border text-esm-grey hover:bg-slate-50 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Export Report
+          </a>
+          <RefreshButton />
+        </div>
       </div>
 
       {/* ── Licensed Products + Team row ── */}
@@ -266,10 +278,7 @@ export default async function HubDashboard() {
                   <p className="text-xs text-esm-grey mt-1 leading-relaxed line-clamp-2">{m.agendaSummary}</p>
                 )}
                 {m.customerDeliverables && (
-                  <div className="mt-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-card">
-                    <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Due from you</p>
-                    <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">{m.customerDeliverables}</p>
-                  </div>
+                  <MeetingPrepChecklist meetingId={m.id} deliverables={m.customerDeliverables} />
                 )}
               </li>
             ))}

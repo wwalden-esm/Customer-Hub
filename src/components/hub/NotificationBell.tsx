@@ -115,6 +115,13 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
               ))}
             </ul>
           )}
+          <a
+            href="/hub/notifications"
+            className="block text-center text-xs font-medium py-2 border-t border-esm-border hover:bg-gray-50 transition-colors"
+            style={{ color: "var(--hub-accent, #F4333F)" }}
+          >
+            View all notifications
+          </a>
         </div>
       )}
     </div>

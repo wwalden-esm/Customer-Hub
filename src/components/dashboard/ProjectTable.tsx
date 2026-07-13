@@ -6,6 +6,7 @@ import LinkSheetsButton from "./LinkSheetsButton";
 import { parseLocalDate } from "@/lib/date-utils";
 import { Button } from "@/components/ui/Button";
 import { Badge, type BadgeVariant, Card } from "@/components/ui";
+import Pagination from "./Pagination";
 
 interface ProjectRow {
   id: string;
@@ -42,6 +43,8 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
   const [bulkAction, setBulkAction] = useState<string | null>(null);
   const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
   const [bulkResult, setBulkResult] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const filtered = useMemo(() => {
     let list = projects;
@@ -65,6 +68,10 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
     });
     return list;
   }, [projects, search, statusFilter, sortKey, sortAsc]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedProjects = filtered.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
 
   const filteredIds = useMemo(() => new Set(filtered.map((p) => p.id)), [filtered]);
   const allVisibleSelected = filtered.length > 0 && filtered.every((p) => selected.has(p.id));
@@ -247,12 +254,22 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
             <tbody className="divide-y divide-gray-100">
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-esm-grey">
-                    {projects.length === 0 ? "No projects configured." : "No projects match your search."}
+                  <td colSpan={8} className="px-4 py-12 text-center">
+                    {projects.length === 0 ? (
+                      <div>
+                        <svg className="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                        </svg>
+                        <p className="text-sm font-medium text-esm-black mb-1">No projects configured</p>
+                        <p className="text-sm text-esm-grey">Add a project in projects.json to get started.</p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-esm-grey">No projects match your search.</p>
+                    )}
                   </td>
                 </tr>
               )}
-              {filtered.map((p) => {
+              {paginatedProjects.map((p) => {
                 const badge = STATUS_BADGE[p.status] || STATUS_BADGE.ON_TRACK;
                 const isSelected = selected.has(p.id);
                 return (
@@ -299,6 +316,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
             </tbody>
           </table>
         </div>
+        <Pagination currentPage={safePage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </Card>
     </>
   );

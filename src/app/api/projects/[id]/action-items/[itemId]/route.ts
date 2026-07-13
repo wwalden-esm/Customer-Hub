@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getSmartsheetConfig } from "@/lib/smartsheet-data";
 import { getSheet, columnIdMap, updateRows } from "@/lib/smartsheet";
@@ -9,13 +10,14 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; itemId: string }> },
 ) {
-  const session = await getCustomerSession();
-  if (!session) {
+  const staffSession = await auth();
+  const customerSession = await getCustomerSession();
+  if (!staffSession?.user && !customerSession) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id, itemId } = await params;
-  if (session.projectId !== id) {
+  if (!staffSession?.user && customerSession && customerSession.projectId !== id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

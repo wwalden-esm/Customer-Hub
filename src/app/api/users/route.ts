@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { auth } from "@/lib/auth";
 import crypto from "crypto";
+import bcryptjs from "bcryptjs";
 
 interface EsmUser {
   email: string;
@@ -68,7 +69,8 @@ export async function POST(req: NextRequest) {
   }
 
   const password = generatePassword();
-  users.push({ email, name, role, password });
+  const hash = bcryptjs.hashSync(password, 10);
+  users.push({ email, name, role, password: hash });
   saveUsers(users);
 
   return NextResponse.json({ email, name, role, password }, { status: 201 });
@@ -105,7 +107,8 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { email } = await req.json();
+  const body = await req.json();
+  const email = body.email;
   if (!email) {
     return NextResponse.json({ error: "Email is required" }, { status: 400 });
   }
@@ -116,8 +119,18 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
+  if (body.role) {
+    const role = String(body.role).toUpperCase();
+    if (!["SC", "PM", "ADMIN"].includes(role)) {
+      return NextResponse.json({ error: "Role must be SC, PM, or ADMIN" }, { status: 400 });
+    }
+    user.role = role;
+    saveUsers(users);
+    return NextResponse.json({ email: user.email, role: user.role });
+  }
+
   const newPassword = generatePassword();
-  user.password = newPassword;
+  user.password = bcryptjs.hashSync(newPassword, 10);
   saveUsers(users);
 
   return NextResponse.json({ email: user.email, password: newPassword });

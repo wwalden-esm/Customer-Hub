@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, useToast } from "@/components/ui";
 import { Button } from "@/components/ui/Button";
+import { SkeletonRow } from "@/components/dashboard/Skeleton";
+import ConfirmDialog from "@/components/dashboard/ConfirmDialog";
 
 interface UserRow {
   email: string;
@@ -20,6 +21,7 @@ interface NewUserResult {
 }
 
 export default function UsersPage() {
+  const { toast } = useToast();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -31,6 +33,8 @@ export default function UsersPage() {
   const [createdUser, setCreatedUser] = useState<NewUserResult | null>(null);
   const [resetResult, setResetResult] = useState<{ email: string; password: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{ title: string; message: string; action: () => void; variant: "danger" | "warning" } | null>(null);
+  const [editingRole, setEditingRole] = useState<string | null>(null);
 
   const fetchUsers = useCallback(async () => {
     const res = await fetch("/api/users");
@@ -55,6 +59,7 @@ export default function UsersPage() {
     const data = await res.json();
     if (!res.ok) {
       setError(data.error);
+      toast(data.error, "error");
       setSaving(false);
       return;
     }
@@ -65,35 +70,70 @@ export default function UsersPage() {
     setNewRole("SC");
     setSaving(false);
     setShowForm(false);
+    toast(`User ${data.name} created`, "success");
     fetchUsers();
   }
 
-  async function handleDelete(email: string) {
-    if (!confirm(`Remove ${email}?`)) return;
-    const res = await fetch("/api/users", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+  function handleDelete(email: string) {
+    setConfirmDialog({
+      title: "Remove User",
+      message: `Are you sure you want to remove ${email}? This action cannot be undone.`,
+      variant: "danger",
+      action: async () => {
+        setConfirmDialog(null);
+        const res = await fetch("/api/users", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (res.ok) {
+          toast("User removed", "success");
+          fetchUsers();
+        } else {
+          const data = await res.json();
+          toast(data.error, "error");
+        }
+      },
     });
-    if (res.ok) fetchUsers();
-    else {
-      const data = await res.json();
-      alert(data.error);
-    }
   }
 
-  async function handleResetPassword(email: string) {
-    if (!confirm(`Generate a new password for ${email}?`)) return;
+  function handleResetPassword(email: string) {
+    setConfirmDialog({
+      title: "Reset Password",
+      message: `Generate a new password for ${email}? The current password will stop working immediately.`,
+      variant: "warning",
+      action: async () => {
+        setConfirmDialog(null);
+        const res = await fetch("/api/users", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setResetResult(data);
+          setCopied(false);
+          toast("Password reset", "success");
+        } else {
+          toast("Failed to reset password", "error");
+        }
+      },
+    });
+  }
+
+  async function handleRoleChange(email: string, newRole: string) {
     const res = await fetch("/api/users", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, role: newRole }),
     });
     if (res.ok) {
-      const data = await res.json();
-      setResetResult(data);
-      setCopied(false);
+      toast("Role updated", "success");
+      fetchUsers();
+    } else {
+      toast("Failed to update role", "error");
     }
+    setEditingRole(null);
   }
 
   function copyToClipboard(text: string) {
@@ -103,25 +143,22 @@ export default function UsersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-esm-grey-light">
-      <header className="bg-white border-b border-esm-border">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">
-              ESM
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-esm-black">User Management</h1>
-              <p className="text-xs text-esm-grey">Manage ESM staff accounts</p>
-            </div>
-          </div>
-          <Link href="/dashboard" className="text-sm text-esm-grey hover:text-esm-black">
-            Back to Dashboard
-          </Link>
+    <div>
+      <div className="bg-white border-b border-esm-border">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <nav className="flex items-center gap-1.5 text-sm">
+            <a href="/dashboard" className="text-esm-grey hover:text-esm-black transition-colors">Projects</a>
+            <svg className="w-3 h-3 text-esm-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="text-esm-black font-medium">Users</span>
+          </nav>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-4xl mx-auto px-6 py-6">
+        <h1 className="text-xl font-semibold text-esm-black mb-1">User Management</h1>
+        <p className="text-sm text-esm-grey mb-6">Manage ESM staff accounts</p>
         {/* Created user banner */}
         {createdUser && (
           <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-card p-4" role="alert">
@@ -272,7 +309,12 @@ export default function UsersPage() {
         {/* Users table */}
         <Card padding="sm" className="!p-0 overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-sm text-esm-grey">Loading users...</div>
+            <div className="divide-y divide-gray-100">
+              <SkeletonRow />
+              <SkeletonRow />
+              <SkeletonRow />
+              <SkeletonRow />
+            </div>
           ) : users.length === 0 ? (
             <div className="p-8 text-center text-sm text-esm-grey">No users found.</div>
           ) : (
@@ -292,9 +334,25 @@ export default function UsersPage() {
                       <td className="px-5 py-3 text-esm-black font-medium">{u.name}</td>
                       <td className="px-5 py-3 text-esm-grey">{u.email}</td>
                       <td className="px-5 py-3">
-                        <Badge variant="neutral">
-                          {u.role === "SC" ? "Solutions Consultant" : u.role === "PM" ? "Project Manager" : "Admin"}
-                        </Badge>
+                        {editingRole === u.email ? (
+                          <select
+                            autoFocus
+                            defaultValue={u.role}
+                            onChange={(e) => handleRoleChange(u.email, e.target.value)}
+                            onBlur={() => setEditingRole(null)}
+                            className="text-sm border border-esm-border rounded px-2 py-1 bg-white"
+                          >
+                            <option value="SC">Solutions Consultant</option>
+                            <option value="PM">Project Manager</option>
+                            <option value="ADMIN">Admin</option>
+                          </select>
+                        ) : (
+                          <button onClick={() => setEditingRole(u.email)} className="cursor-pointer" title="Click to change role">
+                            <Badge variant="neutral">
+                              {u.role === "SC" ? "Solutions Consultant" : u.role === "PM" ? "Project Manager" : "Admin"}
+                            </Badge>
+                          </button>
+                        )}
                       </td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -320,6 +378,18 @@ export default function UsersPage() {
           )}
         </Card>
       </div>
-    </main>
+
+      {confirmDialog && (
+        <ConfirmDialog
+          open
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          confirmLabel={confirmDialog.variant === "danger" ? "Remove" : "Reset"}
+          variant={confirmDialog.variant}
+          onConfirm={confirmDialog.action}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
+    </div>
   );
 }
