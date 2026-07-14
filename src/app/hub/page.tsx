@@ -5,6 +5,7 @@ import { getProjectById } from "@/lib/smartsheet-data";
 import { getHubDashboardData } from "@/lib/hub-data";
 import { getProjectConfirmations } from "@/lib/checklist-store";
 import { getProjectMilestoneComments, getProjectMilestoneCommentsAsync } from "@/lib/milestone-comments";
+import { getFeedbackForProject } from "@/lib/milestone-feedback";
 
 export async function generateMetadata(): Promise<Metadata> {
   const session = await getCustomerSession();
@@ -27,6 +28,7 @@ import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import QuickLinks from "@/components/hub/QuickLinks";
 import RefreshButton from "@/components/hub/RefreshButton";
+import DataTimestamp from "@/components/hub/DataTimestamp";
 import MeetingPrepChecklist from "@/components/hub/MeetingPrepChecklist";
 import CollapsibleSection from "@/components/hub/CollapsibleSection";
 import { Badge, Card, SectionLabel } from "@/components/ui";
@@ -61,6 +63,8 @@ export default async function HubDashboard() {
     confirmedAt: c.confirmedAt,
     note: c.note,
   }));
+  const milestoneFeedback = getFeedbackForProject(session.projectId);
+
   const milestoneMetric = metrics.find((m) => m.metricType === "milestone");
   const integMetric = metrics.find((m) => m.metricType === "integration");
   const meetingsMetric = metrics.find((m) => m.metricType === "meetings");
@@ -93,6 +97,7 @@ export default async function HubDashboard() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <DataTimestamp timestamp={data.dataTimestamp} />
           <a
             href="/hub/export"
             className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border border-esm-border text-esm-grey hover:bg-slate-50 transition-colors"
@@ -318,7 +323,7 @@ export default async function HubDashboard() {
           ══════════════════════════════════════════════ */}
 
       <CollapsibleSection id="milestones" title="Project Milestones" className="mb-5">
-        <MilestoneLine milestones={data.milestones.filter((m) => m.isMilestone || m.level === 1)} projectId={session.projectId} initialComments={milestoneComments} commentAuthors={commentAuthors} />
+        <MilestoneLine milestones={data.milestones.filter((m) => m.isMilestone || m.level === 1)} projectId={session.projectId} initialComments={milestoneComments} commentAuthors={commentAuthors} initialFeedback={milestoneFeedback} />
       </CollapsibleSection>
 
       <CollapsibleSection id="open-actions" title="Open Action Items" subtitle={`${data.actionItems.length} open`} className="mb-5">

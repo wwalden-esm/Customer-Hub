@@ -12,6 +12,7 @@ import {
   getProjectDocuments,
   deriveCurrentPhase,
 } from "@/lib/smartsheet-data";
+import { getProjectQuestionsAsync } from "@/lib/question-store";
 import { parseLocalDate } from "@/lib/date-utils";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 import ProjectTimeline from "@/components/dashboard/ProjectTimeline";
@@ -44,12 +45,13 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
     ? await getProjectActionItems(config.actionItemSheetId)
     : [];
 
-  const [activity, integrations, raidItems, meetings, documents] = await Promise.all([
+  const [activity, integrations, raidItems, meetings, documents, questions] = await Promise.all([
     getProjectActivity(config),
     config.integrationTrackerSheetId ? getProjectIntegrations(config.integrationTrackerSheetId) : Promise.resolve([]),
     config.raidLogSheetId ? getRaidLogItems(config.raidLogSheetId) : Promise.resolve([]),
     config.meetingTrackerSheetId ? getProjectMeetings(config.meetingTrackerSheetId) : Promise.resolve([]),
     config.documentSheetId ? getProjectDocuments(config.documentSheetId) : Promise.resolve([]),
+    getProjectQuestionsAsync(params.projectId),
   ]);
 
   const openItems = actionItems.filter((a) => a.status !== "done");
@@ -247,6 +249,42 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             </Card>
           )}
 
+          {/* Questions summary */}
+          <Card padding="md">
+            <div className="flex justify-between items-center mb-3">
+              <SectionLabel>Questions</SectionLabel>
+              <span className="text-lg font-bold text-esm-black">
+                {questions.filter((q) => q.status === "open").length}{" "}
+                <span className="text-xs font-normal text-esm-grey">open</span>
+              </span>
+            </div>
+            {(() => {
+              const openQuestions = questions.filter((q) => q.status === "open");
+              if (openQuestions.length === 0) {
+                return <p className="text-xs text-esm-grey">No questions</p>;
+              }
+              return (
+                <div className="space-y-2">
+                  {openQuestions.slice(0, 3).map((q) => (
+                    <div key={q.id} className="text-xs border-b border-gray-100 last:border-0 pb-1.5 last:pb-0">
+                      <div className="font-medium text-esm-black truncate">{q.subject}</div>
+                      <div className="flex justify-between text-esm-grey">
+                        <span>{q.category}</span>
+                        <span>{fmtDate(q.createdAt)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+            <Link
+              href="/dashboard/questions"
+              className="block text-xs text-esm-blue hover:underline mt-3"
+            >
+              View all questions &rarr;
+            </Link>
+          </Card>
+
           <div className="space-y-2">
             <Link href={`/dashboard/${project.id}/meetings`} className="block w-full text-center bg-esm-black text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
               Manage Meetings
@@ -256,6 +294,9 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             </Link>
             <Link href={`/dashboard/${project.id}/config`} className="block w-full text-center bg-esm-blue text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
               Configure Hub
+            </Link>
+            <Link href="/dashboard/questions" className="block w-full text-center bg-slate-600 text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
+              Questions
             </Link>
             {project.sharepointFolderUrl && (
               <a href={project.sharepointFolderUrl} target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-[#0078D4] text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">

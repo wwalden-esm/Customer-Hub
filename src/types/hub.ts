@@ -145,4 +145,5 @@ export interface HubDashboardData {
   healthHistory: Array<{ week: string; status: "ON_TRACK" | "AT_RISK" | "OFF_TRACK" }>;
   documentTypes: string[];
   contactName: string | null;
+  dataTimestamp: string;
 }

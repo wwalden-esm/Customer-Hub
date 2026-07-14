@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getSmartsheetConfig, getProjectActivity } from "@/lib/smartsheet-data";
-import { getProjectHubNotifications, markHubNotificationRead } from "@/lib/hub-notification-store";
+import { getProjectHubNotifications, markHubNotificationRead, markAllProjectNotificationsRead } from "@/lib/hub-notification-store";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -54,8 +54,13 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { notificationId } = await req.json();
-  if (notificationId) {
+  const body = await req.json();
+  const { notificationId, markAllRead } = body;
+
+  if (markAllRead) {
+    const projectId = req.nextUrl.pathname.split("/")[3];
+    markAllProjectNotificationsRead(projectId);
+  } else if (notificationId) {
     markHubNotificationRead(notificationId);
   }
   return NextResponse.json({ ok: true });

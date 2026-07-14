@@ -103,6 +103,7 @@ body {
   button,
   a[href*="/dashboard"],
   [aria-label="breadcrumb"],
+  .no-print,
   .fixed { display: none !important; }
 
   body { background: white !important; color: #2D2826 !important; font-size: 12pt; }
@@ -112,6 +113,17 @@ body {
   * {
     box-shadow: none !important;
     border-color: #ccc !important;
+  }
+
+  /* RAID Log + Meeting print: expand all details, show notes */
+  [id^="raid-detail-"],
+  [id^="meeting-detail-"] {
+    display: block !important;
+  }
+
+  /* Prevent page breaks inside items */
+  .divide-y > div {
+    break-inside: avoid;
   }
 
   @page { margin: 1.5cm; }

@@ -7,7 +7,7 @@ export interface AuditEntry {
   action: string;
   target: string;
   detail?: string;
-  category: "auth" | "user" | "config" | "notification" | "project" | "question";
+  category: "auth" | "user" | "config" | "notification" | "project" | "question" | "email";
 }
 
 const AUDIT_FILE = join(process.cwd(), "config", "audit-log.json");

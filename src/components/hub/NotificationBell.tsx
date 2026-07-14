@@ -66,6 +66,15 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
     }
   }
 
+  async function markAllRead() {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    fetch(`/api/projects/${projectId}/notifications`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ markAllRead: true }),
+    }).catch(() => {});
+  }
+
   return (
     <div className="relative" ref={ref} onKeyDown={handleKeyDown}>
       <button
@@ -91,8 +100,17 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
           role="region"
           aria-label="Notifications"
         >
-          <div className="px-4 py-3 border-b border-esm-border">
+          <div className="px-4 py-3 border-b border-esm-border flex items-center justify-between">
             <SectionLabel>Notifications</SectionLabel>
+            {unreadCount > 0 && (
+              <button
+                onClick={markAllRead}
+                className="text-xs font-medium hover:underline"
+                style={{ color: "var(--hub-accent, #F4333F)" }}
+              >
+                Mark all read
+              </button>
+            )}
           </div>
           {notifications.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-esm-grey">No notifications</div>

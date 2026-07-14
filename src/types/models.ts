@@ -59,6 +59,8 @@ export interface Milestone {
   date?: string;
   startDate?: string;
   endDate?: string;
+  baselineStartDate?: string;
+  baselineEndDate?: string;
   status: string;
   phase?: string;
   percentComplete?: number;

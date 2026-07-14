@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getProjectQuestions, getProjectQuestionsAsync } from "@/lib/question-store";
-import { Card, SectionLabel, Badge } from "@/components/ui";
+import QuestionThread from "@/components/hub/QuestionThread";
 
 export const metadata: Metadata = { title: "My Questions" };
 export const dynamic = "force-dynamic";
@@ -39,62 +39,7 @@ export default async function QuestionsPage() {
         </a>
       </div>
 
-      {questions.length === 0 ? (
-        <Card padding="lg" className="text-center !py-12">
-          <p className="text-sm text-esm-grey mb-3">No questions yet.</p>
-          <a
-            href="/hub/ask"
-            className="text-sm font-medium transition-colors hover:opacity-80"
-            style={{ color: "var(--hub-accent, #F4333F)" }}
-          >
-            Ask your first question
-          </a>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {questions.map((q) => {
-            const date = new Date(q.createdAt);
-            const dateStr = date.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            });
-            return (
-              <Card key={q.id} padding="md">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
-                    <Badge variant={q.status === "replied" ? "success" : "warning"} pill className="text-[10px]">
-                      {q.status === "replied" ? "Replied" : "Open"}
-                    </Badge>
-                    <span className="text-xs text-esm-muted">{q.category}</span>
-                  </div>
-                  <span className="text-xs text-esm-muted">{dateStr}</span>
-                </div>
-                <p className="text-sm font-medium text-esm-black mb-1">{q.subject}</p>
-                <p className="text-sm text-esm-grey whitespace-pre-wrap">{q.message}</p>
-                {q.reply && (
-                  <div className="mt-3 pt-3 border-t border-esm-border">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-medium text-esm-black">
-                        {q.repliedBy || "Implementation Team"}
-                      </span>
-                      {q.repliedAt && (
-                        <span className="text-xs text-esm-muted">
-                          {new Date(q.repliedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-esm-grey whitespace-pre-wrap">{q.reply}</p>
-                  </div>
-                )}
-              </Card>
-            );
-          })}
-        </div>
-      )}
+      <QuestionThread questions={questions} projectId={session.projectId} />
     </div>
   );
 }

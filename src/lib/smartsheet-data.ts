@@ -84,6 +84,8 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
     const milestoneCol = cols.get("Milestone");
     const healthCol = cols.get("Health");
     const rowLevelCol = cols.get("Row Level");
+    const baselineStartCol = cols.get("Baseline Start") ?? cols.get("Baseline Start Date");
+    const baselineEndCol = cols.get("Baseline End") ?? cols.get("Baseline End Date") ?? cols.get("Baseline Finish");
 
     if (!nameCol) return [];
 
@@ -147,6 +149,10 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
       const percentComplete = pctRaw != null ? Number(pctRaw) : undefined;
       const healthRaw = getCellVal(row, healthCol);
       const health = healthRaw ? String(healthRaw) as Milestone["health"] : undefined;
+      const baselineStartRaw = getCellVal(row, baselineStartCol);
+      const baselineStartDate = baselineStartRaw ? String(baselineStartRaw).split("T")[0] : undefined;
+      const baselineEndRaw = getCellVal(row, baselineEndCol);
+      const baselineEndDate = baselineEndRaw ? String(baselineEndRaw).split("T")[0] : undefined;
       const isMilestoneChecked = getCellVal(row, milestoneCol);
       const isMilestone = isMilestoneChecked === true || isMilestoneChecked === "True" || isMilestoneChecked === "true";
 
@@ -187,6 +193,8 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
         date,
         startDate,
         endDate,
+        baselineStartDate,
+        baselineEndDate,
         status: milestoneStatus,
         percentComplete,
         level,

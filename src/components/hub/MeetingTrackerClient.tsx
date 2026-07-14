@@ -140,6 +140,20 @@ function RecapPanel({ meetingId, projectId }: { meetingId: string; projectId: st
   );
 }
 
+function PrintMeetingsButton() {
+  return (
+    <button
+      onClick={() => window.print()}
+      className="no-print inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-esm-grey bg-gray-100 rounded-card hover:bg-gray-200 transition-colors"
+    >
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+      </svg>
+      Print
+    </button>
+  );
+}
+
 export default function MeetingTrackerClient({ meetings, projectId }: { meetings: Meeting[]; projectId: string }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [phaseFilter, setPhaseFilter] = useState("All");
@@ -257,6 +271,9 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
             </select>
           </div>
         )}
+        <div className="ml-auto">
+          <PrintMeetingsButton />
+        </div>
       </div>
 
       {/* Meeting list */}
@@ -317,6 +334,31 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
                   </div>
                 </button>
 
+                {/* Inline recap/notes for completed meetings (visible without expanding) */}
+                {!isExpanded && meeting.status === "Complete" && (meeting.notes || meeting.recapAttachmentId) && (
+                  <div className="ml-7 mt-2">
+                    {meeting.notes && (
+                      <p className="text-xs text-esm-grey line-clamp-2">{meeting.notes}</p>
+                    )}
+                    {meeting.recapAttachmentId && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggle(meeting.id);
+                          setViewingRecap(meeting.id);
+                        }}
+                        className="inline-flex items-center gap-1 mt-1 text-xs font-medium hover:underline"
+                        style={{ color: "var(--hub-accent, #F4333F)" }}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        </svg>
+                        View Meeting Recap
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {isExpanded && (
                   <div id={contentId} className="ml-7 mt-3 space-y-3">
                     {meeting.agendaSummary && (
@@ -337,8 +379,8 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
                       </div>
                     )}
                     {meeting.notes && (
-                      <div className="pl-4 border-l-2 border-red-200">
-                        <p className="text-[10px] font-extrabold text-red-600 tracking-[0.09em] uppercase mb-1">Watch-Out / Notes</p>
+                      <div className="pl-4 border-l-2 border-green-200">
+                        <p className="text-[10px] font-extrabold text-green-700 tracking-[0.09em] uppercase mb-1">Meeting Notes / Recap</p>
                         <p className="text-sm text-esm-black whitespace-pre-wrap">{meeting.notes}</p>
                       </div>
                     )}
@@ -353,7 +395,7 @@ export default function MeetingTrackerClient({ meetings, projectId }: { meetings
                           }}
                           className="ml-auto px-2.5 py-1 text-xs font-medium rounded bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
                         >
-                          {viewingRecap === meeting.id ? "Hide Recap" : "View Recap"}
+                          {viewingRecap === meeting.id ? "Hide Full Recap" : "View Full Recap"}
                         </button>
                       )}
                     </div>

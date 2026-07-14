@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { sendNotificationEmail } from "@/lib/email";
-import { addQuestion } from "@/lib/question-store";
+import { addQuestion, addMessageToQuestion } from "@/lib/question-store";
 import { logAudit } from "@/lib/audit-log";
 
 export async function POST(req: NextRequest) {
@@ -91,4 +91,37 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ ok: true, questionId: question.id, subject, recipients: recipients.length });
+}
+
+export async function PATCH(req: NextRequest) {
+  const customerSession = await getCustomerSession();
+  const session = await auth();
+  if (!session?.user && !customerSession) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+  const { questionId, message } = body;
+
+  if (!questionId || !message?.trim()) {
+    return NextResponse.json({ error: "Question ID and message are required" }, { status: 400 });
+  }
+
+  const senderName = customerSession?.name || session?.user?.name || "Customer";
+  const senderEmail = customerSession?.email || session?.user?.email || "";
+
+  const updated = addMessageToQuestion(questionId, {
+    text: message.trim(),
+    authorName: senderName,
+    authorEmail: senderEmail,
+    authorType: "customer",
+  });
+
+  if (!updated) {
+    return NextResponse.json({ error: "Question not found" }, { status: 404 });
+  }
+
+  logAudit(senderEmail || senderName, "follow_up_question", updated.projectId, "question", updated.subject);
+
+  return NextResponse.json(updated);
 }

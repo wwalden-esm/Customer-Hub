@@ -358,5 +358,6 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
     healthHistory,
     documentTypes,
     contactName: contactName ?? null,
+    dataTimestamp: new Date().toISOString(),
   };
 }

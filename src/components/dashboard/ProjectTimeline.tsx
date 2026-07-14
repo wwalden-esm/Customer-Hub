@@ -9,6 +9,8 @@ interface TimelineMilestone {
   name: string;
   startDate: string | null;
   endDate: string | null;
+  baselineStartDate?: string | null;
+  baselineEndDate?: string | null;
   status: string;
   percentComplete: number | null;
 }
@@ -63,6 +65,8 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd, 
     for (const m of valid) {
       if (m.startDate) allDates.push(parseDate(m.startDate));
       if (m.endDate) allDates.push(parseDate(m.endDate));
+      if (m.baselineStartDate) allDates.push(parseDate(m.baselineStartDate));
+      if (m.baselineEndDate) allDates.push(parseDate(m.baselineEndDate));
     }
     if (projectStart) allDates.push(parseDate(projectStart));
     if (projectEnd) allDates.push(parseDate(projectEnd));
@@ -82,9 +86,28 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd, 
     const items = valid.map((m) => {
       const s = m.startDate ? parseDate(m.startDate) : parseDate(m.endDate!);
       const e = m.endDate ? parseDate(m.endDate) : parseDate(m.startDate!);
-      const leftPct = ((s.getTime() - rStart.getTime()) / (rEnd.getTime() - rStart.getTime())) * 100;
-      const widthPct = Math.max(1.5, ((e.getTime() - s.getTime()) / (rEnd.getTime() - rStart.getTime())) * 100);
-      return { ...m, leftPct, widthPct };
+      const range = rEnd.getTime() - rStart.getTime();
+      const leftPct = ((s.getTime() - rStart.getTime()) / range) * 100;
+      const widthPct = Math.max(1.5, ((e.getTime() - s.getTime()) / range) * 100);
+
+      // Baseline bar positioning (ghost bar for original planned dates)
+      let baselineLeftPct: number | undefined;
+      let baselineWidthPct: number | undefined;
+      let slippagePct: number | undefined;
+      let hasSlippage = false;
+      if (m.baselineEndDate) {
+        const bs = m.baselineStartDate ? parseDate(m.baselineStartDate) : s;
+        const be = parseDate(m.baselineEndDate);
+        baselineLeftPct = ((bs.getTime() - rStart.getTime()) / range) * 100;
+        baselineWidthPct = Math.max(1.5, ((be.getTime() - bs.getTime()) / range) * 100);
+        // If actual end is later than baseline end, compute slippage region
+        if (e.getTime() > be.getTime()) {
+          hasSlippage = true;
+          slippagePct = ((e.getTime() - be.getTime()) / range) * 100;
+        }
+      }
+
+      return { ...m, leftPct, widthPct, baselineLeftPct, baselineWidthPct, slippagePct, hasSlippage };
     });
 
     return { items, rangeStart: rStart, rangeEnd: rEnd, totalDays: days, months: ms };
@@ -182,7 +205,28 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd, 
                   onMouseEnter={() => setHoveredId(item.id)}
                   onMouseLeave={() => setHoveredId(null)}
                 >
-                  {/* Bar */}
+                  {/* Baseline ghost bar (original planned dates) */}
+                  {item.baselineLeftPct != null && item.baselineWidthPct != null && (
+                    <div
+                      className="absolute h-6 rounded-card border border-dashed border-slate-300 bg-slate-100/40"
+                      style={{ left: `${item.baselineLeftPct}%`, width: `${item.baselineWidthPct}%` }}
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  {/* Slippage region (delta beyond baseline) */}
+                  {item.hasSlippage && item.slippagePct != null && (
+                    <div
+                      className="absolute h-6 rounded-r-card bg-red-400/25 border border-dashed border-red-300"
+                      style={{
+                        left: `${item.leftPct + item.widthPct - item.slippagePct}%`,
+                        width: `${item.slippagePct}%`,
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  {/* Actual bar */}
                   <div
                     className={`absolute h-6 rounded-card transition-all ${colors.bar} ${isHovered ? "opacity-100 shadow-sm" : "opacity-80"}`}
                     style={{ left: `${item.leftPct}%`, width: `${item.widthPct}%` }}
@@ -222,6 +266,14 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd, 
                         {item.endDate && fmtShort(item.endDate)}
                         {item.percentComplete != null && ` · ${Math.round(item.percentComplete * 100)}%`}
                       </div>
+                      {item.baselineEndDate && (
+                        <div className={`text-[10px] mt-0.5 ${item.hasSlippage ? "text-red-300" : "text-white/50"}`}>
+                          Baseline: {item.baselineStartDate && fmtShort(item.baselineStartDate)}
+                          {item.baselineStartDate && item.baselineEndDate && " → "}
+                          {fmtShort(item.baselineEndDate)}
+                          {item.hasSlippage && " (slipped)"}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -230,7 +282,7 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd, 
           </div>
 
           {/* Legend */}
-          <div className="flex gap-4 mt-4 pt-3 border-t border-esm-border">
+          <div className="flex gap-4 mt-4 pt-3 border-t border-esm-border flex-wrap">
             {[
               { label: "Complete", color: "bg-emerald-500" },
               { label: "In Progress", color: "bg-blue-500" },
@@ -245,6 +297,18 @@ export default function ProjectTimeline({ milestones, projectStart, projectEnd, 
               <div className="flex items-center gap-1.5 text-[10px] text-esm-grey">
                 <div className="w-3 h-px bg-red-400" aria-hidden="true" />
                 Today
+              </div>
+            )}
+            {items.some((i) => i.baselineLeftPct != null) && (
+              <div className="flex items-center gap-1.5 text-[10px] text-esm-grey">
+                <div className="w-3 h-2 rounded-card border border-dashed border-slate-300 bg-slate-100/40" aria-hidden="true" />
+                Baseline
+              </div>
+            )}
+            {items.some((i) => i.hasSlippage) && (
+              <div className="flex items-center gap-1.5 text-[10px] text-esm-grey">
+                <div className="w-3 h-2 rounded-card bg-red-400/25 border border-dashed border-red-300" aria-hidden="true" />
+                Slippage
               </div>
             )}
           </div>

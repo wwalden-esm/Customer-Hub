@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getAllQuestions, getAllQuestionsAsync, replyToQuestion } from "@/lib/question-store";
+import { getAllQuestions, getAllQuestionsAsync, replyToQuestion, addMessageToQuestion, closeQuestion, reopenQuestion } from "@/lib/question-store";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { sendNotificationEmail } from "@/lib/email";
 import { logAudit } from "@/lib/audit-log";
@@ -29,12 +29,39 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { questionId, reply } = await req.json();
-  if (!questionId || !reply?.trim()) {
-    return NextResponse.json({ error: "Question ID and reply are required" }, { status: 400 });
+  const body = await req.json();
+  const { questionId, action, reply } = body;
+  const resolvedAction = action || "reply";
+
+  if (!questionId) {
+    return NextResponse.json({ error: "Question ID is required" }, { status: 400 });
   }
 
   const repliedBy = session.user.name || session.user.email || "Staff";
+
+  if (resolvedAction === "close") {
+    const question = closeQuestion(questionId);
+    if (!question) {
+      return NextResponse.json({ error: "Question not found" }, { status: 404 });
+    }
+    logAudit(session.user.email || "unknown", "close_question", question.projectId, "question", question.subject);
+    return NextResponse.json(question);
+  }
+
+  if (resolvedAction === "reopen") {
+    const question = reopenQuestion(questionId);
+    if (!question) {
+      return NextResponse.json({ error: "Question not found" }, { status: 404 });
+    }
+    logAudit(session.user.email || "unknown", "reopen_question", question.projectId, "question", question.subject);
+    return NextResponse.json(question);
+  }
+
+  // Default: "reply"
+  if (!reply?.trim()) {
+    return NextResponse.json({ error: "Reply text is required" }, { status: 400 });
+  }
+
   const question = await replyToQuestion(questionId, reply.trim(), repliedBy);
   if (!question) {
     return NextResponse.json({ error: "Question not found" }, { status: 404 });

@@ -62,3 +62,17 @@ export function markHubNotificationRead(notificationId: string): void {
     saveNotifications(notifications);
   }
 }
+
+export function markAllProjectNotificationsRead(projectId: string): void {
+  const notifications = loadNotifications();
+  let changed = false;
+  for (const n of notifications) {
+    if (n.projectId === projectId && !n.read) {
+      n.read = true;
+      changed = true;
+    }
+  }
+  if (changed) {
+    saveNotifications(notifications);
+  }
+}

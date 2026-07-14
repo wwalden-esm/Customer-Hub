@@ -39,19 +39,59 @@ const PRIORITY_VARIANTS: Record<string, BadgeVariant> = {
 
 const TYPES = ["All", "Risk", "Action", "Issue", "Decision"] as const;
 const STATUSES = ["All", "New", "In Progress", "Blocked", "Complete"] as const;
+const OWNER_FILTERS = ["All", "My Items", "ESM Items"] as const;
 
-export default function RaidLogClient({ items }: { items: RaidItem[] }) {
+interface RaidLogClientProps {
+  items: RaidItem[];
+  contactNames?: string[];
+  esmTeamNames?: string[];
+  sessionName?: string | null;
+}
+
+function PrintRaidButton() {
+  return (
+    <button
+      onClick={() => window.print()}
+      className="no-print inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-esm-grey bg-gray-100 rounded-card hover:bg-gray-200 transition-colors"
+    >
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+      </svg>
+      Print
+    </button>
+  );
+}
+
+export default function RaidLogClient({ items, contactNames = [], esmTeamNames = [], sessionName }: RaidLogClientProps) {
   const [typeFilter, setTypeFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [ownerFilter, setOwnerFilter] = useState("All");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     return items.filter((item) => {
       if (typeFilter !== "All" && item.type !== typeFilter) return false;
       if (statusFilter !== "All" && item.status !== statusFilter) return false;
+      if (ownerFilter !== "All") {
+        const assignedLower = (item.assigned || "").toLowerCase();
+        if (ownerFilter === "My Items") {
+          // Match against customer contact names and session name
+          const customerNames = [...contactNames];
+          if (sessionName) customerNames.push(sessionName);
+          const isCustomerOwned = customerNames.some((name) =>
+            assignedLower.includes(name.toLowerCase())
+          );
+          if (!isCustomerOwned) return false;
+        } else if (ownerFilter === "ESM Items") {
+          const isEsmOwned = esmTeamNames.some((name) =>
+            assignedLower.includes(name.toLowerCase())
+          ) || assignedLower.includes("esm");
+          if (!isEsmOwned) return false;
+        }
+      }
       return true;
     });
-  }, [items, typeFilter, statusFilter]);
+  }, [items, typeFilter, statusFilter, ownerFilter, contactNames, esmTeamNames, sessionName]);
 
   const counts = useMemo(() => {
     const c = { Risk: 0, Action: 0, Issue: 0, Decision: 0, open: 0 };
@@ -108,7 +148,28 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-4" role="group" aria-label="Filters">
+      <div className="flex flex-wrap items-center gap-4 mb-4" role="group" aria-label="Filters">
+        {(contactNames.length > 0 || esmTeamNames.length > 0) && (
+          <fieldset className="flex items-center gap-2">
+            <legend className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">Owner</legend>
+            <div className="flex gap-1" role="radiogroup" aria-label="Filter by owner">
+              {OWNER_FILTERS.map((o) => (
+                <button
+                  key={o}
+                  onClick={() => setOwnerFilter(o)}
+                  aria-pressed={ownerFilter === o}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${
+                    ownerFilter === o
+                      ? "bg-esm-black text-white"
+                      : "bg-gray-100 text-esm-grey hover:bg-gray-200"
+                  }`}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
         <fieldset className="flex items-center gap-2">
           <legend className="text-[10px] font-extrabold text-esm-grey tracking-[0.09em] uppercase">Type</legend>
           <div className="flex gap-1" role="radiogroup" aria-label="Filter by type">
@@ -147,6 +208,9 @@ export default function RaidLogClient({ items }: { items: RaidItem[] }) {
             ))}
           </div>
         </fieldset>
+        <div className="ml-auto">
+          <PrintRaidButton />
+        </div>
       </div>
 
       {/* Items list */}

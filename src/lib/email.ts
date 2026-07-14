@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { logAudit } from "@/lib/audit-log";
 
 let _resend: Resend | null = null;
 function getResend(): Resend {
@@ -38,8 +39,23 @@ export async function sendNotificationEmail(to: string, subject: string, html: s
   const result = await getResend().emails.send({ from: getFrom(), to, subject, html });
   if ("error" in result && result.error) {
     console.error(`[EMAIL] Resend error sending to ${to}:`, result.error);
+    logAudit("system", "email_failed", to, "email", subject);
     throw new Error(`Resend error: ${JSON.stringify(result.error)}`);
   }
   console.log(`[EMAIL] Sent to ${to}: "${subject}"`);
   return result;
+}
+
+export async function sendNotificationEmailSafe(
+  to: string,
+  subject: string,
+  html: string,
+): Promise<{ sent: boolean; error?: string }> {
+  try {
+    await sendNotificationEmail(to, subject, html);
+    return { sent: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { sent: false, error: message };
+  }
 }
