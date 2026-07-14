@@ -1,4 +1,5 @@
-import type { Project, Milestone, ActionItem, RaidLogItem } from "@/types/models";
+import type { Project, Milestone, ActionItem, RaidLogItem, Meeting, DocumentInfo } from "@/types/models";
+import type { SmartsheetConfig } from "@/types/models";
 import { parseLocalDate } from "@/lib/date-utils";
 
 export interface HealthScore {
@@ -10,10 +11,12 @@ export interface HealthScore {
     actionItemHealth: number;
     raidHealth: number;
     timelinePressure: number;
-    velocityTrend: number;
+    completionProgress: number;
+    engagementScore: number;
   };
   signals: HealthSignal[];
   prediction: RiskPrediction;
+  dataCoverage: DataCoverage;
 }
 
 export interface HealthSignal {
@@ -25,6 +28,12 @@ export interface RiskPrediction {
   slipProbability: number;
   primaryRisk: string;
   trend: "improving" | "stable" | "declining";
+}
+
+export interface DataCoverage {
+  configured: string[];
+  missing: string[];
+  score: number;
 }
 
 export interface ProjectAnalytics {
@@ -45,6 +54,7 @@ export interface ProjectAnalytics {
     overdueRate: number;
   };
   raidStats: {
+    total: number;
     openRisks: number;
     openIssues: number;
     blockedItems: number;
@@ -55,6 +65,13 @@ export interface ProjectAnalytics {
     daysElapsed: number | null;
     totalDuration: number | null;
     percentElapsed: number | null;
+    progressGap: number | null;
+  };
+  engagementStats: {
+    meetingsCompleted: number;
+    meetingsTotal: number;
+    recapsSent: number;
+    documentsGenerated: number;
   };
 }
 
@@ -77,18 +94,28 @@ export interface PortfolioAnalytics {
   }>;
 }
 
+export interface HealthSnapshot {
+  date: string;
+  projects: Record<string, {
+    overall: number;
+    components: HealthScore["components"];
+    riskLevel: HealthScore["riskLevel"];
+  }>;
+}
+
 const WEIGHTS = {
-  milestoneHealth: 0.30,
-  actionItemHealth: 0.25,
+  milestoneHealth: 0.25,
+  actionItemHealth: 0.20,
   raidHealth: 0.15,
   timelinePressure: 0.15,
-  velocityTrend: 0.15,
+  completionProgress: 0.15,
+  engagementScore: 0.10,
 };
 
 function scoreMilestoneHealth(milestones: Milestone[]): { score: number; stats: ProjectAnalytics["milestoneStats"] } {
   const level2 = milestones.filter(m => m.level === 2 || m.isMilestone);
   const total = level2.length;
-  if (total === 0) return { score: 70, stats: { total: 0, completed: 0, inProgress: 0, overdue: 0, completionRate: 0 } };
+  if (total === 0) return { score: -1, stats: { total: 0, completed: 0, inProgress: 0, overdue: 0, completionRate: 0 } };
 
   const completed = level2.filter(m => m.status === "complete").length;
   const inProgress = level2.filter(m => m.status === "in-progress").length;
@@ -102,8 +129,8 @@ function scoreMilestoneHealth(milestones: Milestone[]): { score: number; stats: 
     return parseLocalDate(endDate) < now;
   }).length;
 
-  const completionRate = total > 0 ? completed / total : 0;
-  const overdueRatio = total > 0 ? overdue / total : 0;
+  const completionRate = completed / total;
+  const overdueRatio = overdue / total;
   const healthCount = level2.filter(m => m.health === "Green").length;
   const yellowCount = level2.filter(m => m.health === "Yellow").length;
   const redCount = level2.filter(m => m.health === "Red").length;
@@ -124,7 +151,7 @@ function scoreMilestoneHealth(milestones: Milestone[]): { score: number; stats: 
 
 function scoreActionItemHealth(items: ActionItem[]): { score: number; stats: ProjectAnalytics["actionItemStats"] } {
   const total = items.length;
-  if (total === 0) return { score: 80, stats: { total: 0, completed: 0, overdue: 0, highPriority: 0, overdueRate: 0 } };
+  if (total === 0) return { score: -1, stats: { total: 0, completed: 0, overdue: 0, highPriority: 0, overdueRate: 0 } };
 
   const now = new Date();
   now.setHours(0, 0, 0, 0);
@@ -146,7 +173,7 @@ function scoreActionItemHealth(items: ActionItem[]): { score: number; stats: Pro
 
   const highPriority = open.filter(i => i.priority.toLowerCase() === "high").length;
   const overdueRate = open.length > 0 ? overdue / open.length : 0;
-  const completionRate = total > 0 ? completed / total : 0;
+  const completionRate = completed / total;
 
   let score = 40 + (completionRate * 35);
   score -= overdueRate * 35;
@@ -159,32 +186,40 @@ function scoreActionItemHealth(items: ActionItem[]): { score: number; stats: Pro
 }
 
 function scoreRaidHealth(items: RaidLogItem[]): { score: number; stats: ProjectAnalytics["raidStats"] } {
+  if (items.length === 0) return { score: -1, stats: { total: 0, openRisks: 0, openIssues: 0, blockedItems: 0, highPriorityOpen: 0 } };
+
   const openItems = items.filter(i => i.status !== "Complete");
   const openRisks = openItems.filter(i => i.type === "Risk").length;
   const openIssues = openItems.filter(i => i.type === "Issue").length;
   const blockedItems = openItems.filter(i => i.status === "Blocked").length;
   const highPriorityOpen = openItems.filter(i => i.priority === "High").length;
 
-  if (items.length === 0) return { score: 80, stats: { openRisks: 0, openIssues: 0, blockedItems: 0, highPriorityOpen: 0 } };
+  const totalItems = items.length;
+  const completedItems = items.filter(i => i.status === "Complete").length;
+  const completionRatio = completedItems / totalItems;
 
-  let score = 90;
-  score -= openRisks * 5;
-  score -= openIssues * 4;
-  score -= blockedItems * 8;
-  score -= highPriorityOpen * 6;
+  const openRatio = openItems.length / totalItems;
+  const blockedRatio = totalItems > 0 ? blockedItems / totalItems : 0;
+  const highPriorityRatio = openItems.length > 0 ? highPriorityOpen / openItems.length : 0;
+
+  let score = 50 + (completionRatio * 30);
+  score -= openRatio * 15;
+  score -= blockedRatio * 25;
+  score -= highPriorityRatio * 15;
+  if (openRisks > 0) score -= Math.min(10, (openRisks / totalItems) * 20);
 
   return {
     score: Math.max(0, Math.min(100, Math.round(score))),
-    stats: { openRisks, openIssues, blockedItems, highPriorityOpen },
+    stats: { total: totalItems, openRisks, openIssues, blockedItems, highPriorityOpen },
   };
 }
 
-function scoreTimelinePressure(project: Project): { score: number; stats: ProjectAnalytics["timelineStats"] } {
+function scoreTimelinePressure(project: Project, milestones: Milestone[]): { score: number; stats: ProjectAnalytics["timelineStats"] } {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
   if (!project.goLiveDate) {
-    return { score: 70, stats: { daysToGoLive: null, daysElapsed: null, totalDuration: null, percentElapsed: null } };
+    return { score: -1, stats: { daysToGoLive: null, daysElapsed: null, totalDuration: null, percentElapsed: null, progressGap: null } };
   }
 
   const goLive = parseLocalDate(project.goLiveDate);
@@ -193,6 +228,7 @@ function scoreTimelinePressure(project: Project): { score: number; stats: Projec
   let daysElapsed: number | null = null;
   let totalDuration: number | null = null;
   let percentElapsed: number | null = null;
+  let progressGap: number | null = null;
 
   if (project.startDate) {
     const start = parseLocalDate(project.startDate);
@@ -201,6 +237,18 @@ function scoreTimelinePressure(project: Project): { score: number; stats: Projec
     percentElapsed = totalDuration > 0 ? Math.round((daysElapsed / totalDuration) * 100) : null;
   }
 
+  // Progress gap: expected completion % (based on elapsed time) vs actual completion %
+  const level2 = milestones.filter(m => m.level === 2 || m.isMilestone);
+  const actualCompletion = level2.length > 0
+    ? level2.filter(m => m.status === "complete").length / level2.length
+    : 0;
+
+  if (percentElapsed !== null && level2.length > 0) {
+    const expectedCompletion = Math.min(percentElapsed / 100, 1);
+    progressGap = Math.round((actualCompletion - expectedCompletion) * 100);
+  }
+
+  // Base score from days remaining
   let score: number;
   if (daysToGoLive < 0) score = 15;
   else if (daysToGoLive <= 7) score = 30;
@@ -210,13 +258,20 @@ function scoreTimelinePressure(project: Project): { score: number; stats: Projec
   else if (daysToGoLive <= 90) score = 85;
   else score = 95;
 
+  // Adjust based on progress gap
+  if (progressGap !== null) {
+    if (progressGap < -30) score -= 20;
+    else if (progressGap < -15) score -= 10;
+    else if (progressGap > 15) score += 5;
+  }
+
   return {
     score: Math.max(0, Math.min(100, score)),
-    stats: { daysToGoLive, daysElapsed, totalDuration, percentElapsed },
+    stats: { daysToGoLive, daysElapsed, totalDuration, percentElapsed, progressGap },
   };
 }
 
-function estimateVelocityTrend(milestones: Milestone[], actionItems: ActionItem[]): number {
+function scoreCompletionProgress(milestones: Milestone[], actionItems: ActionItem[]): number {
   const completedMilestones = milestones.filter(m => m.status === "complete").length;
   const totalMilestones = milestones.filter(m => m.level === 2 || m.isMilestone).length;
 
@@ -226,14 +281,64 @@ function estimateVelocityTrend(milestones: Milestone[], actionItems: ActionItem[
   }).length;
   const totalActions = actionItems.length;
 
-  if (totalMilestones === 0 && totalActions === 0) return 70;
+  if (totalMilestones === 0 && totalActions === 0) return -1;
 
-  const milestoneVelocity = totalMilestones > 0 ? completedMilestones / totalMilestones : 0.5;
-  const actionVelocity = totalActions > 0 ? completedActions / totalActions : 0.5;
+  const milestoneProgress = totalMilestones > 0 ? completedMilestones / totalMilestones : 0.5;
+  const actionProgress = totalActions > 0 ? completedActions / totalActions : 0.5;
 
-  const velocity = (milestoneVelocity * 0.6 + actionVelocity * 0.4);
+  const progress = (milestoneProgress * 0.6 + actionProgress * 0.4);
+  return Math.max(0, Math.min(100, Math.round(progress * 100)));
+}
 
-  return Math.max(0, Math.min(100, Math.round(velocity * 100)));
+function scoreEngagement(meetings: Meeting[], documents: DocumentInfo[]): { score: number; stats: ProjectAnalytics["engagementStats"] } {
+  const meetingsCompleted = meetings.filter(m => m.status === "Complete").length;
+  const meetingsTotal = meetings.filter(m => m.status !== "Skipped").length;
+  const recapsSent = meetings.filter(m => m.recapSent).length;
+  const documentsGenerated = documents.length;
+
+  if (meetingsTotal === 0 && documentsGenerated === 0) {
+    return { score: -1, stats: { meetingsCompleted, meetingsTotal, recapsSent, documentsGenerated } };
+  }
+
+  let score = 50;
+
+  if (meetingsTotal > 0) {
+    const meetingRate = meetingsCompleted / meetingsTotal;
+    score += meetingRate * 25;
+    const recapRate = meetingsCompleted > 0 ? recapsSent / meetingsCompleted : 0;
+    score += recapRate * 15;
+  }
+
+  if (documentsGenerated > 0) {
+    score += Math.min(10, documentsGenerated * 2);
+  }
+
+  return {
+    score: Math.max(0, Math.min(100, Math.round(score))),
+    stats: { meetingsCompleted, meetingsTotal, recapsSent, documentsGenerated },
+  };
+}
+
+function computeDataCoverage(config: SmartsheetConfig): DataCoverage {
+  const sources = [
+    { key: "projectPlanSheetId", label: "Project Plan" },
+    { key: "actionItemSheetId", label: "Action Items" },
+    { key: "raidLogSheetId", label: "RAID Log" },
+    { key: "meetingTrackerSheetId", label: "Meetings" },
+    { key: "documentSheetId", label: "Documents" },
+    { key: "metricsSheetId", label: "Metrics" },
+  ] as const;
+
+  const configured: string[] = [];
+  const missing: string[] = [];
+
+  for (const { key, label } of sources) {
+    if (config[key]) configured.push(label);
+    else missing.push(label);
+  }
+
+  const score = Math.round((configured.length / sources.length) * 100);
+  return { configured, missing, score };
 }
 
 function generateSignals(
@@ -241,6 +346,8 @@ function generateSignals(
   actionItemStats: ProjectAnalytics["actionItemStats"],
   raidStats: ProjectAnalytics["raidStats"],
   timelineStats: ProjectAnalytics["timelineStats"],
+  engagementStats: ProjectAnalytics["engagementStats"],
+  dataCoverage: DataCoverage,
 ): HealthSignal[] {
   const signals: HealthSignal[] = [];
 
@@ -254,7 +361,11 @@ function generateSignals(
   if (raidStats.highPriorityOpen > 0) signals.push({ type: "warning", label: `${raidStats.highPriorityOpen} high-priority open item${raidStats.highPriorityOpen === 1 ? "" : "s"}` });
   if (timelineStats.daysToGoLive !== null && timelineStats.daysToGoLive < 0) signals.push({ type: "critical", label: `Go-live was ${Math.abs(timelineStats.daysToGoLive)} days ago` });
   else if (timelineStats.daysToGoLive !== null && timelineStats.daysToGoLive <= 14) signals.push({ type: "warning", label: `${timelineStats.daysToGoLive} days to go-live` });
+  if (timelineStats.progressGap !== null && timelineStats.progressGap < -20) signals.push({ type: "critical", label: `${Math.abs(timelineStats.progressGap)}% behind expected progress` });
+  else if (timelineStats.progressGap !== null && timelineStats.progressGap > 10) signals.push({ type: "positive", label: `${timelineStats.progressGap}% ahead of expected progress` });
+  if (engagementStats.meetingsTotal > 3 && engagementStats.meetingsCompleted / engagementStats.meetingsTotal >= 0.9) signals.push({ type: "positive", label: "Strong meeting engagement" });
   if (actionItemStats.highPriority === 0 && raidStats.blockedItems === 0 && milestoneStats.overdue === 0) signals.push({ type: "positive", label: "No critical blockers" });
+  if (dataCoverage.score < 50) signals.push({ type: "warning", label: `Limited data: ${dataCoverage.missing.slice(0, 2).join(", ")} not configured` });
 
   return signals;
 }
@@ -277,6 +388,7 @@ function computeRiskLevel(score: number): HealthScore["riskLevel"] {
 function computePrediction(
   components: HealthScore["components"],
   signals: HealthSignal[],
+  history: Array<{ overall: number }>,
 ): RiskPrediction {
   const criticalCount = signals.filter(s => s.type === "critical").length;
   const positiveCount = signals.filter(s => s.type === "positive").length;
@@ -295,10 +407,21 @@ function computePrediction(
   else if (components.actionItemHealth < 50) primaryRisk = "Action item backlog";
   else if (components.raidHealth < 50) primaryRisk = "Unresolved blockers";
   else if (components.timelinePressure < 40) primaryRisk = "Timeline pressure";
+  else if (components.engagementScore < 40) primaryRisk = "Low engagement";
 
+  // Compute trend from historical data if available
   let trend: RiskPrediction["trend"] = "stable";
-  if (criticalCount >= 2) trend = "declining";
-  else if (positiveCount >= 2 && criticalCount === 0) trend = "improving";
+  if (history.length >= 2) {
+    const recent = history.slice(-3);
+    const first = recent[0].overall;
+    const last = recent[recent.length - 1].overall;
+    const diff = last - first;
+    if (diff >= 5) trend = "improving";
+    else if (diff <= -5) trend = "declining";
+  } else {
+    if (criticalCount >= 2) trend = "declining";
+    else if (positiveCount >= 2 && criticalCount === 0) trend = "improving";
+  }
 
   return { slipProbability, primaryRisk, trend };
 }
@@ -308,30 +431,62 @@ export function computeHealthScore(
   milestones: Milestone[],
   actionItems: ActionItem[],
   raidItems: RaidLogItem[],
+  meetings: Meeting[],
+  documents: DocumentInfo[],
+  config: SmartsheetConfig,
+  history: Array<{ overall: number }>,
 ): ProjectAnalytics {
   const { score: milestoneScore, stats: milestoneStats } = scoreMilestoneHealth(milestones);
   const { score: actionItemScore, stats: actionItemStats } = scoreActionItemHealth(actionItems);
   const { score: raidScore, stats: raidStats } = scoreRaidHealth(raidItems);
-  const { score: timelineScore, stats: timelineStats } = scoreTimelinePressure(project);
-  const velocityScore = estimateVelocityTrend(milestones, actionItems);
+  const { score: timelineScore, stats: timelineStats } = scoreTimelinePressure(project, milestones);
+  const completionScore = scoreCompletionProgress(milestones, actionItems);
+  const { score: engagementScore, stats: engagementStats } = scoreEngagement(meetings, documents);
+  const dataCoverage = computeDataCoverage(config);
 
-  const components = {
+  // For components with no data (-1), use a neutral score but don't count them
+  const rawComponents = {
     milestoneHealth: milestoneScore,
     actionItemHealth: actionItemScore,
     raidHealth: raidScore,
     timelinePressure: timelineScore,
-    velocityTrend: velocityScore,
+    completionProgress: completionScore,
+    engagementScore: engagementScore,
   };
 
-  const overall = Math.round(
-    components.milestoneHealth * WEIGHTS.milestoneHealth +
-    components.actionItemHealth * WEIGHTS.actionItemHealth +
-    components.raidHealth * WEIGHTS.raidHealth +
-    components.timelinePressure * WEIGHTS.timelinePressure +
-    components.velocityTrend * WEIGHTS.velocityTrend
-  );
+  // Reweight: redistribute weight from missing components proportionally
+  let totalWeight = 0;
+  const activeWeights: Record<string, number> = {};
+  for (const [key, weight] of Object.entries(WEIGHTS)) {
+    const val = rawComponents[key as keyof typeof rawComponents];
+    if (val >= 0) {
+      activeWeights[key] = weight;
+      totalWeight += weight;
+    }
+  }
 
-  const signals = generateSignals(milestoneStats, actionItemStats, raidStats, timelineStats);
+  const components: HealthScore["components"] = {
+    milestoneHealth: Math.max(0, milestoneScore),
+    actionItemHealth: Math.max(0, actionItemScore),
+    raidHealth: Math.max(0, raidScore),
+    timelinePressure: Math.max(0, timelineScore),
+    completionProgress: Math.max(0, completionScore),
+    engagementScore: Math.max(0, engagementScore),
+  };
+
+  let overall: number;
+  if (totalWeight === 0) {
+    overall = 50;
+  } else {
+    const normalizer = 1 / totalWeight;
+    overall = Math.round(
+      Object.entries(activeWeights).reduce((sum, [key, weight]) => {
+        return sum + components[key as keyof typeof components] * weight * normalizer;
+      }, 0)
+    );
+  }
+
+  const signals = generateSignals(milestoneStats, actionItemStats, raidStats, timelineStats, engagementStats, dataCoverage);
 
   return {
     project,
@@ -341,12 +496,14 @@ export function computeHealthScore(
       riskLevel: computeRiskLevel(overall),
       components,
       signals,
-      prediction: computePrediction(components, signals),
+      prediction: computePrediction(components, signals, history),
+      dataCoverage,
     },
     milestoneStats,
     actionItemStats,
     raidStats,
     timelineStats,
+    engagementStats,
   };
 }
 
@@ -399,4 +556,54 @@ export function computePortfolioAnalytics(projectAnalytics: ProjectAnalytics[]):
     },
     scWorkload,
   };
+}
+
+// --- Historical snapshot management ---
+
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { join } from "path";
+
+const HISTORY_FILE = join(process.cwd(), "config", "health-history.json");
+
+export function loadHealthHistory(): HealthSnapshot[] {
+  if (!existsSync(HISTORY_FILE)) return [];
+  try {
+    return JSON.parse(readFileSync(HISTORY_FILE, "utf-8"));
+  } catch {
+    return [];
+  }
+}
+
+export function saveHealthSnapshot(analytics: ProjectAnalytics[]): void {
+  const history = loadHealthHistory();
+  const today = new Date().toISOString().split("T")[0];
+
+  // Don't save more than once per day
+  if (history.length > 0 && history[history.length - 1].date === today) {
+    history[history.length - 1] = buildSnapshot(today, analytics);
+  } else {
+    history.push(buildSnapshot(today, analytics));
+  }
+
+  // Keep last 52 weeks
+  const trimmed = history.slice(-52);
+  writeFileSync(HISTORY_FILE, JSON.stringify(trimmed, null, 2) + "\n", "utf-8");
+}
+
+function buildSnapshot(date: string, analytics: ProjectAnalytics[]): HealthSnapshot {
+  const projects: HealthSnapshot["projects"] = {};
+  for (const pa of analytics) {
+    projects[pa.project.id] = {
+      overall: pa.healthScore.overall,
+      components: pa.healthScore.components,
+      riskLevel: pa.healthScore.riskLevel,
+    };
+  }
+  return { date, projects };
+}
+
+export function getProjectHistory(projectId: string, snapshots: HealthSnapshot[]): Array<{ date: string; overall: number }> {
+  return snapshots
+    .filter(s => s.projects[projectId])
+    .map(s => ({ date: s.date, overall: s.projects[projectId].overall }));
 }

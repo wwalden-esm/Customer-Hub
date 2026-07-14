@@ -5,6 +5,7 @@ import { getProjectById } from "@/lib/smartsheet-data";
 import { getProjectMilestoneComments, addMilestoneComment } from "@/lib/milestone-comments";
 import { sendNotificationEmail } from "@/lib/email";
 import { logAudit } from "@/lib/audit-log";
+import { addHubNotification } from "@/lib/hub-notification-store";
 
 export async function GET(
   _req: NextRequest,
@@ -108,7 +109,11 @@ export async function POST(
       if (!isEsmStaff) {
         // Customer posted — no notification back to them
       } else {
-        // ESM staff posted — notify customer contacts
+        addHubNotification(
+          id,
+          "New Milestone Comment",
+          `A new comment has been posted on milestone "${milestoneName || milestoneId}".`,
+        );
         for (const r of customerContacts) {
           await sendNotificationEmail(r, `New Communication — ${project.projectName}`, customerHtml);
         }

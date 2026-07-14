@@ -91,11 +91,11 @@ export default function AskQuestionForm({
             Ask Another Question
           </button>
           <a
-            href="/hub"
+            href="/hub/questions"
             className="text-sm font-medium px-4 py-2 rounded-card text-white transition-colors hover:opacity-90"
             style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
           >
-            Back to Dashboard
+            View My Questions
           </a>
         </div>
       </Card>

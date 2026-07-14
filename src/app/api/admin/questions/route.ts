@@ -4,6 +4,7 @@ import { getAllQuestions, getAllQuestionsAsync, replyToQuestion } from "@/lib/qu
 import { getProjectById } from "@/lib/smartsheet-data";
 import { sendNotificationEmail } from "@/lib/email";
 import { logAudit } from "@/lib/audit-log";
+import { addHubNotification } from "@/lib/hub-notification-store";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +42,16 @@ export async function PATCH(req: NextRequest) {
 
   logAudit(session.user.email || "unknown", "reply_question", question.projectId, "question", question.subject);
 
+  const project = getProjectById(question.projectId);
+  const projectName = project?.projectName || question.projectId;
+
+  addHubNotification(
+    question.projectId,
+    "New Reply",
+    `Your question "${question.subject}" has received a reply. View it in the Questions section.`,
+  );
+
   if (question.senderEmail && process.env.RESEND_API_KEY) {
-    const project = getProjectById(question.projectId);
-    const projectName = project?.projectName || question.projectId;
     const html = `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
         <span style="color: white; font-weight: bold; font-size: 18px;">New Communication</span>
@@ -55,10 +63,14 @@ export async function PATCH(req: NextRequest) {
       </div>
     </div>`;
     try {
+      console.log(`[REPLY] Sending reply notification email to ${question.senderEmail}`);
       await sendNotificationEmail(question.senderEmail, `New Communication — ${projectName}`, html);
+      console.log(`[REPLY] Email sent successfully`);
     } catch (err) {
       console.error("[REPLY] Failed to send reply email:", err);
     }
+  } else {
+    console.log(`[REPLY] Email not sent — senderEmail: ${question.senderEmail}, RESEND_API_KEY set: ${!!process.env.RESEND_API_KEY}`);
   }
 
   return NextResponse.json(question);

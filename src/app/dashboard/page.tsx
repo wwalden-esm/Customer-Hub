@@ -1,10 +1,12 @@
 import { auth } from "@/lib/auth";
 import { parseLocalDate } from "@/lib/date-utils";
 import { getProjectList, getSmartsheetConfig, getProjectMilestones, deriveCurrentPhase } from "@/lib/smartsheet-data";
+import { getAllQuestions } from "@/lib/question-store";
 import SyncHubSpotButton from "@/components/dashboard/SyncHubSpotButton";
 import SendNotificationsButton from "@/components/dashboard/SendNotificationsButton";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 import ProjectTable from "@/components/dashboard/ProjectTable";
+import ScWelcome from "@/components/dashboard/ScWelcome";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +17,7 @@ export default async function DashboardPage() {
 
   const userEmail = session?.user?.email || "";
   const userRole = session?.user?.role || "SC";
+  const userName = session?.user?.name || "there";
 
   const projects = userRole === "ADMIN"
     ? allProjects
@@ -45,8 +48,15 @@ export default async function DashboardPage() {
     };
   }));
 
+  const openQuestionCount = getAllQuestions().filter((q) => q.status === "open").length;
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      <ScWelcome
+        userName={userName}
+        projects={projectRows}
+        openQuestionCount={openQuestionCount}
+      />
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <SyncHubSpotButton />

@@ -22,7 +22,30 @@ function CustomerLoginForm() {
   const [loading, setLoading] = useState(false);
   const [contacts, setContacts] = useState<ContactOption[] | null>(null);
   const [selectedContact, setSelectedContact] = useState<string>("");
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const ids = { project: useId(), password: useId(), contact: useId(), error: useId() };
+
+  async function handleForgotPassword() {
+    if (!projectId) {
+      setError("Please enter your project ID first.");
+      return;
+    }
+    setResetLoading(true);
+    setError(null);
+    try {
+      await fetch("/api/auth/customer/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId }),
+      });
+      setResetSent(true);
+    } catch {
+      setError("Could not send reset request. Please contact your SC directly.");
+    } finally {
+      setResetLoading(false);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -192,6 +215,20 @@ function CustomerLoginForm() {
         >
           {loading ? "Signing in..." : "Sign in"}
         </Button>
+        {resetSent ? (
+          <p className="text-sm text-emerald-600 text-center mt-2">
+            Reset request sent. Your Solutions Consultant will contact you with a new password.
+          </p>
+        ) : (
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            disabled={resetLoading}
+            className="w-full text-sm text-esm-grey hover:text-esm-black py-1 transition-colors mt-1 disabled:opacity-50"
+          >
+            {resetLoading ? "Sending..." : "Forgot password?"}
+          </button>
+        )}
       </form>
     </Card>
   );

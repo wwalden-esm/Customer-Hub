@@ -2,6 +2,7 @@ import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import DarkModeToggle from "@/components/hub/DarkModeToggle";
 import HubToastProvider from "@/components/hub/HubToastProvider";
+import ActiveNavLink from "@/components/dashboard/ActiveNavLink";
 
 export default async function DashboardLayout({
   children,
@@ -15,56 +16,39 @@ export default async function DashboardLayout({
   const userRole = session.user.role || "SC";
   const userName = session.user.name || userEmail;
 
+  const navLinks = [
+    { href: "/dashboard", label: "Projects", exact: true },
+    { href: "/dashboard/analytics", label: "Analytics" },
+    { href: "/dashboard/questions", label: "Questions" },
+    { href: "/dashboard/meeting-guide", label: "Meeting Guide" },
+    { href: "/dashboard/settings", label: "Settings" },
+    { href: "/dashboard/users", label: "Users" },
+    ...(userRole === "ADMIN" ? [{ href: "/dashboard/audit", label: "Audit" }] : []),
+  ];
+
   return (
     <HubToastProvider>
       <div className="min-h-screen bg-esm-grey-light">
         <header className="bg-white border-b border-esm-border sticky top-0 z-30">
-          <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <a href="/dashboard" className="flex items-center gap-3 no-underline">
-                <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">
-                  ESM
-                </div>
-                <span className="text-lg font-semibold text-esm-black hidden sm:inline">
-                  Implementation Hub
-                </span>
-              </a>
-            </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-2">
+            <a href="/dashboard" className="flex items-center gap-2 no-underline shrink-0">
+              <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">
+                ESM
+              </div>
+              <span className="text-lg font-semibold text-esm-black hidden sm:inline">
+                Implementation Hub
+              </span>
+            </a>
 
-            <nav className="flex items-center gap-1">
-              <a
-                href="/dashboard"
-                className="text-sm text-esm-grey hover:text-esm-black px-2.5 py-1.5 rounded-card hover:bg-slate-50 transition-colors"
-              >
-                Projects
-              </a>
-              <a
-                href="/dashboard/analytics"
-                className="text-sm text-esm-grey hover:text-esm-black px-2.5 py-1.5 rounded-card hover:bg-slate-50 transition-colors"
-              >
-                Analytics
-              </a>
-              <a
-                href="/dashboard/meeting-guide"
-                className="text-sm text-esm-grey hover:text-esm-black px-2.5 py-1.5 rounded-card hover:bg-slate-50 transition-colors"
-              >
-                Meeting Guide
-              </a>
-              <a
-                href="/dashboard/settings"
-                className="text-sm text-esm-grey hover:text-esm-black px-2.5 py-1.5 rounded-card hover:bg-slate-50 transition-colors"
-              >
-                Settings
-              </a>
-              <a
-                href="/dashboard/users"
-                className="text-sm text-esm-grey hover:text-esm-black px-2.5 py-1.5 rounded-card hover:bg-slate-50 transition-colors"
-              >
-                Users
-              </a>
+            <nav className="flex items-center gap-1 overflow-x-auto min-w-0 flex-1 mx-2">
+              {navLinks.map((link) => (
+                <ActiveNavLink key={link.href} href={link.href} exact={link.exact}>
+                  {link.label}
+                </ActiveNavLink>
+              ))}
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
               <DarkModeToggle />
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-medium text-esm-black leading-tight">{userName}</p>

@@ -110,7 +110,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
     }
   }
 
-  const runBulk = useCallback(async (action: "link-sheets" | "refresh-metrics") => {
+  const runBulk = useCallback(async (action: "link-sheets" | "refresh-metrics" | "set-status", statusValue?: string) => {
     const ids = Array.from(selected).filter((id) => filteredIds.has(id));
     if (ids.length === 0) return;
 
@@ -123,10 +123,24 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
 
     for (let i = 0; i < ids.length; i++) {
       try {
-        const endpoint = action === "link-sheets"
-          ? `/api/projects/${ids[i]}/link-sheets`
-          : `/api/projects/${ids[i]}/metrics/refresh`;
-        const res = await fetch(endpoint, { method: "POST" });
+        let endpoint: string;
+        let method = "POST";
+        let body: string | undefined;
+
+        if (action === "link-sheets") {
+          endpoint = `/api/projects/${ids[i]}/link-sheets`;
+        } else if (action === "refresh-metrics") {
+          endpoint = `/api/projects/${ids[i]}/metrics/refresh`;
+        } else {
+          endpoint = `/api/projects/${ids[i]}/status`;
+          method = "PUT";
+          body = JSON.stringify({ status: statusValue });
+        }
+
+        const res = await fetch(endpoint, {
+          method,
+          ...(body ? { headers: { "Content-Type": "application/json" }, body } : {}),
+        });
         if (res.ok) successes++;
         else failures++;
       } catch {
@@ -135,7 +149,12 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
       setBulkProgress({ done: i + 1, total: ids.length });
     }
 
-    const label = action === "link-sheets" ? "Link Sheets" : "Refresh Metrics";
+    const labels: Record<string, string> = {
+      "link-sheets": "Link Sheets",
+      "refresh-metrics": "Refresh Metrics",
+      "set-status": `Set ${statusValue?.replace("_", " ")}`,
+    };
+    const label = labels[action] || action;
     const parts = [];
     if (successes) parts.push(`${successes} succeeded`);
     if (failures) parts.push(`${failures} failed`);
@@ -209,6 +228,23 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
             >
               {bulkAction === "refresh-metrics" ? `Refreshing ${bulkProgress?.done}/${bulkProgress?.total}...` : "Refresh Metrics"}
             </Button>
+            <span className="text-blue-300 mx-1">|</span>
+            <select
+              onChange={(e) => {
+                if (e.target.value) {
+                  runBulk("set-status", e.target.value);
+                  e.target.value = "";
+                }
+              }}
+              disabled={!!bulkAction}
+              className="text-xs border border-blue-300 rounded px-2 py-1 bg-white text-blue-800 disabled:opacity-50"
+              defaultValue=""
+            >
+              <option value="" disabled>Set Status...</option>
+              <option value="ON_TRACK">On Track</option>
+              <option value="AT_RISK">At Risk</option>
+              <option value="OFF_TRACK">Off Track</option>
+            </select>
           </div>
           <button
             onClick={() => setSelected(new Set())}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/Card";
 import type { PortfolioAnalytics, ProjectAnalytics, HealthScore } from "@/lib/health-score";
 
@@ -89,9 +89,10 @@ function Sparkline({ components }: { components: HealthScore["components"] }) {
     components.actionItemHealth,
     components.raidHealth,
     components.timelinePressure,
-    components.velocityTrend,
+    components.completionProgress,
+    components.engagementScore,
   ];
-  const w = 80;
+  const w = 96;
   const h = 24;
   const step = w / (vals.length - 1);
   const points = vals.map((v, i) => `${i * step},${h - (v / 100) * h}`).join(" ");
@@ -115,6 +116,62 @@ function Sparkline({ components }: { components: HealthScore["components"] }) {
         />
       ))}
     </svg>
+  );
+}
+
+function DataCoverageBar({ coverage }: { coverage: HealthScore["dataCoverage"] }) {
+  if (coverage.score === 100) return null;
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className="text-esm-muted">Data:</span>
+      <div className="flex-1 max-w-[120px]">
+        <MiniBar value={coverage.score} max={100} color={coverage.score >= 80 ? "#22c55e" : coverage.score >= 50 ? "#eab308" : "#ef4444"} />
+      </div>
+      <span className="text-esm-grey">{coverage.score}%</span>
+      {coverage.missing.length > 0 && (
+        <span className="text-amber-600" title={`Missing: ${coverage.missing.join(", ")}`}>
+          {coverage.missing.length} missing
+        </span>
+      )}
+    </div>
+  );
+}
+
+function FilterBar({ projects, filters, onFilterChange }: {
+  projects: ProjectAnalytics[];
+  filters: { sc: string; status: string; phase: string };
+  onFilterChange: (key: string, value: string) => void;
+}) {
+  const scs = [...new Set(projects.map(p => p.project.scName).filter(Boolean))].sort();
+  const statuses = [...new Set(projects.map(p => p.project.status).filter(Boolean))].sort();
+  const phases = [...new Set(projects.map(p => p.project.currentPhase).filter(Boolean))].sort();
+
+  const selectClass = "text-xs border border-esm-border rounded-card px-2 py-1.5 bg-white text-esm-black focus:outline-none focus:ring-1 focus:ring-esm-red";
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 mb-4">
+      <span className="text-xs text-esm-muted uppercase tracking-wider font-semibold">Filter:</span>
+      <select value={filters.sc} onChange={(e) => onFilterChange("sc", e.target.value)} className={selectClass}>
+        <option value="">All SCs</option>
+        {scs.map(sc => <option key={sc} value={sc}>{sc}</option>)}
+      </select>
+      <select value={filters.status} onChange={(e) => onFilterChange("status", e.target.value)} className={selectClass}>
+        <option value="">All Statuses</option>
+        {statuses.map(s => <option key={s} value={s}>{s}</option>)}
+      </select>
+      <select value={filters.phase} onChange={(e) => onFilterChange("phase", e.target.value)} className={selectClass}>
+        <option value="">All Phases</option>
+        {phases.map(p => <option key={p} value={p}>{p}</option>)}
+      </select>
+      {(filters.sc || filters.status || filters.phase) && (
+        <button
+          onClick={() => { onFilterChange("sc", ""); onFilterChange("status", ""); onFilterChange("phase", ""); }}
+          className="text-xs text-esm-red hover:text-esm-red-dark font-medium"
+        >
+          Clear
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -285,13 +342,14 @@ function ProjectHealthTable({ projects, onSelect }: { projects: ProjectAnalytics
 }
 
 function ProjectDetail({ pa, onClose }: { pa: ProjectAnalytics; onClose: () => void }) {
-  const { healthScore: hs, milestoneStats: ms, actionItemStats: ai, raidStats: rs, timelineStats: ts } = pa;
+  const { healthScore: hs, milestoneStats: ms, actionItemStats: ai, raidStats: rs, timelineStats: ts, engagementStats: es } = pa;
   const componentLabels = [
-    { key: "milestoneHealth" as const, label: "Milestones", weight: "30%" },
-    { key: "actionItemHealth" as const, label: "Action Items", weight: "25%" },
+    { key: "milestoneHealth" as const, label: "Milestones", weight: "25%" },
+    { key: "actionItemHealth" as const, label: "Action Items", weight: "20%" },
     { key: "raidHealth" as const, label: "RAID Log", weight: "15%" },
     { key: "timelinePressure" as const, label: "Timeline", weight: "15%" },
-    { key: "velocityTrend" as const, label: "Velocity", weight: "15%" },
+    { key: "completionProgress" as const, label: "Completion", weight: "15%" },
+    { key: "engagementScore" as const, label: "Engagement", weight: "10%" },
   ];
 
   return (
@@ -307,7 +365,9 @@ function ProjectDetail({ pa, onClose }: { pa: ProjectAnalytics; onClose: () => v
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <DataCoverageBar coverage={hs.dataCoverage} />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 mt-4">
         <div className="space-y-2">
           <p className="text-[10px] uppercase tracking-wider text-esm-muted font-semibold">Score Components</p>
           {componentLabels.map(({ key, label, weight }) => (
@@ -339,8 +399,8 @@ function ProjectDetail({ pa, onClose }: { pa: ProjectAnalytics; onClose: () => v
               <p className="text-[10px] text-esm-grey">{ai.overdue} overdue</p>
             </div>
             <div className="bg-slate-50 rounded-card p-2">
-              <p className="text-[10px] text-esm-muted">Open Risks</p>
-              <p className="text-sm font-semibold text-esm-black">{rs.openRisks}</p>
+              <p className="text-[10px] text-esm-muted">RAID</p>
+              <p className="text-sm font-semibold text-esm-black">{rs.openRisks}R / {rs.openIssues}I</p>
               <p className="text-[10px] text-esm-grey">{rs.blockedItems} blocked</p>
             </div>
             <div className="bg-slate-50 rounded-card p-2">
@@ -349,8 +409,20 @@ function ProjectDetail({ pa, onClose }: { pa: ProjectAnalytics; onClose: () => v
                 {ts.daysToGoLive !== null ? `${ts.daysToGoLive}d` : "—"}
               </p>
               <p className="text-[10px] text-esm-grey">
-                {ts.percentElapsed !== null ? `${ts.percentElapsed}% elapsed` : "No date set"}
+                {ts.progressGap !== null
+                  ? `${ts.progressGap > 0 ? "+" : ""}${ts.progressGap}% vs expected`
+                  : ts.percentElapsed !== null ? `${ts.percentElapsed}% elapsed` : "No date set"}
               </p>
+            </div>
+            <div className="bg-slate-50 rounded-card p-2">
+              <p className="text-[10px] text-esm-muted">Meetings</p>
+              <p className="text-sm font-semibold text-esm-black">{es.meetingsCompleted}/{es.meetingsTotal}</p>
+              <p className="text-[10px] text-esm-grey">{es.recapsSent} recaps sent</p>
+            </div>
+            <div className="bg-slate-50 rounded-card p-2">
+              <p className="text-[10px] text-esm-muted">Documents</p>
+              <p className="text-sm font-semibold text-esm-black">{es.documentsGenerated}</p>
+              <p className="text-[10px] text-esm-grey">generated</p>
             </div>
           </div>
         </div>
@@ -368,7 +440,7 @@ function ProjectDetail({ pa, onClose }: { pa: ProjectAnalytics; onClose: () => v
                 }`}
               >
                 <span className="flex-shrink-0">
-                  {s.type === "critical" ? "⚠" : s.type === "warning" ? "●" : "✓"}
+                  {s.type === "critical" ? "!" : s.type === "warning" ? "~" : "+"}
                 </span>
                 <span>{s.label}</span>
               </div>
@@ -504,7 +576,8 @@ function ComponentBreakdown({ projects }: { projects: ProjectAnalytics[] }) {
     { key: "actionItemHealth" as const, label: "Action Items" },
     { key: "raidHealth" as const, label: "RAID" },
     { key: "timelinePressure" as const, label: "Timeline" },
-    { key: "velocityTrend" as const, label: "Velocity" },
+    { key: "completionProgress" as const, label: "Completion" },
+    { key: "engagementScore" as const, label: "Engagement" },
   ];
 
   const avgs = labels.map(({ key, label }) => {
@@ -545,30 +618,89 @@ function ComponentBreakdown({ projects }: { projects: ProjectAnalytics[] }) {
   );
 }
 
-export default function AnalyticsDashboard({ portfolio }: Props) {
-  const [selectedProject, setSelectedProject] = useState<ProjectAnalytics | null>(null);
+function ExportButton({ contentRef }: { contentRef: React.RefObject<HTMLDivElement | null> }) {
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const res = await fetch("/api/analytics/export");
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const w = window.open(url, "_blank");
+      if (w) {
+        w.addEventListener("afterprint", () => URL.revokeObjectURL(url));
+      }
+    } catch {
+      window.print();
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
-    <div>
-      <SummaryCards portfolio={portfolio} />
+    <button
+      onClick={handleExport}
+      disabled={exporting}
+      className="text-xs border border-esm-border rounded-card px-3 py-1.5 text-esm-grey hover:text-esm-black hover:bg-slate-50 transition-colors disabled:opacity-50"
+    >
+      {exporting ? "Generating..." : "Export PDF"}
+    </button>
+  );
+}
+
+export default function AnalyticsDashboard({ portfolio }: Props) {
+  const [selectedProject, setSelectedProject] = useState<ProjectAnalytics | null>(null);
+  const [filters, setFilters] = useState({ sc: "", status: "", phase: "" });
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const filteredProjects = portfolio.projects.filter(pa => {
+    if (filters.sc && pa.project.scName !== filters.sc) return false;
+    if (filters.status && pa.project.status !== filters.status) return false;
+    if (filters.phase && pa.project.currentPhase !== filters.phase) return false;
+    return true;
+  });
+
+  const filteredPortfolio = {
+    ...portfolio,
+    projects: filteredProjects,
+  };
+
+  return (
+    <div ref={contentRef}>
+      <div className="flex items-center justify-between mb-4">
+        <FilterBar
+          projects={portfolio.projects}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
+        <ExportButton contentRef={contentRef} />
+      </div>
+
+      <SummaryCards portfolio={filteredPortfolio} />
 
       {selectedProject && (
         <ProjectDetail pa={selectedProject} onClose={() => setSelectedProject(null)} />
       )}
 
-      <HealthHeatmap projects={portfolio.projects} />
+      <HealthHeatmap projects={filteredProjects} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
-          <ProjectHealthTable projects={portfolio.projects} onSelect={setSelectedProject} />
+          <ProjectHealthTable projects={filteredProjects} onSelect={setSelectedProject} />
         </div>
         <div>
-          <RiskRadar projects={portfolio.projects} />
+          <RiskRadar projects={filteredProjects} />
           <ScWorkload workload={portfolio.scWorkload} />
         </div>
       </div>
 
-      <ComponentBreakdown projects={portfolio.projects} />
+      <ComponentBreakdown projects={filteredProjects} />
     </div>
   );
 }

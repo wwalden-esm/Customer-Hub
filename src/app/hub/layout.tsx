@@ -24,6 +24,8 @@ const ALL_NAV_ITEMS = [
   { href: "/hub/meetings", label: "Meetings", key: "meetings" },
   { href: "/hub/documents", label: "Documents", key: "documents" },
   { href: "/hub/recordings", label: "Recordings", key: "recordings" },
+  { href: "/hub/questions", label: "Questions", key: "questions" },
+  { href: "/hub/resources", label: "Resources", key: "resources" },
   { href: "/hub/help", label: "Help", key: "help" },
 ];
 

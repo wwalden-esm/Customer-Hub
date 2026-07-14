@@ -57,6 +57,13 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
+    if (id.startsWith("hn-")) {
+      fetch(`/api/projects/${projectId}/notifications`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationId: id }),
+      }).catch(() => {});
+    }
   }
 
   return (

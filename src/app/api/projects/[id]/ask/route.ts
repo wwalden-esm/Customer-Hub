@@ -77,17 +77,17 @@ export async function POST(req: NextRequest) {
   const emailSubject = subject || `${category} — ${project.projectName}`;
   if (process.env.RESEND_API_KEY) {
     try {
+      console.log(`[ASK] Sending question notification to staff: ${recipients.join(", ")}`);
       for (const recipient of recipients) {
         await sendNotificationEmail(recipient, emailSubject, staffHtml);
       }
+      console.log(`[ASK] Staff emails sent successfully`);
     } catch (err) {
       console.error("[ASK] Failed to send email:", err);
       return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
     }
   } else {
-    console.log(`[ASK] Email not configured — RESEND_API_KEY is empty`);
-    console.log(`[ASK] Would send to staff: ${recipients.join(", ")}\nSubject: ${emailSubject}`);
-    if (senderEmail) console.log(`[ASK] Would send to customer: ${senderEmail}\n`);
+    console.log(`[ASK] Email not configured — RESEND_API_KEY set: ${!!process.env.RESEND_API_KEY}`);
   }
 
   return NextResponse.json({ ok: true, questionId: question.id, subject, recipients: recipients.length });

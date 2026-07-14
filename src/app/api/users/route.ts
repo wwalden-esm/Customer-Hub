@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { auth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit-log";
 import crypto from "crypto";
 import bcryptjs from "bcryptjs";
 
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
   const hash = bcryptjs.hashSync(password, 10);
   users.push({ email, name, role, password: hash });
   saveUsers(users);
+  logAudit(session.user.email || "unknown", "create_user", email, "user", `Role: ${role}`);
 
   return NextResponse.json({ email, name, role, password }, { status: 201 });
 }
@@ -98,6 +100,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   saveUsers(filtered);
+  logAudit(session.user.email || "unknown", "delete_user", email, "user");
   return NextResponse.json({ ok: true });
 }
 
@@ -126,12 +129,14 @@ export async function PATCH(req: NextRequest) {
     }
     user.role = role;
     saveUsers(users);
+    logAudit(session.user.email || "unknown", "change_role", email, "user", `New role: ${role}`);
     return NextResponse.json({ email: user.email, role: user.role });
   }
 
   const newPassword = generatePassword();
   user.password = bcryptjs.hashSync(newPassword, 10);
   saveUsers(users);
+  logAudit(session.user.email || "unknown", "reset_password", email, "user");
 
   return NextResponse.json({ email: user.email, password: newPassword });
 }

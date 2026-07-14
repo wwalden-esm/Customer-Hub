@@ -9,5 +9,19 @@
     "id": "q-1783979054117-eh7e",
     "createdAt": "2026-07-13T21:44:14.117Z",
     "status": "open"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "category": "Technical Issue",
+    "subject": "Technical issue",
+    "message": "Technical issue question",
+    "senderName": "Customer",
+    "senderEmail": "customer@portal",
+    "id": "q-1784034759062-d7u6",
+    "createdAt": "2026-07-14T13:12:39.062Z",
+    "status": "replied",
+    "reply": "Issue Reply Text",
+    "repliedBy": "Whitney Walden",
+    "repliedAt": "2026-07-14T13:13:45.325Z"
   }
 ]

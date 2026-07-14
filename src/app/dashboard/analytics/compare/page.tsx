@@ -10,17 +10,15 @@ import {
 } from "@/lib/smartsheet-data";
 import {
   computeHealthScore,
-  computePortfolioAnalytics,
   loadHealthHistory,
-  saveHealthSnapshot,
   getProjectHistory,
 } from "@/lib/health-score";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
-import AnalyticsDashboard from "@/components/dashboard/AnalyticsDashboard";
+import CompareView from "@/components/dashboard/CompareView";
 
 export const dynamic = "force-dynamic";
 
-export default async function AnalyticsPage() {
+export default async function ComparePage() {
   const session = await auth();
   const allProjects = getProjectList();
 
@@ -48,37 +46,17 @@ export default async function AnalyticsPage() {
     })
   );
 
-  saveHealthSnapshot(projectAnalytics);
-  const portfolio = computePortfolioAnalytics(projectAnalytics);
-
   return (
     <div>
-      <DashboardBreadcrumb items={[{ label: "Analytics" }]} />
+      <DashboardBreadcrumb items={[{ label: "Analytics", href: "/dashboard/analytics" }, { label: "Compare" }]} />
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-semibold text-esm-black">
-                Portfolio Health & Analytics
-              </h1>
-              <p className="text-sm text-esm-grey mt-1">
-                Predictive health scoring across {portfolio.summary.totalProjects} active project{portfolio.summary.totalProjects === 1 ? "" : "s"}
-              </p>
-            </div>
-            {portfolio.summary.totalProjects > 1 && (
-              <a
-                href="/dashboard/analytics/compare"
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-esm-border rounded-card hover:bg-gray-50 transition-colors text-esm-black"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                </svg>
-                Compare Projects
-              </a>
-            )}
-          </div>
+          <h1 className="text-xl font-semibold text-esm-black">Compare Projects</h1>
+          <p className="text-sm text-esm-grey mt-1">
+            Side-by-side comparison of project health and metrics
+          </p>
         </div>
-        <AnalyticsDashboard portfolio={portfolio} />
+        <CompareView allProjects={projectAnalytics} />
       </div>
     </div>
   );

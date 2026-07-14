@@ -35,5 +35,11 @@ export async function sendMagicLinkEmail(to: string, customerName: string, link:
 }
 
 export async function sendNotificationEmail(to: string, subject: string, html: string) {
-  await getResend().emails.send({ from: getFrom(), to, subject, html });
+  const result = await getResend().emails.send({ from: getFrom(), to, subject, html });
+  if ("error" in result && result.error) {
+    console.error(`[EMAIL] Resend error sending to ${to}:`, result.error);
+    throw new Error(`Resend error: ${JSON.stringify(result.error)}`);
+  }
+  console.log(`[EMAIL] Sent to ${to}: "${subject}"`);
+  return result;
 }

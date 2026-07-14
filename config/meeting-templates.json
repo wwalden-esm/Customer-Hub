@@ -1,0 +1,63 @@
+{
+  "templates": [
+    {
+      "id": "weekly-status",
+      "name": "Weekly Status Meeting",
+      "duration": 30,
+      "sections": [
+        { "title": "Project Health Review", "prompt": "Current health status, any status changes since last week" },
+        { "title": "Milestone Progress", "prompt": "Milestones completed, in progress, or blocked" },
+        { "title": "Action Items Review", "prompt": "Overdue items, new items assigned, items completed" },
+        { "title": "RAID Log Updates", "prompt": "New risks/issues, resolved items, escalations" },
+        { "title": "Next Steps", "prompt": "Key priorities for next week" }
+      ]
+    },
+    {
+      "id": "kickoff",
+      "name": "Project Kickoff",
+      "duration": 60,
+      "sections": [
+        { "title": "Introductions", "prompt": "Team members, roles, and responsibilities" },
+        { "title": "Project Overview", "prompt": "Scope, objectives, licensed products" },
+        { "title": "Timeline & Milestones", "prompt": "Key dates, phases, go-live target" },
+        { "title": "Communication Plan", "prompt": "Meeting cadence, escalation paths, portal access" },
+        { "title": "Intake Process", "prompt": "Next steps for data gathering and discovery" },
+        { "title": "Questions & Action Items", "prompt": "Open questions and immediate next steps" }
+      ]
+    },
+    {
+      "id": "uat-review",
+      "name": "UAT Review",
+      "duration": 45,
+      "sections": [
+        { "title": "Testing Progress", "prompt": "Test cases completed, pass/fail rates" },
+        { "title": "Defects & Issues", "prompt": "Open defects, severity, resolution timeline" },
+        { "title": "Sign-Off Status", "prompt": "Areas ready for sign-off, remaining blockers" },
+        { "title": "Next Steps", "prompt": "Remaining test scenarios and timeline" }
+      ]
+    },
+    {
+      "id": "go-no-go",
+      "name": "Go / No-Go Decision",
+      "duration": 60,
+      "sections": [
+        { "title": "Readiness Checklist", "prompt": "Review each readiness criteria" },
+        { "title": "Open Items", "prompt": "Remaining action items and their risk" },
+        { "title": "Rollback Plan", "prompt": "Contingency and rollback procedures" },
+        { "title": "Decision", "prompt": "Go or No-Go determination with rationale" },
+        { "title": "Post Go-Live Plan", "prompt": "Hypercare schedule and support contacts" }
+      ]
+    },
+    {
+      "id": "executive-steering",
+      "name": "Executive Steering Committee",
+      "duration": 30,
+      "sections": [
+        { "title": "Executive Summary", "prompt": "High-level project status and health" },
+        { "title": "Key Decisions Needed", "prompt": "Items requiring executive approval" },
+        { "title": "Risk Escalations", "prompt": "Risks that need executive attention" },
+        { "title": "Budget & Timeline", "prompt": "Any changes to scope, budget, or timeline" }
+      ]
+    }
+  ]
+}

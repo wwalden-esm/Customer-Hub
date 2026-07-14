@@ -1,0 +1,19 @@
+[
+  {
+    "date": "2026-07-13",
+    "projects": {
+      "rob-smith-consulting": {
+        "overall": 62,
+        "components": {
+          "milestoneHealth": 73,
+          "actionItemHealth": 0,
+          "raidHealth": 39,
+          "timelinePressure": 95,
+          "completionProgress": 26,
+          "engagementScore": 76
+        },
+        "riskLevel": "moderate"
+      }
+    }
+  }
+]
