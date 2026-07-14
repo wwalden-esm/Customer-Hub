@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { getHubDashboardData } from "@/lib/hub-data";
+import { getProjectConfirmations } from "@/lib/checklist-store";
+import { getProjectMilestoneComments, getProjectMilestoneCommentsAsync } from "@/lib/milestone-comments";
 
 export async function generateMetadata(): Promise<Metadata> {
   const session = await getCustomerSession();
@@ -38,6 +40,27 @@ export default async function HubDashboard() {
   if (!data) redirect("/hub/login");
 
   const { metrics, daysToGoLive, daysElapsed, totalDays, intakePercent, project, upcomingMeetings } = data;
+  let milestoneComments;
+  try {
+    milestoneComments = await getProjectMilestoneCommentsAsync(session.projectId);
+  } catch {
+    milestoneComments = getProjectMilestoneComments(session.projectId);
+  }
+  const commentAuthors = [
+    ...(project.contacts || []).map((c) => ({ name: c.name, email: c.email })),
+    ...(project.executiveSponsorName ? [{ name: project.executiveSponsorName, email: project.executiveSponsorEmail || "" }] : []),
+    ...(project.projectChampionName ? [{ name: project.projectChampionName, email: project.projectChampionEmail || "" }] : []),
+    ...(project.scName ? [{ name: project.scName, email: project.scEmail || "" }] : []),
+    ...(project.pmName ? [{ name: project.pmName, email: project.pmEmail || "" }] : []),
+    ...(project.saName ? [{ name: project.saName, email: project.saEmail || "" }] : []),
+  ].filter((a, i, arr) => a.name && arr.findIndex((b) => b.name === a.name) === i);
+
+  const checklistConfirmations = getProjectConfirmations(session.projectId).map((c) => ({
+    itemKey: c.itemKey,
+    confirmedBy: c.confirmedBy,
+    confirmedAt: c.confirmedAt,
+    note: c.note,
+  }));
   const milestoneMetric = metrics.find((m) => m.metricType === "milestone");
   const integMetric = metrics.find((m) => m.metricType === "integration");
   const meetingsMetric = metrics.find((m) => m.metricType === "meetings");
@@ -295,7 +318,7 @@ export default async function HubDashboard() {
           ══════════════════════════════════════════════ */}
 
       <CollapsibleSection id="milestones" title="Project Milestones" className="mb-5">
-        <MilestoneLine milestones={data.milestones.filter((m) => m.isMilestone || m.level === 1)} />
+        <MilestoneLine milestones={data.milestones.filter((m) => m.isMilestone || m.level === 1)} projectId={session.projectId} initialComments={milestoneComments} commentAuthors={commentAuthors} />
       </CollapsibleSection>
 
       <CollapsibleSection id="open-actions" title="Open Action Items" subtitle={`${data.actionItems.length} open`} className="mb-5">
@@ -340,7 +363,7 @@ export default async function HubDashboard() {
 
       <CollapsibleSection id="go-live-readiness" title="Go-Live Readiness" className="mb-5">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <GoLiveReadiness items={data.goLiveReadiness} daysToGoLive={daysToGoLive} />
+          <GoLiveReadiness items={data.goLiveReadiness} daysToGoLive={daysToGoLive} projectId={session.projectId} confirmations={checklistConfirmations} />
           {data.trainingProgress && (
             <TrainingProgress completed={data.trainingProgress.completed} total={data.trainingProgress.total} />
           )}

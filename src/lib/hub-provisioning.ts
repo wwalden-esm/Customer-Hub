@@ -459,6 +459,8 @@ const SHEET_NAME_MAP: Record<string, string> = {
   "meeting tracker": "meetingTrackerSheetId",
   "project info": "projectInfoSheetId",
   "metrics": "metricsSheetId",
+  "customer questions": "questionsSheetId",
+  "milestone comments": "milestoneCommentsSheetId",
 };
 
 export interface LinkResult {

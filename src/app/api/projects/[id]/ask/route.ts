@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { sendNotificationEmail } from "@/lib/email";
+import { addQuestion } from "@/lib/question-store";
+import { logAudit } from "@/lib/audit-log";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -26,13 +28,14 @@ export async function POST(req: NextRequest) {
 
   const scEmail = project.scEmail;
   const saEmail = project.saEmail;
-  const recipients = [scEmail, saEmail].filter(Boolean) as string[];
+  const pmEmail = project.pmEmail;
+  const recipients = [scEmail, saEmail, pmEmail].filter(Boolean) as string[];
 
   if (recipients.length === 0) {
     return NextResponse.json({ error: "No team contacts configured" }, { status: 500 });
   }
 
-  const htmlBody = `
+  const staffHtml = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
         <span style="color: white; font-weight: bold; font-size: 18px;">Customer Hub — New Question</span>
@@ -59,13 +62,23 @@ export async function POST(req: NextRequest) {
           Sent from the ESM Implementation Customer Hub
         </p>
       </div>
-    </div>
-  `;
+    </div>`;
 
+  const question = addQuestion({
+    projectId,
+    category,
+    subject: subject || `${category} — ${project.projectName}`,
+    message,
+    senderName,
+    senderEmail,
+  });
+  logAudit(senderEmail || senderName, "ask_question", projectId, "question", category);
+
+  const emailSubject = subject || `${category} — ${project.projectName}`;
   if (process.env.RESEND_API_KEY) {
     try {
       for (const recipient of recipients) {
-        await sendNotificationEmail(recipient, subject, htmlBody);
+        await sendNotificationEmail(recipient, emailSubject, staffHtml);
       }
     } catch (err) {
       console.error("[ASK] Failed to send email:", err);
@@ -73,8 +86,9 @@ export async function POST(req: NextRequest) {
     }
   } else {
     console.log(`[ASK] Email not configured — RESEND_API_KEY is empty`);
-    console.log(`[ASK] Would send to: ${recipients.join(", ")}\nSubject: ${subject}\n`);
+    console.log(`[ASK] Would send to staff: ${recipients.join(", ")}\nSubject: ${emailSubject}`);
+    if (senderEmail) console.log(`[ASK] Would send to customer: ${senderEmail}\n`);
   }
 
-  return NextResponse.json({ ok: true, subject, recipients: recipients.length });
+  return NextResponse.json({ ok: true, questionId: question.id, subject, recipients: recipients.length });
 }

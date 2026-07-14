@@ -20,6 +20,8 @@ export interface SmartsheetConfig {
   integrationTrackerSheetId?: string;
   meetingTrackerSheetId?: string;
   projectInfoSheetId?: string;
+  questionsSheetId?: string;
+  milestoneCommentsSheetId?: string;
 }
 
 export interface Project {

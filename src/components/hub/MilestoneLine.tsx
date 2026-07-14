@@ -1,9 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { HubMilestone } from "@/types/hub";
 import { parseLocalDate } from "@/lib/date-utils";
 import { SectionLabel, Card } from "@/components/ui";
+
+interface MilestoneComment {
+  id: string;
+  milestoneId: string;
+  message: string;
+  authorName: string;
+  createdAt: string;
+}
+
+interface CommentAuthor {
+  name: string;
+  email: string;
+}
+
+interface MilestoneLineProps {
+  milestones: HubMilestone[];
+  projectId: string;
+  initialComments?: MilestoneComment[];
+  commentAuthors?: CommentAuthor[];
+}
 
 function fmtShort(d: string) {
   return parseLocalDate(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -13,8 +33,12 @@ function fmtFull(d: string) {
   return parseLocalDate(d).toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric", year: "numeric" });
 }
 
-export default function MilestoneLine({ milestones }: { milestones: HubMilestone[] }) {
+export default function MilestoneLine({ milestones, projectId, initialComments = [], commentAuthors = [] }: MilestoneLineProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [comments, setComments] = useState<MilestoneComment[]>(initialComments);
+  const [newComment, setNewComment] = useState("");
+  const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [posting, setPosting] = useState(false);
   const completed = milestones.filter((m) => m.status === "complete").length;
   const railPct = milestones.length > 1 ? (completed / (milestones.length - 1)) * 100 : 0;
 
@@ -26,6 +50,34 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
   };
 
   const expanded = expandedId ? milestones.find((m) => m.id === expandedId) : null;
+  const expandedComments = expandedId
+    ? comments.filter((c) => c.milestoneId === expandedId)
+    : [];
+
+  const handlePostComment = useCallback(async () => {
+    if (!expandedId || !newComment.trim()) return;
+    const author = commentAuthors.find((a) => a.name === selectedAuthor);
+    setPosting(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/milestones/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          milestoneId: expandedId,
+          milestoneName: expanded?.name || expandedId,
+          message: newComment.trim(),
+          ...(author ? { authorName: author.name, authorEmail: author.email } : {}),
+        }),
+      });
+      if (res.ok) {
+        const comment = await res.json();
+        setComments((prev) => [...prev, comment]);
+        setNewComment("");
+      }
+    } finally {
+      setPosting(false);
+    }
+  }, [expandedId, newComment, projectId, selectedAuthor, commentAuthors]);
 
   return (
     <section className="mb-5" aria-labelledby="milestones-heading">
@@ -46,6 +98,7 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
             const isI = m.status === "in-progress";
             const isH = m.status === "on-hold";
             const isExpanded = expandedId === m.id;
+            const commentCount = comments.filter((c) => c.milestoneId === m.id).length;
 
             const dotStyle: React.CSSProperties = isC
               ? { backgroundColor: "var(--hub-accent)", borderColor: "var(--hub-accent)" }
@@ -110,6 +163,14 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
                       {m.phase}
                     </span>
                   )}
+                  {commentCount > 0 && (
+                    <div className="flex items-center justify-center gap-0.5 mt-1 text-[10px] text-esm-muted">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      {commentCount}
+                    </div>
+                  )}
                 </button>
               </div>
             );
@@ -117,7 +178,6 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
         </div>
       </div>
 
-      {/* Expanded detail panel */}
       {expanded && (
         <div className="mt-4 p-4 border border-esm-border rounded-card bg-gray-50 animate-in slide-in-from-top-1">
           <div className="flex items-start justify-between">
@@ -159,6 +219,60 @@ export default function MilestoneLine({ milestones }: { milestones: HubMilestone
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Comments section */}
+          <div className="mt-4 pt-3 border-t border-esm-border">
+            <p className="text-[10px] font-bold text-esm-grey uppercase tracking-wider mb-2">
+              Comments {expandedComments.length > 0 && `(${expandedComments.length})`}
+            </p>
+            {expandedComments.length > 0 && (
+              <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
+                {expandedComments.map((c) => (
+                  <div key={c.id} className="bg-white rounded-card px-3 py-2 border border-esm-border">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-xs font-medium text-esm-black">{c.authorName}</span>
+                      <span className="text-[10px] text-esm-muted">
+                        {new Date(c.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </span>
+                    </div>
+                    <p className="text-xs text-esm-grey whitespace-pre-wrap">{c.message}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {commentAuthors.length > 0 && (
+              <div className="mb-2">
+                <select
+                  value={selectedAuthor}
+                  onChange={(e) => setSelectedAuthor(e.target.value)}
+                  className="text-xs border border-esm-border rounded-card px-3 py-1.5 bg-white focus:outline-none focus:border-esm-black w-full sm:w-auto"
+                >
+                  <option value="">Select your name...</option>
+                  {commentAuthors.map((a) => (
+                    <option key={a.email || a.name} value={a.name}>{a.name}{a.email ? ` (${a.email})` : ""}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !posting && handlePostComment()}
+                placeholder="Add a comment..."
+                className="flex-1 text-xs border border-esm-border rounded-card px-3 py-1.5 focus:outline-none focus:border-esm-black"
+              />
+              <button
+                onClick={handlePostComment}
+                disabled={posting || !newComment.trim() || (commentAuthors.length > 0 && !selectedAuthor)}
+                className="text-xs font-medium px-3 py-1.5 rounded-card text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+              >
+                {posting ? "..." : "Post"}
+              </button>
+            </div>
           </div>
         </div>
       )}

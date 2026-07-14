@@ -120,6 +120,96 @@ function buildEmailHtml(project: Project, items: ClassifiedItem[]): string {
     </div>`;
 }
 
+export async function sendDocumentNotification(
+  project: Project,
+  documentName: string,
+  recipientEmail: string,
+): Promise<void> {
+  if (!process.env.RESEND_API_KEY) return;
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
+        <span style="color: white; font-weight: bold; font-size: 18px;">New Document Available</span>
+      </div>
+      <div style="background: #ffffff; padding: 24px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 8px 8px;">
+        <p style="font-size: 14px; color: #6B7280; margin: 0 0 8px;">Project: ${project.customerName}</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1F2937; margin: 0 0 16px;">
+          A new document has been uploaded: <strong>${documentName}</strong>
+        </p>
+        <p style="font-size: 14px; color: #374151; margin: 0;">
+          Visit your implementation hub to view and download the document.
+        </p>
+      </div>
+    </div>`;
+  await sendNotificationEmail(
+    recipientEmail,
+    `[${project.customerName}] New Document: ${documentName}`,
+    html,
+  );
+}
+
+export async function sendMeetingRecapNotification(
+  project: Project,
+  meetingTitle: string,
+  recipientEmails: string[],
+): Promise<void> {
+  if (!process.env.RESEND_API_KEY) return;
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
+        <span style="color: white; font-weight: bold; font-size: 18px;">Meeting Recap Available</span>
+      </div>
+      <div style="background: #ffffff; padding: 24px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 8px 8px;">
+        <p style="font-size: 14px; color: #6B7280; margin: 0 0 8px;">Project: ${project.customerName}</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1F2937; margin: 0 0 16px;">${meetingTitle}</p>
+        <p style="font-size: 14px; color: #374151; margin: 0;">
+          A meeting recap has been posted. Visit your implementation hub to review the details and action items.
+        </p>
+      </div>
+    </div>`;
+  for (const email of recipientEmails) {
+    try {
+      await sendNotificationEmail(
+        email,
+        `[${project.customerName}] Meeting Recap: ${meetingTitle}`,
+        html,
+      );
+    } catch (err) {
+      console.error(`[NOTIFY] Failed recap email to ${email}:`, err);
+    }
+  }
+}
+
+export async function sendStatusChangeNotification(
+  project: Project,
+  newStatus: string,
+  recipientEmail: string,
+): Promise<void> {
+  if (!process.env.RESEND_API_KEY) return;
+  const statusLabel = newStatus.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const statusColor = newStatus === "ON_TRACK" ? "#22c55e" : newStatus === "AT_RISK" ? "#eab308" : "#ef4444";
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #F4333F; padding: 16px 24px; border-radius: 8px 8px 0 0;">
+        <span style="color: white; font-weight: bold; font-size: 18px;">Project Status Update</span>
+      </div>
+      <div style="background: #ffffff; padding: 24px; border: 1px solid #e5e7eb; border-top: 0; border-radius: 0 0 8px 8px;">
+        <p style="font-size: 14px; color: #6B7280; margin: 0 0 8px;">Project: ${project.customerName}</p>
+        <p style="font-size: 16px; margin: 0 0 16px;">
+          Status changed to: <span style="color: ${statusColor}; font-weight: 600;">${statusLabel}</span>
+        </p>
+        <p style="font-size: 14px; color: #374151; margin: 0;">
+          Visit your implementation hub for details.
+        </p>
+      </div>
+    </div>`;
+  await sendNotificationEmail(
+    recipientEmail,
+    `[${project.customerName}] Status: ${statusLabel}`,
+    html,
+  );
+}
+
 export async function checkAndSendNotifications(): Promise<NotificationSummary> {
   const summary: NotificationSummary = { sent: [], skipped: 0, errors: [] };
   const now = new Date();

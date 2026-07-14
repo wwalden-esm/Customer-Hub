@@ -86,10 +86,19 @@ export interface HubDeadline {
 }
 
 export interface GoLiveReadinessItem {
+  key: string;
   label: string;
   done: boolean;
   detail: string | null;
   href?: string;
+  customerConfirmable?: boolean;
+}
+
+export interface ChecklistConfirmationInfo {
+  itemKey: string;
+  confirmedBy: string;
+  confirmedAt: string;
+  note?: string;
 }
 
 export interface HubDashboardData {
@@ -102,6 +111,13 @@ export interface HubDashboardData {
     scEmail: string;
     pmName?: string;
     pmEmail?: string;
+    saName?: string;
+    saEmail?: string;
+    executiveSponsorName?: string;
+    executiveSponsorEmail?: string;
+    projectChampionName?: string;
+    projectChampionEmail?: string;
+    contacts?: Array<{ name: string; email: string; role?: string }>;
     startDate: string | null;
     goLiveDate: string | null;
     currentPhase: string;

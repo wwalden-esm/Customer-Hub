@@ -239,42 +239,51 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
 
   const goLiveReadiness: GoLiveReadinessItem[] = [
     {
+      key: "intake-complete",
       label: "Intake Complete",
       done: intakePercent >= 100,
       detail: intakePercent > 0 ? `${intakePercent}% complete` : null,
       href: "/hub/intake",
     },
     {
+      key: "milestones-complete",
       label: "All Milestones Complete",
       done: totalMilestones.length > 0 && completedMilestones.length === totalMilestones.length,
       detail: totalMilestones.length > 0 ? `${completedMilestones.length} of ${totalMilestones.length}` : null,
     },
     {
+      key: "integrations-live",
       label: "Integrations Live",
       done: integrations.length > 0 && completedIntegrations.length === integrations.length,
       detail: integrations.length > 0 ? `${completedIntegrations.length} of ${integrations.length}` : null,
     },
     {
+      key: "meetings-held",
       label: "All Meetings Held",
       done: totalMeetings > 0 && completedMeetings.length === totalMeetings,
       detail: totalMeetings > 0 ? `${completedMeetings.length} of ${totalMeetings}` : null,
       href: "/hub/meetings",
     },
     {
+      key: "raid-clear",
       label: "No Open RAID Items",
       done: allRaidItems.length > 0 && allRaidItems.filter((r) => r.status !== "Complete").length === 0,
       detail: allRaidItems.length > 0 ? `${allRaidItems.filter((r) => r.status !== "Complete").length} open` : null,
       href: "/hub/raid-log",
     },
     {
+      key: "uat-signoff",
       label: "UAT Sign-Off",
       done: milestones.some((m) => m.name.toLowerCase().includes("uat") && m.status === "complete"),
       detail: null,
+      customerConfirmable: true,
     },
     {
+      key: "training-complete",
       label: "Training Complete",
       done: milestones.some((m) => m.name.toLowerCase().includes("training") && m.status === "complete"),
       detail: null,
+      customerConfirmable: true,
     },
   ];
 
@@ -315,6 +324,13 @@ export async function getHubDashboardData(projectId: string, contactName?: strin
       scEmail: project.scEmail,
       pmName: project.pmName,
       pmEmail: project.pmEmail,
+      saName: project.saName,
+      saEmail: project.saEmail,
+      executiveSponsorName: project.executiveSponsorName,
+      executiveSponsorEmail: project.executiveSponsorEmail,
+      projectChampionName: project.projectChampionName,
+      projectChampionEmail: project.projectChampionEmail,
+      contacts: project.contacts,
       startDate,
       goLiveDate: project.goLiveDate ?? null,
       currentPhase: deriveCurrentPhase(rawMilestones, project.currentPhase),

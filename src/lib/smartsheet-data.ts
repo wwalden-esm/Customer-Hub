@@ -43,6 +43,21 @@ export function getSmartsheetConfig(id: string): SmartsheetConfig {
   return (p?.smartsheetConfig ?? {}) as SmartsheetConfig;
 }
 
+export function saveSmartsheetConfigField(projectId: string, field: string, value: string): void {
+  const { readFileSync, writeFileSync } = require("fs");
+  const { join } = require("path");
+  const configPath = join(process.cwd(), "config", "projects.json");
+  const all = JSON.parse(readFileSync(configPath, "utf-8"));
+  if (!all[projectId]) return;
+  if (!all[projectId].smartsheetConfig) all[projectId].smartsheetConfig = {};
+  all[projectId].smartsheetConfig[field] = value;
+  writeFileSync(configPath, JSON.stringify(all, null, 2) + "\n", "utf-8");
+  // Update in-memory cache
+  if (projects[projectId]) {
+    (projects[projectId].smartsheetConfig as Record<string, string>)[field] = value;
+  }
+}
+
 export function getSheetPermalinks(config: SmartsheetConfig): Record<string, string | undefined> {
   const result: Record<string, string | undefined> = {};
   const keys = [
