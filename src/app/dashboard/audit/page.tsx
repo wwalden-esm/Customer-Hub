@@ -1,24 +1,31 @@
-import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getAuditLog } from "@/lib/audit-log";
-import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 import AuditLogClient from "@/components/dashboard/AuditLogClient";
+import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 
-export const metadata: Metadata = { title: "Audit Trail" };
 export const dynamic = "force-dynamic";
 
 export default async function AuditPage() {
   const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") redirect("/dashboard");
 
-  const entries = getAuditLog({ limit: 200 });
+  // Admin-only access
+  if (session?.user?.role !== "ADMIN") {
+    redirect("/dashboard");
+  }
+
+  const entries = getAuditLog();
 
   return (
     <div>
-      <DashboardBreadcrumb items={[{ label: "Audit Trail" }]} />
+      <DashboardBreadcrumb items={[{ label: "Audit Log" }]} />
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <h1 className="text-xl font-semibold text-esm-black mb-6">Audit Trail</h1>
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold text-esm-black">Audit Log</h1>
+          <p className="text-sm text-esm-grey mt-1">
+            System activity log — admin only
+          </p>
+        </div>
         <AuditLogClient entries={entries} />
       </div>
     </div>

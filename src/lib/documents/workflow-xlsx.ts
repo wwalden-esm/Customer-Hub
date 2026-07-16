@@ -13,11 +13,11 @@ export async function generateWorkflowXlsx(
   const tplPath = templatePath || path.join(getTemplatesDir(), TEMPLATE_FILE);
   const templateBuffer = await readFile(tplPath);
 
-  // Step 1: Use JSZip to replace [Customer Name] in shared strings (preserves formatting)
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const JSZip = require("jszip");
   const zip = await JSZip.loadAsync(templateBuffer);
 
+  // Replace [Customer Name] in shared strings
   const ssFile = zip.file("xl/sharedStrings.xml");
   if (ssFile) {
     const ssXml: string = await ssFile.async("string");
@@ -25,7 +25,7 @@ export async function generateWorkflowXlsx(
     zip.file("xl/sharedStrings.xml", replaced);
   }
 
-  // Replace in sheet XML too (inline strings)
+  // Replace in sheet XML inline strings
   const sheetFiles = Object.keys(zip.files).filter((f: string) =>
     f.match(/xl\/worksheets\/sheet\d+\.xml/)
   );
@@ -36,30 +36,42 @@ export async function generateWorkflowXlsx(
     }
   }
 
-  // Step 2: Generate the modified XLSX buffer with customer name replaced
   const modifiedBuffer = await zip.generateAsync({ type: "nodebuffer" });
 
-  // Step 3: Now use SheetJS to write data into cells (this re-reads the modified file)
   const workbook = XLSX.read(modifiedBuffer, { type: "buffer" });
 
-  const stepSheetMap = buildStepSheetMap(workbook.SheetNames);
+  // Build map of template step sheets (sheet index -> sheet name)
+  const templateSteps = buildStepSheetMap(workbook.SheetNames);
 
-  for (const [sheetName, stepKey] of Object.entries(stepSheetMap)) {
-    const step = workflowData.workflow_steps[stepKey];
-    if (!step || !step.active || step.rules.length === 0) continue;
+  // Get active steps sorted by priority
+  const activeSteps = Object.entries(workflowData.workflow_steps)
+    .filter(([, step]) => step.active && step.rules.length > 0)
+    .sort(([, a], [, b]) => a.priority - b.priority);
+
+  // Map customer steps to template sheets in order
+  const templateSheetNames = Object.keys(templateSteps);
+
+  for (let i = 0; i < activeSteps.length && i < templateSheetNames.length; i++) {
+    const sheetName = templateSheetNames[i];
+    const [, step] = activeSteps[i];
 
     const sheet = workbook.Sheets[sheetName];
-    const hasThreshold = isThresholdSheet(stepKey);
+    if (!sheet) continue;
+
+    const hasThreshold = step.has_threshold;
     const headerRow = findHeaderRow(sheet);
     const instructionsRow = findInstructionsRow(sheet, headerRow);
     const dataStart = instructionsRow > 0 ? instructionsRow + 1 : headerRow + 1;
     const cols = detectColumns(sheet, headerRow, hasThreshold);
 
-    for (let i = 0; i < step.rules.length; i++) {
-      const r = dataStart + i;
-      const rule = step.rules[i];
+    // Rename the sheet tab to match the customer's step label
+    renameSheet(workbook, sheetName, step, i + 1);
 
-      setCell(sheet, r, 0, i + 1);
+    for (let j = 0; j < step.rules.length; j++) {
+      const r = dataStart + j;
+      const rule = step.rules[j];
+
+      setCell(sheet, r, 0, j + 1);
       setCell(sheet, r, cols.workflowName, rule.workflow_name || "");
       setCell(sheet, r, cols.fundCode, rule.fund_code || "");
       setCell(sheet, r, cols.orgCode, rule.org_code || "");
@@ -80,7 +92,6 @@ export async function generateWorkflowXlsx(
       if (cols.notes >= 0) setCell(sheet, r, cols.notes, rule.notes || "");
     }
 
-    // Extend sheet range
     const ref = sheet["!ref"];
     if (ref) {
       const range = XLSX.utils.decode_range(ref);
@@ -92,6 +103,23 @@ export async function generateWorkflowXlsx(
 
   const output = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
   return Buffer.from(output);
+}
+
+function renameSheet(
+  workbook: XLSX.WorkBook,
+  oldName: string,
+  step: { label: string; priority: number },
+  stepNumber: number,
+): void {
+  const newName = `Step ${stepNumber} - ${step.label}`.slice(0, 31);
+  if (newName === oldName) return;
+
+  const idx = workbook.SheetNames.indexOf(oldName);
+  if (idx === -1) return;
+
+  workbook.SheetNames[idx] = newName;
+  workbook.Sheets[newName] = workbook.Sheets[oldName];
+  delete workbook.Sheets[oldName];
 }
 
 function setCell(sheet: XLSX.WorkSheet, r: number, c: number, v: string | number) {
@@ -108,11 +136,6 @@ function buildStepSheetMap(sheetNames: string[]): Record<string, string> {
     }
   }
   return map;
-}
-
-function isThresholdSheet(stepKey: string): boolean {
-  const num = parseInt(stepKey.replace("step", ""));
-  return num >= 3 && num !== 6;
 }
 
 function findHeaderRow(sheet: XLSX.WorkSheet): number {

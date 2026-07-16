@@ -25,7 +25,7 @@ const categoryColors: Record<string, string> = {
 export default function AuditLogClient({ entries }: { entries: AuditEntry[] }) {
   const [filter, setFilter] = useState<string>("all");
 
-  const categories = [...new Set(entries.map((e) => e.category))].sort();
+  const categories = Array.from(new Set(entries.map((e) => e.category))).sort();
   const filtered = filter === "all" ? entries : entries.filter((e) => e.category === filter);
 
   return (

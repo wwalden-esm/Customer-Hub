@@ -26,6 +26,7 @@ export default async function RaidLogPage() {
       <h1 className="text-2xl font-semibold text-esm-black mb-6">RAID Log</h1>
       <RaidLogClient
         items={items}
+        projectId={session.projectId}
         contactNames={contactNames}
         esmTeamNames={esmTeamNames}
         sessionName={session.name ?? null}

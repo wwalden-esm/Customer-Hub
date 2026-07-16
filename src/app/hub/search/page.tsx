@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCustomerSession } from "@/lib/magic-link";
-import { getSmartsheetConfig, getProjectMilestones, getProjectActionItems, getProjectMeetings, getProjectActivity, getRaidLogItems } from "@/lib/smartsheet-data";
+import { getSmartsheetConfig, getProjectMilestones, getProjectActionItems, getProjectMeetings, getProjectActivity, getRaidLogItems, getProjectDocuments } from "@/lib/smartsheet-data";
+import { getProjectQuestions } from "@/lib/question-store";
 import SearchClient from "@/components/hub/SearchClient";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,6 +22,11 @@ export default async function SearchPage() {
     getProjectActivity(config).catch(() => []),
     config.raidLogSheetId ? getRaidLogItems(config.raidLogSheetId) : Promise.resolve([]),
   ]);
+
+  const questions = getProjectQuestions(session.projectId);
+  const documents = config.documentSheetId
+    ? await getProjectDocuments(config.documentSheetId)
+    : [];
 
   const searchItems = [
     ...milestones.map((m) => ({
@@ -50,6 +56,20 @@ export default async function SearchPage() {
       title: r.item,
       detail: `${r.type} · ${r.status} · ${r.priority}`,
       href: "/hub/raid-log",
+    })),
+    ...questions.map((q) => ({
+      id: `question-${q.id}`,
+      type: "question" as const,
+      title: q.subject || "Question",
+      detail: [q.message, ...(q.messages || []).map((m: { text: string }) => m.text)].filter(Boolean).join(" ").slice(0, 200),
+      href: "/hub/ask",
+    })),
+    ...documents.map((d) => ({
+      id: `document-${d.id}`,
+      type: "document" as const,
+      title: d.name,
+      detail: `Type: ${d.type}${d.status ? ` · ${d.status}` : ""}`,
+      href: "/hub/documents",
     })),
   ];
 

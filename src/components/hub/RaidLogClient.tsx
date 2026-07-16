@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { parseLocalDate } from "@/lib/date-utils";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, useToast } from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
 
 interface RaidItem {
@@ -43,6 +44,7 @@ const OWNER_FILTERS = ["All", "My Items", "ESM Items"] as const;
 
 interface RaidLogClientProps {
   items: RaidItem[];
+  projectId: string;
   contactNames?: string[];
   esmTeamNames?: string[];
   sessionName?: string | null;
@@ -62,11 +64,15 @@ function PrintRaidButton() {
   );
 }
 
-export default function RaidLogClient({ items, contactNames = [], esmTeamNames = [], sessionName }: RaidLogClientProps) {
+export default function RaidLogClient({ items, projectId, contactNames = [], esmTeamNames = [], sessionName }: RaidLogClientProps) {
+  const router = useRouter();
+  const { toast } = useToast();
   const [typeFilter, setTypeFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [ownerFilter, setOwnerFilter] = useState("All");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const filtered = useMemo(() => {
     return items.filter((item) => {
@@ -110,6 +116,39 @@ export default function RaidLogClient({ items, contactNames = [], esmTeamNames =
       return next;
     });
   };
+
+  async function handleSubmitRaid(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitting(true);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const payload = {
+      type: formData.get("type") as string,
+      item: formData.get("title") as string,
+      notes: formData.get("description") as string,
+      priority: formData.get("priority") as string,
+      assigned: formData.get("suggestedOwner") as string,
+    };
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}/raid-log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit");
+      }
+      toast(`${payload.type} added to the RAID log.`, "success");
+      setShowSubmitModal(false);
+      router.refresh();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Failed to submit item", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   if (items.length === 0) {
     return (
@@ -208,7 +247,17 @@ export default function RaidLogClient({ items, contactNames = [], esmTeamNames =
             ))}
           </div>
         </fieldset>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => setShowSubmitModal(true)}
+            className="no-print inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white rounded-card transition-colors"
+            style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Submit Risk / Issue
+          </button>
           <PrintRaidButton />
         </div>
       </div>
@@ -284,6 +333,95 @@ export default function RaidLogClient({ items, contactNames = [], esmTeamNames =
       <p className="text-xs text-esm-muted mt-3" aria-live="polite">
         Showing {filtered.length} of {items.length} items
       </p>
+
+      {/* Submit RAID Item Modal */}
+      {showSubmitModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowSubmitModal(false); }}
+        >
+          <div className="bg-white rounded-card border border-esm-border shadow-lg w-full max-w-md mx-4 p-6">
+            <h2 className="text-lg font-semibold text-esm-black mb-4">Submit Risk / Issue</h2>
+            <form onSubmit={handleSubmitRaid} className="space-y-4">
+              <div>
+                <label htmlFor="raid-type" className="block text-xs font-medium text-esm-grey mb-1">Type</label>
+                <select
+                  id="raid-type"
+                  name="type"
+                  required
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent,#F4333F)] focus:border-transparent"
+                >
+                  <option value="Risk">Risk</option>
+                  <option value="Issue">Issue</option>
+                  <option value="Action">Assumption</option>
+                  <option value="Decision">Decision</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="raid-title" className="block text-xs font-medium text-esm-grey mb-1">Title</label>
+                <input
+                  id="raid-title"
+                  name="title"
+                  type="text"
+                  required
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent,#F4333F)] focus:border-transparent"
+                  placeholder="Brief summary of the risk or issue"
+                />
+              </div>
+              <div>
+                <label htmlFor="raid-description" className="block text-xs font-medium text-esm-grey mb-1">Description</label>
+                <textarea
+                  id="raid-description"
+                  name="description"
+                  rows={3}
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent,#F4333F)] focus:border-transparent resize-none"
+                  placeholder="Additional details (optional)"
+                />
+              </div>
+              <div>
+                <label htmlFor="raid-priority" className="block text-xs font-medium text-esm-grey mb-1">Priority</label>
+                <select
+                  id="raid-priority"
+                  name="priority"
+                  defaultValue="Medium"
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent,#F4333F)] focus:border-transparent"
+                >
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="raid-owner" className="block text-xs font-medium text-esm-grey mb-1">Suggested Owner</label>
+                <input
+                  id="raid-owner"
+                  name="suggestedOwner"
+                  type="text"
+                  className="w-full rounded-card border border-esm-border px-3 py-2 text-sm text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent,#F4333F)] focus:border-transparent"
+                  placeholder="Who should own this item? (optional)"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSubmitModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-esm-grey bg-gray-100 rounded-card hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 text-sm font-medium text-white rounded-card transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+                >
+                  {submitting ? "Submitting..." : "Submit"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

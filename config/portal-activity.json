@@ -1013,5 +1013,40 @@
     "name": "Rob Smith",
     "page": "/hub",
     "timestamp": "2026-07-14T13:29:50.730Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/go-live",
+    "timestamp": "2026-07-16T14:12:18.038Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/go-live",
+    "timestamp": "2026-07-16T14:13:42.667Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/notifications",
+    "timestamp": "2026-07-16T14:15:25.231Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/notifications",
+    "timestamp": "2026-07-16T14:21:15.344Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/notifications",
+    "timestamp": "2026-07-16T14:21:24.530Z"
   }
 ]

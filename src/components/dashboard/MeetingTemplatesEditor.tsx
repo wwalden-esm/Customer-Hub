@@ -21,8 +21,6 @@ export default function MeetingTemplatesEditor({ initialTemplates }: { initialTe
   const [saving, setSaving] = useState(false);
   const [draft, setDraft] = useState<Template | null>(null);
 
-  const editing = editingId ? templates.find((t) => t.id === editingId) : null;
-
   const startEdit = useCallback((t: Template) => {
     setEditingId(t.id);
     setDraft({ ...t, sections: t.sections.map((s) => ({ ...s })) });

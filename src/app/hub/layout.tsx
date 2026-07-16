@@ -20,11 +20,15 @@ import { EsmLogo } from "@/components/ui";
 const ALL_NAV_ITEMS = [
   { href: "/hub", label: "Dashboard", key: "dashboard" },
   { href: "/hub/intake", label: "Intake", key: "intake" },
+  { href: "/hub/milestones", label: "Milestones", key: "milestones" },
   { href: "/hub/raid-log", label: "RAID Log", key: "raid-log" },
   { href: "/hub/meetings", label: "Meetings", key: "meetings" },
   { href: "/hub/documents", label: "Documents", key: "documents" },
+  { href: "/hub/workflow-builder", label: "Workflow Builder", key: "workflow-builder" },
   { href: "/hub/recordings", label: "Recordings", key: "recordings" },
   { href: "/hub/questions", label: "Questions", key: "questions" },
+  { href: "/hub/go-live", label: "Go-Live Readiness", key: "go-live" },
+  { href: "/hub/status-report", label: "Status Report", key: "status-report" },
   { href: "/hub/resources", label: "Resources", key: "resources" },
   { href: "/hub/help", label: "Help", key: "help" },
 ];
@@ -42,14 +46,6 @@ export default async function HubLayout({ children }: { children: React.ReactNod
   const branding = (project.branding as BrandingConfig) || {};
   const cssVars = brandingCssVars(branding);
 
-  const visibility = project.sectionVisibility ?? {};
-  const spConfigured = isSharePointConfigured();
-  const navItems = ALL_NAV_ITEMS.filter((item) => {
-    if (item.key === "dashboard") return true;
-    if (item.key === "recordings" && !spConfigured && visibility[item.key] !== true) return false;
-    return visibility[item.key] !== false;
-  });
-
   let daysToGoLive: number | null = null;
   if (project.goLiveDate) {
     const now = new Date();
@@ -57,6 +53,15 @@ export default async function HubLayout({ children }: { children: React.ReactNod
     const goLive = parseLocalDate(project.goLiveDate);
     daysToGoLive = Math.ceil((goLive.getTime() - now.getTime()) / 86400000);
   }
+
+  const visibility = project.sectionVisibility ?? {};
+  const spConfigured = isSharePointConfigured();
+  const navItems = ALL_NAV_ITEMS.filter((item) => {
+    if (item.key === "dashboard") return true;
+    if (item.key === "recordings" && !spConfigured && visibility[item.key] !== true) return false;
+    if (item.key === "go-live" && (daysToGoLive === null || daysToGoLive > 60)) return false;
+    return visibility[item.key] !== false;
+  });
 
   return (
     <HubToastProvider>

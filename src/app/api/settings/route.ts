@@ -34,6 +34,10 @@ export async function PUT(req: NextRequest) {
     settings.globalLinks = body.globalLinks;
   }
 
+  if (body.defaultAccentColor !== undefined) {
+    settings.defaultAccentColor = body.defaultAccentColor;
+  }
+
   fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
   return NextResponse.json({ ok: true });
 }

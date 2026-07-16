@@ -7,25 +7,26 @@ RULES:
 - Every active step MUST have at least one rule. If a step appears active but has no clear rules, create one rule with "[SAMPLE - verify details]" markers
 - Approver email addresses must be exact as found in the document; do not guess email formats
 - Threshold amounts should be numeric values only (no currency symbols)
-- The "operator" between approvers should be one of: "NEXT" (sequential), "AND" (all must approve), or "OR" (any one approves)`;
+- The "operator" between approvers should be one of: "NEXT" (sequential), "AND" (all must approve), or "OR" (any one approves)
+- Step names should match the customer's own terminology (e.g., "College Business Officer", "Associate Provost"), not generic titles
+- Determine the number of steps and their order from the documents — do NOT force a fixed step count
+- Any step may or may not use dollar thresholds — determine this from the documents, not from a template`;
 
-export const WORKFLOW_EXTRACTION_USER = `Analyze the following customer documents and extract the procurement workflow approval rules into the JSON structure below.
+export const WORKFLOW_EXTRACTION_USER = `Analyze the following customer documents and extract the procurement workflow approval rules.
 
-The ESM workflow template has up to 15 approval steps:
-- Step 1: Budget Manager (priority 100) - no dollar threshold
-- Step 2: Special Approvals (priority 200) - no dollar threshold
-- Step 3: Dean / Director / AVP (priority 300) - has dollar threshold (Transaction Total Min)
-- Step 4: Vice President (priority 400) - has dollar threshold
-- Step 5: President (priority 500) - has dollar threshold
-- Step 6: Purchasing (priority 600) - no dollar threshold
-- Steps 7-15: Custom/placeholder steps (priorities 700-1500) - may have dollar threshold
+Determine the customer's actual approval hierarchy from their documents. Each institution is different:
+- Some have 3 steps, some have 12
+- Step names are institution-specific (e.g., "Budget Manager", "College Dean", "Board of Trustees")
+- ANY step may or may not use dollar thresholds — determine this from the documents
+- Steps should be ordered by their position in the approval chain (first approver = step1, etc.)
+- Priority is auto-assigned: step1 = 100, step2 = 200, step3 = 300, etc.
 
 Each rule in a step represents one approval routing. A rule has:
 - workflow_name: unique name for this rule (max 50 chars)
 - fund_code: Segment 1 value (leave empty if not applicable)
 - org_code: Segment 2 / Organization Code value (leave empty if not applicable)
 - other_criteria: Account Code, Auxiliary Field, or other trigger criteria
-- transaction_total: minimum dollar amount triggering this step (only for threshold steps 3-5 and optionally 7+)
+- transaction_total: minimum dollar amount triggering this step (null if this step does not use dollar thresholds)
 - approver_1_email, approver_1_name: primary approver (required)
 - approver_1_2_operator: "NEXT", "AND", or "OR" - relationship between approver 1 and 2
 - approver_2_email, approver_2_name: second approver (optional)
@@ -44,7 +45,7 @@ Return ONLY valid JSON matching this schema:
   "workflow_steps": {
     "step1": {
       "active": true,
-      "label": "Budget Manager",
+      "label": "string - the customer's own name for this approval level",
       "priority": 100,
       "has_threshold": false,
       "rules": [
@@ -65,19 +66,13 @@ Return ONLY valid JSON matching this schema:
           "notes": "string"
         }
       ]
-    },
-    "step2": { "active": false, "label": "Special Approvals", "priority": 200, "has_threshold": false, "rules": [] },
-    "step3": { "active": true, "label": "Dean/Director/AVP", "priority": 300, "has_threshold": true, "rules": [] },
-    "step4": { "active": true, "label": "Vice President", "priority": 400, "has_threshold": true, "rules": [] },
-    "step5": { "active": true, "label": "President", "priority": 500, "has_threshold": true, "rules": [] },
-    "step6": { "active": false, "label": "Purchasing", "priority": 600, "has_threshold": false, "rules": [] },
-    "step7": { "active": false, "label": "Custom Step 7", "priority": 700, "has_threshold": true, "rules": [] }
+    }
   },
   "additional_notes": "string - any other relevant information found in the documents"
 }
 \`\`\`
 
-Set "active" to false for steps not mentioned or not applicable. Only include steps 7+ if the customer has custom approval levels beyond the standard 6.`;
+Only include steps that are mentioned in the documents. Use keys "step1", "step2", etc. in the order they appear in the approval chain. Set "active" to true for all steps you include — omit steps that don't exist for this customer rather than marking them inactive. Maximum 15 steps.`;
 
 export interface WorkflowRule {
   workflow_name: string;
@@ -101,7 +96,6 @@ export interface WorkflowStep {
   label: string;
   priority: number;
   has_threshold: boolean;
-  threshold_amount?: number;
   rules: WorkflowRule[];
 }
 
@@ -112,4 +106,32 @@ export interface WorkflowData {
   org_codes: string;
   workflow_steps: Record<string, WorkflowStep>;
   additional_notes: string;
+}
+
+export const EMPTY_RULE: WorkflowRule = {
+  workflow_name: "",
+  fund_code: "",
+  org_code: "",
+  other_criteria: "",
+  transaction_total: null,
+  approver_1_email: "",
+  approver_1_name: "",
+  approver_1_2_operator: "",
+  approver_2_email: "",
+  approver_2_name: "",
+  approver_2_3_operator: "",
+  approver_3_email: "",
+  approver_3_name: "",
+  notes: "",
+};
+
+export function createEmptyWorkflowData(customerName: string): WorkflowData {
+  return {
+    customer_name: customerName,
+    gl_system: "",
+    fund_codes: "",
+    org_codes: "",
+    workflow_steps: {},
+    additional_notes: "",
+  };
 }

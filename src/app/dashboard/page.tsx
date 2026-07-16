@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { parseLocalDate } from "@/lib/date-utils";
 import { getProjectList, getSmartsheetConfig, getProjectMilestones, deriveCurrentPhase } from "@/lib/smartsheet-data";
@@ -59,6 +60,15 @@ export default async function DashboardPage() {
       />
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/create"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-card bg-esm-red text-white hover:bg-esm-red-dark transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            New Project
+          </Link>
           <SyncHubSpotButton />
           <SendNotificationsButton />
         </div>

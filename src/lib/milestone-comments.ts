@@ -1,7 +1,6 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import {
-  ssFetch,
   getSheet,
   columnIdMap,
   addRows,

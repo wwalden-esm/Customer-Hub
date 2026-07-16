@@ -5,7 +5,7 @@ import { Card } from "@/components/ui";
 
 interface SearchItem {
   id: string;
-  type: "milestone" | "action" | "meeting" | "raid";
+  type: "milestone" | "action" | "meeting" | "raid" | "question" | "document";
   title: string;
   detail: string;
   href: string;
@@ -16,6 +16,8 @@ const TYPE_STYLES: Record<string, { label: string; bg: string; color: string }> 
   action: { label: "Action Item", bg: "bg-amber-100", color: "text-amber-700" },
   meeting: { label: "Meeting", bg: "bg-blue-100", color: "text-blue-700" },
   raid: { label: "RAID", bg: "bg-purple-100", color: "text-purple-700" },
+  question: { label: "Question", bg: "bg-rose-100", color: "text-rose-700" },
+  document: { label: "Document", bg: "bg-cyan-100", color: "text-cyan-700" },
 };
 
 export default function SearchClient({ items }: { items: SearchItem[] }) {
@@ -31,7 +33,7 @@ export default function SearchClient({ items }: { items: SearchItem[] }) {
     });
   }, [items, query, typeFilter]);
 
-  const types = ["all", "milestone", "action", "meeting", "raid"];
+  const types = ["all", "milestone", "action", "meeting", "raid", "question", "document"];
 
   return (
     <div>
@@ -50,7 +52,7 @@ export default function SearchClient({ items }: { items: SearchItem[] }) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search milestones, action items, meetings, RAID items..."
+            placeholder="Search milestones, action items, meetings, RAID, questions, documents..."
             className="w-full text-sm border border-esm-border rounded-card pl-10 pr-4 py-2.5 focus:outline-none focus:border-esm-black"
             autoFocus
           />
@@ -82,7 +84,7 @@ export default function SearchClient({ items }: { items: SearchItem[] }) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <p className="text-sm text-esm-grey">Type to search across {items.length} items</p>
-          <p className="text-xs text-esm-muted mt-1">Milestones, action items, meetings, and RAID log entries</p>
+          <p className="text-xs text-esm-muted mt-1">Milestones, action items, meetings, RAID log, questions, and documents</p>
         </Card>
       ) : results.length === 0 ? (
         <Card padding="lg" className="!p-8 text-center">

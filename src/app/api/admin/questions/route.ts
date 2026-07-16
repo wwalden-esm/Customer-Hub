@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getAllQuestions, getAllQuestionsAsync, replyToQuestion, addMessageToQuestion, closeQuestion, reopenQuestion } from "@/lib/question-store";
+import { getAllQuestions, getAllQuestionsAsync, replyToQuestion, closeQuestion, reopenQuestion } from "@/lib/question-store";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { sendNotificationEmail } from "@/lib/email";
 import { logAudit } from "@/lib/audit-log";

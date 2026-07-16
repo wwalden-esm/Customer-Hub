@@ -44,14 +44,16 @@ export function getSmartsheetConfig(id: string): SmartsheetConfig {
 }
 
 export function saveSmartsheetConfigField(projectId: string, field: string, value: string): void {
-  const { readFileSync, writeFileSync } = require("fs");
-  const { join } = require("path");
-  const configPath = join(process.cwd(), "config", "projects.json");
-  const all = JSON.parse(readFileSync(configPath, "utf-8"));
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const fs = require("fs");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const path = require("path");
+  const configPath = path.join(process.cwd(), "config", "projects.json");
+  const all = JSON.parse(fs.readFileSync(configPath, "utf-8"));
   if (!all[projectId]) return;
   if (!all[projectId].smartsheetConfig) all[projectId].smartsheetConfig = {};
   all[projectId].smartsheetConfig[field] = value;
-  writeFileSync(configPath, JSON.stringify(all, null, 2) + "\n", "utf-8");
+  fs.writeFileSync(configPath, JSON.stringify(all, null, 2) + "\n", "utf-8");
   // Update in-memory cache
   if (projects[projectId]) {
     (projects[projectId].smartsheetConfig as Record<string, string>)[field] = value;

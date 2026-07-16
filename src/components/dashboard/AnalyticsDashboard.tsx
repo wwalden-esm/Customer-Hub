@@ -142,9 +142,9 @@ function FilterBar({ projects, filters, onFilterChange }: {
   filters: { sc: string; status: string; phase: string };
   onFilterChange: (key: string, value: string) => void;
 }) {
-  const scs = [...new Set(projects.map(p => p.project.scName).filter(Boolean))].sort();
-  const statuses = [...new Set(projects.map(p => p.project.status).filter(Boolean))].sort();
-  const phases = [...new Set(projects.map(p => p.project.currentPhase).filter(Boolean))].sort();
+  const scs = Array.from(new Set(projects.map(p => p.project.scName).filter(Boolean))).sort();
+  const statuses = Array.from(new Set(projects.map(p => p.project.status).filter(Boolean))).sort();
+  const phases = Array.from(new Set(projects.map(p => p.project.currentPhase).filter(Boolean))).sort();
 
   const selectClass = "text-xs border border-esm-border rounded-card px-2 py-1.5 bg-white text-esm-black focus:outline-none focus:ring-1 focus:ring-esm-red";
 
@@ -618,7 +618,7 @@ function ComponentBreakdown({ projects }: { projects: ProjectAnalytics[] }) {
   );
 }
 
-function ExportButton({ contentRef }: { contentRef: React.RefObject<HTMLDivElement | null> }) {
+function ExportButton({ }: { contentRef?: React.RefObject<HTMLDivElement | null> }) {
   const [exporting, setExporting] = useState(false);
 
   const handleExport = async () => {

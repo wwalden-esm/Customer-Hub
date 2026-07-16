@@ -22,6 +22,7 @@ export interface SmartsheetConfig {
   projectInfoSheetId?: string;
   questionsSheetId?: string;
   milestoneCommentsSheetId?: string;
+  workflowDataSheetId?: string;
 }
 
 export interface Project {

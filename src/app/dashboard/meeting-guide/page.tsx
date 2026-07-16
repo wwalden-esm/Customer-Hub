@@ -1,27 +1,49 @@
-import type { Metadata } from "next";
-import MeetingStructure from "@/components/hub/MeetingStructure";
+import { readFileSync } from "fs";
+import { join } from "path";
+import MeetingGuideCards from "./MeetingGuideCards";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 
-export const metadata: Metadata = { title: "Meeting Guide" };
+export const dynamic = "force-dynamic";
+
+interface MeetingSection {
+  title: string;
+  prompt: string;
+}
+
+interface MeetingTemplate {
+  id: string;
+  name: string;
+  duration: number;
+  sections: MeetingSection[];
+}
+
+function loadTemplates(): MeetingTemplate[] {
+  try {
+    const raw = readFileSync(
+      join(process.cwd(), "config", "meeting-templates.json"),
+      "utf-8",
+    );
+    const data = JSON.parse(raw);
+    return data.templates || [];
+  } catch {
+    return [];
+  }
+}
 
 export default async function MeetingGuidePage() {
+  const templates = loadTemplates();
+
   return (
     <div>
       <DashboardBreadcrumb items={[{ label: "Meeting Guide" }]} />
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-semibold text-esm-black">Weekly Meeting Guide</h1>
-          <a
-            href="/dashboard/meeting-templates"
-            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-card border border-esm-border hover:bg-gray-50 transition-colors text-esm-black"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h8m-8 6h16" />
-            </svg>
-            Recap Templates
-          </a>
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold text-esm-black">Meeting Guide</h1>
+          <p className="text-sm text-esm-grey mt-1">
+            Reference templates for preparing implementation meetings
+          </p>
         </div>
-        <MeetingStructure />
+        <MeetingGuideCards templates={templates} />
       </div>
     </div>
   );

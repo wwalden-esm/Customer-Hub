@@ -35,7 +35,7 @@ export default async function NotificationsPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-esm-black mb-6">Notifications</h1>
-      <NotificationsClient notifications={notifications} />
+      <NotificationsClient notifications={notifications} projectId={session.projectId} />
     </div>
   );
 }
