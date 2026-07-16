@@ -36,6 +36,8 @@ const WORKFLOW_SHEET_COLUMNS = [
   { title: "Fund Codes Desc", type: "TEXT_NUMBER" },
   { title: "Org Codes Desc", type: "TEXT_NUMBER" },
   { title: "Additional Notes", type: "TEXT_NUMBER" },
+  { title: "Review Status", type: "TEXT_NUMBER" },
+  { title: "Review Notes", type: "TEXT_NUMBER" },
 ];
 
 export async function ensureWorkflowDataSheet(
@@ -85,6 +87,8 @@ export async function readWorkflowData(
   data.fund_codes = c(firstRow, "Fund Codes Desc") ?? "";
   data.org_codes = c(firstRow, "Org Codes Desc") ?? "";
   data.additional_notes = c(firstRow, "Additional Notes") ?? "";
+  data.review_status = (c(firstRow, "Review Status") as WorkflowData["review_status"]) ?? undefined;
+  data.review_notes = c(firstRow, "Review Notes") ?? undefined;
 
   // Group rows by step key
   const stepRows = new Map<string, SsRow[]>();
@@ -208,6 +212,8 @@ export async function writeWorkflowData(
         push("Fund Codes Desc", data.fund_codes);
         push("Org Codes Desc", data.org_codes);
         push("Additional Notes", data.additional_notes);
+        push("Review Status", data.review_status ?? "draft");
+        push("Review Notes", data.review_notes ?? "");
         isFirstRow = false;
       }
 

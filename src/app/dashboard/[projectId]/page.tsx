@@ -24,6 +24,7 @@ import StatusChanger from "@/components/dashboard/StatusChanger";
 import ExportProjectButton from "@/components/dashboard/ExportProjectButton";
 import { SectionLabel, Card } from "@/components/ui";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
+import WorkflowReviewCard from "@/components/dashboard/WorkflowReviewCard";
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
@@ -193,6 +194,8 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
               </div>
             </div>
           </Card>
+
+          <WorkflowReviewCard projectId={project.id} />
 
           {/* Meeting recap alerts */}
           {meetingsMissingRecap.length > 0 && (

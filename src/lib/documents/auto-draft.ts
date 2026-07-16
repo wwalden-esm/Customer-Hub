@@ -1,5 +1,6 @@
 import { getProjectById, getSmartsheetConfig, getProjectDocuments } from "@/lib/smartsheet-data";
-import { collectWorkflowData } from "./collect-workflow-data";
+import { readWorkflowData, ensureWorkflowDataSheet } from "@/lib/smartsheet-workflow";
+import { validateWorkflowData } from "./workflow-validation";
 import { generateWorkflowXlsx } from "./workflow-xlsx";
 import { generateWorkflowDocx } from "./workflow-docx";
 import { generateGoLiveChecklist } from "./go-live-checklist";
@@ -19,33 +20,41 @@ export async function checkAndAutoDraft(projectId: string): Promise<void> {
 
   const safeName = project.customerName.replace(/[^a-zA-Z0-9]/g, "_");
 
-  const workflowData = await collectWorkflowData(projectId);
-  if (workflowData) {
-    if (!(await hasDoc(config.documentSheetId, "workflow-xlsx"))) {
-      try {
-        const buffer = await generateWorkflowXlsx(workflowData);
-        await attachFileToSheet(
-          config.documentSheetId,
-          `ESM_Workflow_${safeName}.xlsx`,
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          buffer,
-        );
-      } catch (e) {
-        console.error("Auto-draft workflow XLSX failed:", e);
-      }
-    }
+  let sheetId = config.workflowDataSheetId;
+  if (!sheetId && config.customerFolderId) {
+    sheetId = await ensureWorkflowDataSheet(projectId, config.customerFolderId, project.customerName);
+  }
 
-    if (!(await hasDoc(config.documentSheetId, "workflow-docx"))) {
-      try {
-        const buffer = await generateWorkflowDocx(workflowData);
-        await attachFileToSheet(
-          config.documentSheetId,
-          `ESM_Workflow_${safeName}.docx`,
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          buffer,
-        );
-      } catch (e) {
-        console.error("Auto-draft workflow DOCX failed:", e);
+  if (sheetId) {
+    const workflowData = await readWorkflowData(sheetId, project.customerName);
+
+    if (workflowData.review_status === "approved" && validateWorkflowData(workflowData).valid) {
+      if (!(await hasDoc(config.documentSheetId, "workflow-xlsx"))) {
+        try {
+          const buffer = await generateWorkflowXlsx(workflowData);
+          await attachFileToSheet(
+            config.documentSheetId,
+            `ESM_Workflow_${safeName}.xlsx`,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            buffer,
+          );
+        } catch (e) {
+          console.error("Auto-draft workflow XLSX failed:", e);
+        }
+      }
+
+      if (!(await hasDoc(config.documentSheetId, "workflow-docx"))) {
+        try {
+          const buffer = await generateWorkflowDocx(workflowData);
+          await attachFileToSheet(
+            config.documentSheetId,
+            `ESM_Workflow_${safeName}.docx`,
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            buffer,
+          );
+        } catch (e) {
+          console.error("Auto-draft workflow DOCX failed:", e);
+        }
       }
     }
   }

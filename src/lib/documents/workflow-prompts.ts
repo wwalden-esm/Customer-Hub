@@ -106,6 +106,8 @@ export interface WorkflowData {
   org_codes: string;
   workflow_steps: Record<string, WorkflowStep>;
   additional_notes: string;
+  review_status?: "draft" | "submitted" | "approved" | "changes_requested";
+  review_notes?: string;
 }
 
 export const EMPTY_RULE: WorkflowRule = {

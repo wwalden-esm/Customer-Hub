@@ -9,6 +9,7 @@ interface StepEditorProps {
   onChange: (step: WorkflowStep) => void;
   onRemove: () => void;
   canRemove: boolean;
+  readOnly?: boolean;
 }
 
 const OPERATOR_OPTIONS = ["", "NEXT", "AND", "OR"] as const;
@@ -24,6 +25,7 @@ export default function StepEditor({
   onChange,
   onRemove,
   canRemove,
+  readOnly,
 }: StepEditorProps) {
   const updateRule = useCallback(
     (ruleIdx: number, field: keyof WorkflowRule, value: string | number | null) => {
@@ -63,6 +65,7 @@ export default function StepEditor({
             value={step.label}
             onChange={(e) => onChange({ ...step, label: e.target.value })}
             placeholder="e.g. Department Approver"
+            disabled={readOnly}
           />
         </div>
         <div className="flex items-end gap-3">
@@ -74,10 +77,11 @@ export default function StepEditor({
                 onChange({ ...step, has_threshold: e.target.checked })
               }
               className="rounded border-esm-border"
+              disabled={readOnly}
             />
             <span className="text-sm text-esm-grey">Dollar thresholds</span>
           </label>
-          {canRemove && (
+          {canRemove && !readOnly && (
             <button
               type="button"
               onClick={onRemove}
@@ -91,6 +95,7 @@ export default function StepEditor({
       </div>
 
       {/* Rules table */}
+      <fieldset disabled={readOnly} className="contents">
       <div className="overflow-x-auto">
         <table className="w-full text-sm border border-slate-200 rounded">
           <thead className="bg-slate-50">
@@ -328,14 +333,18 @@ export default function StepEditor({
         </table>
       </div>
 
-      <button
-        type="button"
-        onClick={addRule}
-        className="text-sm hover:opacity-80 transition-opacity"
-        style={{ color: "var(--hub-accent, #F4333F)" }}
-      >
-        + Add rule
-      </button>
+      </fieldset>
+
+      {!readOnly && (
+        <button
+          type="button"
+          onClick={addRule}
+          className="text-sm hover:opacity-80 transition-opacity"
+          style={{ color: "var(--hub-accent, #F4333F)" }}
+        >
+          + Add rule
+        </button>
+      )}
     </div>
   );
 }

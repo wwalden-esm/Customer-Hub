@@ -101,6 +101,88 @@ export async function generateWorkflowXlsx(
     }
   }
 
+  // --- ESM Import consolidation sheet ---
+  const ESM_IMPORT_HEADERS = [
+    "Step #", "Step Label", "Workflow Name", "Fund Code", "Org Code",
+    "Other Criteria", "Transaction Total", "Priority",
+    "Approver 1 Name", "Approver 1 Email", "Op 1-2",
+    "Approver 2 Name", "Approver 2 Email", "Op 2-3",
+    "Approver 3 Name", "Approver 3 Email", "Notes",
+  ];
+
+  const importSheet: XLSX.WorkSheet = {};
+  const importRows: (string | number | null)[][] = [];
+
+  // Collect all rules from all active steps, sorted by step priority then rule order
+  let stepNum = 0;
+  for (const [, step] of activeSteps) {
+    stepNum++;
+    for (const rule of step.rules) {
+      importRows.push([
+        stepNum,
+        step.label,
+        rule.workflow_name || "",
+        rule.fund_code || "",
+        rule.org_code || "",
+        rule.other_criteria || "",
+        rule.transaction_total,
+        step.priority,
+        rule.approver_1_name || "",
+        rule.approver_1_email || "",
+        rule.approver_1_2_operator || "",
+        rule.approver_2_name || "",
+        rule.approver_2_email || "",
+        rule.approver_2_3_operator || "",
+        rule.approver_3_name || "",
+        rule.approver_3_email || "",
+        rule.notes || "",
+      ]);
+    }
+  }
+
+  // Write header row with bold formatting
+  for (let c = 0; c < ESM_IMPORT_HEADERS.length; c++) {
+    const addr = XLSX.utils.encode_cell({ r: 0, c });
+    importSheet[addr] = { v: ESM_IMPORT_HEADERS[c], t: "s", s: { font: { bold: true } } };
+  }
+
+  // Write data rows
+  for (let r = 0; r < importRows.length; r++) {
+    const row = importRows[r];
+    for (let c = 0; c < row.length; c++) {
+      const val = row[c];
+      if (val == null) continue;
+      const addr = XLSX.utils.encode_cell({ r: r + 1, c });
+      importSheet[addr] = {
+        v: val,
+        t: typeof val === "number" ? "n" : "s",
+      };
+    }
+  }
+
+  // Set the sheet range
+  importSheet["!ref"] = XLSX.utils.encode_range({
+    s: { r: 0, c: 0 },
+    e: { r: importRows.length, c: ESM_IMPORT_HEADERS.length - 1 },
+  });
+
+  // Set column widths for readability
+  importSheet["!cols"] = ESM_IMPORT_HEADERS.map((h) => ({
+    wch: Math.max(h.length + 2, 14),
+  }));
+
+  // Remove existing ESM Import sheet if present, then add
+  const existingImportIdx = workbook.SheetNames.findIndex(
+    (n) => n.toLowerCase() === "esm import",
+  );
+  if (existingImportIdx >= 0) {
+    const oldName = workbook.SheetNames[existingImportIdx];
+    workbook.SheetNames.splice(existingImportIdx, 1);
+    delete workbook.Sheets[oldName];
+  }
+  workbook.SheetNames.push("ESM Import");
+  workbook.Sheets["ESM Import"] = importSheet;
+
   const output = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
   return Buffer.from(output);
 }

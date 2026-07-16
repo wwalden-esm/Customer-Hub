@@ -7,8 +7,10 @@ import type {
   WorkflowStep,
 } from "@/lib/documents/workflow-prompts";
 import { EMPTY_RULE } from "@/lib/documents/workflow-prompts";
-import { Card, Button } from "@/components/ui";
+import { Card, Button, Badge } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
+import { validateWorkflowData } from "@/lib/documents/workflow-validation";
+import type { ValidationError } from "@/lib/documents/workflow-validation";
 import StepEditor from "./StepEditor";
 import FileUploader from "@/components/hub/FileUploader";
 
@@ -31,6 +33,9 @@ export default function WorkflowBuilderClient({
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const dragItem = useRef<string | null>(null);
   const dragOver = useRef<string | null>(null);
 
@@ -183,6 +188,72 @@ export default function WorkflowBuilderClient({
     toast("Workflow data extracted and saved", "success");
   }, [router, toast]);
 
+  const handleSubmitForReview = useCallback(async () => {
+    const result = validateWorkflowData(data);
+    if (!result.valid) {
+      setValidationErrors(result.errors);
+      toast("Please fix validation errors before submitting", "error");
+      return;
+    }
+    setValidationErrors([]);
+    setSubmitting(true);
+    try {
+      if (dirty) {
+        if (saveTimer.current) clearTimeout(saveTimer.current);
+        await saveData(data);
+      }
+      const updated = { ...data, review_status: "submitted" as const };
+      const res = await fetch(`/api/projects/${projectId}/workflow-data`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (!res.ok) throw new Error("Failed to submit");
+      setData(updated);
+      setDirty(false);
+      toast("Workflow submitted for review", "success");
+    } catch {
+      toast("Failed to submit for review", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [data, dirty, projectId, saveData, toast]);
+
+  const handleGenerate = useCallback(async () => {
+    const result = validateWorkflowData(data);
+    if (!result.valid) {
+      setValidationErrors(result.errors);
+      toast("Please fix validation errors before generating", "error");
+      return;
+    }
+    setValidationErrors([]);
+    setGenerating(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/workflow-generate`, {
+        method: "POST",
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        if (body.validationErrors) {
+          setValidationErrors(body.validationErrors);
+        }
+        throw new Error(body.error || "Generation failed");
+      }
+      const docs = [];
+      if (body.documents?.xlsx) docs.push(body.documents.xlsx.name);
+      if (body.documents?.docx) docs.push(body.documents.docx.name);
+      toast(`Documents generated: ${docs.join(", ")}`, "success");
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Failed to generate documents", "error");
+    } finally {
+      setGenerating(false);
+    }
+  }, [data, projectId, toast]);
+
+  const reviewStatus = data.review_status ?? "draft";
+  const isLocked = reviewStatus === "submitted";
+  const canGenerate = reviewStatus === "approved";
+
   const activeStep = activeStepKey
     ? data.workflow_steps[activeStepKey]
     : null;
@@ -197,9 +268,25 @@ export default function WorkflowBuilderClient({
       {/* Header bar */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-esm-black">
-            Workflow Builder
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-semibold text-esm-black">
+              Workflow Builder
+            </h1>
+            <Badge
+              variant={
+                reviewStatus === "approved" ? "success" :
+                reviewStatus === "submitted" ? "info" :
+                reviewStatus === "changes_requested" ? "warning" :
+                "neutral"
+              }
+              pill
+            >
+              {reviewStatus === "approved" ? "Approved" :
+               reviewStatus === "submitted" ? "Submitted for Review" :
+               reviewStatus === "changes_requested" ? "Changes Requested" :
+               "Draft"}
+            </Badge>
+          </div>
           <p className="text-sm text-esm-muted mt-0.5">
             {stepKeys.length} step{stepKeys.length !== 1 ? "s" : ""},{" "}
             {totalRules} rule{totalRules !== 1 ? "s" : ""}
@@ -209,26 +296,75 @@ export default function WorkflowBuilderClient({
             {saving && (
               <span className="ml-2 text-esm-muted">Saving…</span>
             )}
+            {isLocked && (
+              <span className="ml-2 text-blue-600">Editing disabled while under review</span>
+            )}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowUpload(!showUpload)}
-          >
-            {showUpload ? "Hide Upload" : "Upload Documents"}
-          </Button>
-          <Button
-            variant="accent"
-            size="sm"
-            onClick={handleManualSave}
-            disabled={saving || !dirty}
-          >
-            Save
-          </Button>
+          {!isLocked && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowUpload(!showUpload)}
+            >
+              {showUpload ? "Hide Upload" : "Upload Documents"}
+            </Button>
+          )}
+          {!isLocked && (
+            <Button
+              variant="accent"
+              size="sm"
+              onClick={handleManualSave}
+              disabled={saving || !dirty}
+            >
+              Save
+            </Button>
+          )}
+          {reviewStatus === "draft" || reviewStatus === "changes_requested" ? (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleSubmitForReview}
+              disabled={submitting || saving}
+            >
+              {submitting ? "Submitting…" : "Submit for Review"}
+            </Button>
+          ) : null}
+          {canGenerate && (
+            <Button
+              variant="accent"
+              size="sm"
+              onClick={handleGenerate}
+              disabled={generating}
+            >
+              {generating ? "Generating…" : "Generate Documents"}
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Review notes */}
+      {reviewStatus === "changes_requested" && data.review_notes && (
+        <div className="bg-amber-50 border border-amber-200 rounded-card p-4">
+          <p className="text-sm font-medium text-amber-800 mb-1">Changes Requested</p>
+          <p className="text-sm text-amber-700">{data.review_notes}</p>
+        </div>
+      )}
+
+      {/* Validation errors */}
+      {validationErrors.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-card p-4">
+          <p className="text-sm font-medium text-red-800 mb-2">Validation Errors</p>
+          <ul className="space-y-1">
+            {validationErrors.map((err, i) => (
+              <li key={i} className="text-sm text-red-700">
+                {err.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Document upload panel */}
       {showUpload && (
@@ -386,6 +522,7 @@ export default function WorkflowBuilderClient({
                 onChange={(s) => updateStep(activeStepKey, s)}
                 onRemove={() => removeStep(activeStepKey)}
                 canRemove={stepKeys.length > 1}
+                readOnly={isLocked}
               />
             </Card>
           ) : (
