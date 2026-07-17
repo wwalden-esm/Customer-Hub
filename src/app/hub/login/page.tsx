@@ -113,9 +113,7 @@ function CustomerLoginForm() {
     return (
       <Card padding="lg" className="w-full max-w-md">
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-8 h-8 bg-esm-red rounded-card flex items-center justify-center text-white text-xs font-bold" aria-hidden="true">
-            ESM
-          </div>
+          <EsmLogo size={48} variant="red" />
           <h1 className="text-2xl font-semibold text-esm-black">Who are you?</h1>
         </div>
         <p className="text-sm text-esm-grey mt-1">Select your name to continue to the portal</p>

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import DarkModeToggle from "@/components/hub/DarkModeToggle";
 import HubToastProvider from "@/components/hub/HubToastProvider";
 import ActiveNavLink from "@/components/dashboard/ActiveNavLink";
+import { EsmLogo } from "@/components/ui";
 
 export default async function DashboardLayout({
   children,
@@ -32,14 +33,11 @@ export default async function DashboardLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <header className="bg-white border-b border-esm-border sticky top-0 z-30">
-          <div className="h-1 bg-esm-red" />
+        <header className="bg-esm-red sticky top-0 z-30" role="banner">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-2">
-            <a href="/dashboard" className="flex items-center gap-2 no-underline shrink-0">
-              <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">
-                ESM
-              </div>
-              <span className="text-lg font-semibold text-esm-black hidden sm:inline">
+            <a href="/dashboard" className="flex items-center gap-3 no-underline shrink-0">
+              <EsmLogo size={72} variant="white" />
+              <span className="text-lg font-semibold text-white hidden sm:inline">
                 Implementation Hub
               </span>
             </a>
@@ -55,8 +53,8 @@ export default async function DashboardLayout({
             <div className="flex items-center gap-2 shrink-0">
               <DarkModeToggle />
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-esm-black leading-tight">{userName}</p>
-                <p className="text-[10px] text-esm-muted uppercase tracking-wider">{userRole}</p>
+                <p className="text-sm font-medium text-white leading-tight">{userName}</p>
+                <p className="text-[10px] text-white/70 uppercase tracking-wider">{userRole}</p>
               </div>
               <form
                 action={async () => {
@@ -66,7 +64,7 @@ export default async function DashboardLayout({
               >
                 <button
                   type="submit"
-                  className="text-xs text-esm-grey hover:text-esm-black px-2 py-1 rounded border border-esm-border hover:bg-slate-50 transition-colors"
+                  className="text-xs text-white/80 hover:text-white px-2 py-1 rounded border border-white/30 hover:bg-white/10 transition-colors"
                 >
                   Sign out
                 </button>

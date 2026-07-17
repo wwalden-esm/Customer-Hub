@@ -19,6 +19,7 @@ const config: Config = {
           grey: "#686468",
           "grey-light": "#F0F0F0",
           blue: "#1F4E79",
+          "blue-brand": "#0056A7",
           "red-text": "#C92A34",
           border: "#E2E0E1",
           "border-hover": "#C5C3C4",

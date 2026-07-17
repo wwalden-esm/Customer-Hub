@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Card } from "@/components/ui";
+import { Card, EsmLogo } from "@/components/ui";
 
 function VerifyToken() {
   const params = useSearchParams();
@@ -41,9 +41,7 @@ function VerifyToken() {
   return (
     <Card padding="lg" className="!border-0 shadow w-full max-w-md !p-8 text-center">
       <div className="flex items-center justify-center gap-3 mb-4">
-        <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold" aria-hidden="true">
-          ESM
-        </div>
+        <EsmLogo size={48} variant="red" />
         <h1 className="text-2xl font-semibold text-esm-black">Implementation Customer Hub</h1>
       </div>
 
