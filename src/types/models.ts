@@ -52,6 +52,7 @@ export interface Project {
   links?: ProjectLink[];
   sharepointFolderUrl?: string;
   sharepointFolderId?: string;
+  allowCustomerRaidSubmissions?: boolean;
 }
 
 export interface Milestone {

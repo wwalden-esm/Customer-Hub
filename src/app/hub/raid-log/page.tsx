@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getSmartsheetConfig, getRaidLogItems, getProjectById } from "@/lib/smartsheet-data";
+import { getPendingRaidItems } from "@/lib/raid-pending-store";
+import { isRaidSubmissionAllowed } from "@/lib/settings";
 import RaidLogClient from "@/components/hub/RaidLogClient";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,9 +19,12 @@ export default async function RaidLogPage() {
     ? await getRaidLogItems(config.raidLogSheetId)
     : [];
 
+  const pendingItems = getPendingRaidItems(session.projectId);
+
   const project = getProjectById(session.projectId);
   const contactNames = (project?.contacts ?? []).map((c) => c.name).filter(Boolean);
   const esmTeamNames = [project?.scName, project?.saName, project?.pmName].filter((n): n is string => Boolean(n));
+  const canSubmit = isRaidSubmissionAllowed(project?.allowCustomerRaidSubmissions);
 
   return (
     <div>
@@ -30,6 +35,8 @@ export default async function RaidLogPage() {
         contactNames={contactNames}
         esmTeamNames={esmTeamNames}
         sessionName={session.name ?? null}
+        pendingItems={pendingItems}
+        canSubmit={canSubmit}
       />
     </div>
   );

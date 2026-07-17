@@ -38,6 +38,10 @@ export async function PUT(req: NextRequest) {
     settings.defaultAccentColor = body.defaultAccentColor;
   }
 
+  if (body.allowCustomerRaidSubmissions !== undefined) {
+    settings.allowCustomerRaidSubmissions = body.allowCustomerRaidSubmissions;
+  }
+
   fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
   return NextResponse.json({ ok: true });
 }

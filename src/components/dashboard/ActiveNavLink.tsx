@@ -19,7 +19,7 @@ export default function ActiveNavLink({
       href={href}
       className={`text-sm px-2.5 py-1.5 rounded-card transition-colors ${
         isActive
-          ? "text-esm-black font-medium bg-slate-100"
+          ? "text-esm-red font-medium bg-red-50/40"
           : "text-esm-grey hover:text-esm-black hover:bg-slate-50"
       }`}
     >

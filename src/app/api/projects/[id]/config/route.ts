@@ -43,6 +43,9 @@ export async function PUT(req: NextRequest) {
   if (body.contacts !== undefined) {
     projects[projectId].contacts = body.contacts;
   }
+  if (body.allowCustomerRaidSubmissions !== undefined) {
+    projects[projectId].allowCustomerRaidSubmissions = body.allowCustomerRaidSubmissions;
+  }
 
   fs.writeFileSync(configPath, JSON.stringify(projects, null, 2));
 

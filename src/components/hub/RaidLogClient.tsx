@@ -18,6 +18,22 @@ interface RaidItem {
   targetDate: string | null;
 }
 
+interface PendingRaidItem {
+  id: string;
+  projectId: string;
+  type: "Risk" | "Action" | "Issue" | "Decision";
+  item: string;
+  notes: string;
+  priority: "High" | "Medium" | "Low";
+  assigned: string;
+  submittedBy: string;
+  submittedAt: string;
+  review_status: "submitted" | "approved" | "changes_requested";
+  review_notes?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+}
+
 const TYPE_VARIANTS: Record<string, BadgeVariant> = {
   Risk: "warning",
   Action: "info",
@@ -42,12 +58,24 @@ const TYPES = ["All", "Risk", "Action", "Issue", "Decision"] as const;
 const STATUSES = ["All", "New", "In Progress", "Blocked", "Complete"] as const;
 const OWNER_FILTERS = ["All", "My Items", "ESM Items"] as const;
 
+const REVIEW_STATUS_LABELS: Record<string, string> = {
+  submitted: "Pending Approval",
+  changes_requested: "Changes Requested",
+};
+
+const REVIEW_STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  submitted: "warning",
+  changes_requested: "danger",
+};
+
 interface RaidLogClientProps {
   items: RaidItem[];
   projectId: string;
   contactNames?: string[];
   esmTeamNames?: string[];
   sessionName?: string | null;
+  pendingItems?: PendingRaidItem[];
+  canSubmit?: boolean;
 }
 
 function PrintRaidButton() {
@@ -64,7 +92,7 @@ function PrintRaidButton() {
   );
 }
 
-export default function RaidLogClient({ items, projectId, contactNames = [], esmTeamNames = [], sessionName }: RaidLogClientProps) {
+export default function RaidLogClient({ items, projectId, contactNames = [], esmTeamNames = [], sessionName, pendingItems = [], canSubmit = true }: RaidLogClientProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [typeFilter, setTypeFilter] = useState("All");
@@ -140,7 +168,7 @@ export default function RaidLogClient({ items, projectId, contactNames = [], esm
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Failed to submit");
       }
-      toast(`${payload.type} added to the RAID log.`, "success");
+      toast(`${payload.type} submitted for approval.`, "success");
       setShowSubmitModal(false);
       router.refresh();
     } catch (err) {
@@ -248,19 +276,63 @@ export default function RaidLogClient({ items, projectId, contactNames = [], esm
           </div>
         </fieldset>
         <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={() => setShowSubmitModal(true)}
-            className="no-print inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white rounded-card transition-colors"
-            style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Submit Risk / Issue
-          </button>
+          {canSubmit && (
+            <button
+              onClick={() => setShowSubmitModal(true)}
+              className="no-print inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white rounded-card transition-colors"
+              style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Submit Risk / Issue
+            </button>
+          )}
           <PrintRaidButton />
         </div>
       </div>
+
+      {/* Pending items */}
+      {pendingItems.length > 0 && (
+        <div className="mb-5">
+          <h2 className="text-sm font-semibold text-esm-black mb-2">Pending Submissions</h2>
+          <Card padding="sm" className="!p-0 divide-y divide-esm-border">
+            {pendingItems.map((pi) => (
+              <div key={pi.id} className="px-5 py-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant={TYPE_VARIANTS[pi.type]} pill>
+                        {pi.type}
+                      </Badge>
+                      <Badge variant={REVIEW_STATUS_VARIANTS[pi.review_status]} pill>
+                        {REVIEW_STATUS_LABELS[pi.review_status]}
+                      </Badge>
+                      <Badge variant={PRIORITY_VARIANTS[pi.priority]} pill>
+                        {pi.priority}
+                      </Badge>
+                    </div>
+                    <p className="text-sm font-medium text-esm-black mt-1.5">{pi.item}</p>
+                    {pi.notes && (
+                      <p className="text-xs text-esm-grey mt-1">{pi.notes}</p>
+                    )}
+                    <div className="flex gap-4 mt-1 text-xs text-esm-grey">
+                      <span>Submitted {new Date(pi.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                      {pi.assigned && <span>Suggested owner: {pi.assigned}</span>}
+                    </div>
+                    {pi.review_status === "changes_requested" && pi.review_notes && (
+                      <div className="mt-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-card">
+                        <p className="text-xs font-medium text-amber-800">Changes Requested</p>
+                        <p className="text-xs text-amber-700 mt-0.5">{pi.review_notes}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </Card>
+        </div>
+      )}
 
       {/* Items list */}
       <Card padding="sm" className="!p-0 divide-y divide-esm-border">
@@ -415,7 +487,7 @@ export default function RaidLogClient({ items, projectId, contactNames = [], esm
                   className="px-4 py-2 text-sm font-medium text-white rounded-card transition-colors disabled:opacity-50"
                   style={{ backgroundColor: "var(--hub-accent, #F4333F)" }}
                 >
-                  {submitting ? "Submitting..." : "Submit"}
+                  {submitting ? "Submitting..." : "Submit for Approval"}
                 </button>
               </div>
             </form>

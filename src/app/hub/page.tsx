@@ -34,6 +34,20 @@ import CollapsibleSection from "@/components/hub/CollapsibleSection";
 import { Badge, Card, SectionLabel } from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
 
+const ESM_PRODUCT_COLOR_KEYWORDS: [string, string][] = [
+  ["platform", "#ac316c"],
+  ["contract", "#813c76"],
+  ["purchase", "#3c628f"],
+  ["source", "#4e7e8f"],
+  ["supplier", "#5e904d"],
+];
+
+function getProductColor(product: string): string {
+  const lower = product.toLowerCase();
+  const match = ESM_PRODUCT_COLOR_KEYWORDS.find(([kw]) => lower.includes(kw));
+  return match ? match[1] : "#6b7280";
+}
+
 export default async function HubDashboard() {
   const session = await getCustomerSession();
   if (!session) redirect("/hub/login");
@@ -117,18 +131,21 @@ export default async function HubDashboard() {
         <Card className="!px-5 !py-4">
           <SectionLabel className="mb-3">Licensed Products</SectionLabel>
           <div className="flex flex-wrap gap-2">
-            {project.products.map((product) => (
-              <span
-                key={product}
-                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-card border-2"
-                style={{ borderColor: "var(--hub-accent, #F4333F)", color: "var(--hub-accent, #F4333F)" }}
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
-                </svg>
-                {product}
-              </span>
-            ))}
+            {project.products.map((product) => {
+              const color = getProductColor(product);
+              return (
+                <span
+                  key={product}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-card text-white"
+                  style={{ backgroundColor: color }}
+                >
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                  </svg>
+                  {product}
+                </span>
+              );
+            })}
           </div>
         </Card>
 

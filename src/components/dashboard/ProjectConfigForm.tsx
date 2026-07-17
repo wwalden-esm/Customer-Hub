@@ -28,6 +28,7 @@ interface Project {
   links?: ProjectLink[];
   contacts?: ContactEntry[];
   smartsheetConfig?: Record<string, string | undefined>;
+  allowCustomerRaidSubmissions?: boolean;
 }
 
 const HUB_SECTIONS = [
@@ -55,6 +56,10 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
     }
     return result;
   });
+  const [allowRaidSubmissions, setAllowRaidSubmissions] = useState<"global" | "yes" | "no">(
+    project.allowCustomerRaidSubmissions === true ? "yes" :
+    project.allowCustomerRaidSubmissions === false ? "no" : "global"
+  );
   const [links, setLinks] = useState<ProjectLink[]>(project.links ?? []);
   const [contacts, setContacts] = useState<ContactEntry[]>(project.contacts ?? []);
   const [newContact, setNewContact] = useState({ name: "", email: "", role: "" });
@@ -109,6 +114,7 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
           documentTypes: ALL_DOC_TYPES.filter((dt) => docTypes[dt.key]).map((dt) => dt.key),
           links: links.filter((l) => l.label.trim() && l.url.trim()),
           contacts,
+          allowCustomerRaidSubmissions: allowRaidSubmissions === "global" ? undefined : allowRaidSubmissions === "yes",
         }),
       });
       if (res.ok) {
@@ -439,6 +445,35 @@ export default function ProjectConfigForm({ project }: { project: Project }) {
               <div>
                 <span className="text-sm font-medium text-esm-black">{s.label}</span>
                 <span className="text-xs text-esm-grey ml-2">{s.description}</span>
+              </div>
+            </label>
+          ))}
+        </div>
+      </Card>
+
+      {/* Customer RAID Submissions */}
+      <Card padding="md">
+        <SectionLabel className="mb-4">Customer RAID Submissions</SectionLabel>
+        <p className="text-xs text-esm-grey mb-3">
+          Control whether this customer can submit RAID items from their portal.
+        </p>
+        <div className="space-y-2">
+          {([
+            { value: "global", label: "Use global default", description: "Follows the setting in Global Settings" },
+            { value: "yes", label: "Allow", description: "Customer can submit RAID items for approval" },
+            { value: "no", label: "Do not allow", description: "Submit button is hidden from the customer" },
+          ] as const).map((opt) => (
+            <label key={opt.value} className="flex items-center gap-3 py-2 px-3 rounded hover:bg-slate-50 cursor-pointer">
+              <input
+                type="radio"
+                name="raidSubmissions"
+                checked={allowRaidSubmissions === opt.value}
+                onChange={() => { setAllowRaidSubmissions(opt.value); markDirty(); }}
+                className="w-4 h-4 border-esm-border text-esm-red focus:ring-esm-red"
+              />
+              <div>
+                <span className="text-sm font-medium text-esm-black">{opt.label}</span>
+                <span className="text-xs text-esm-grey ml-2">{opt.description}</span>
               </div>
             </label>
           ))}

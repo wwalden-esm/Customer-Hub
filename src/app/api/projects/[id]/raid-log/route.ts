@@ -7,6 +7,9 @@ import path from "path";
 import { getSheet, columnIdMap, addRows, updateRows } from "@/lib/smartsheet";
 import type { SsCell } from "@/lib/smartsheet";
 import { getRaidLogItems } from "@/lib/smartsheet-data";
+import { addPendingRaidItem, getPendingRaidItems } from "@/lib/raid-pending-store";
+import { addHubNotification } from "@/lib/hub-notification-store";
+import { isRaidSubmissionAllowed } from "@/lib/settings";
 
 const configPath = path.join(process.cwd(), "config", "projects.json");
 
@@ -82,6 +85,32 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const actorName = customerSession?.name || session?.user?.name || "Unknown";
+
+  // Customer submissions go through approval; staff submissions go directly to Smartsheet
+  if (customerSession) {
+    if (!isRaidSubmissionAllowed(project.allowCustomerRaidSubmissions)) {
+      return NextResponse.json({ error: "RAID submissions are not enabled for this project" }, { status: 403 });
+    }
+    try {
+      const pending = addPendingRaidItem(projectId, {
+        type: type as "Risk" | "Action" | "Issue" | "Decision",
+        item: item.trim(),
+        notes: notes || "",
+        priority: priority && VALID_PRIORITIES.includes(priority) ? priority : "Medium",
+        assigned: assigned || "",
+        submittedBy: actorName,
+      });
+
+      logAudit(actorName, "submit_raid_item", projectId, "project", `${type}: ${item.trim()} (pending approval)`);
+
+      return NextResponse.json({ success: true, pending: true, item: pending }, { status: 201 });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      return NextResponse.json({ error: `Failed to submit RAID item: ${msg}` }, { status: 500 });
+    }
+  }
+
   try {
     const sheet = await getSheet(sheetId);
     const cols = columnIdMap(sheet);
@@ -100,9 +129,7 @@ export async function POST(req: NextRequest) {
     if (itemIdCol && itemId) cells.push({ columnId: itemIdCol, value: itemId });
     if (itemCol) cells.push({ columnId: itemCol, value: item.trim() });
     if (typeCol) cells.push({ columnId: typeCol, value: type });
-    const effectiveStatus = customerSession
-      ? "New"
-      : status && VALID_STATUSES.includes(status) ? status : "New";
+    const effectiveStatus = status && VALID_STATUSES.includes(status) ? status : "New";
     if (statusCol) cells.push({ columnId: statusCol, value: effectiveStatus });
     if (priorityCol) cells.push({ columnId: priorityCol, value: priority && VALID_PRIORITIES.includes(priority) ? priority : "Medium" });
     if (notesCol && notes) cells.push({ columnId: notesCol, value: notes });
@@ -111,7 +138,6 @@ export async function POST(req: NextRequest) {
 
     const result = await addRows(sheetId, [{ cells }]);
 
-    const actorName = customerSession?.name || session?.user?.name || "Unknown";
     logAudit(actorName, "submit_raid_item", projectId, "project", `${type}: ${item.trim()}`);
 
     return NextResponse.json({ success: true, result, item: { item: item.trim(), type, status: effectiveStatus, priority: priority || "Medium", notes, assigned } }, { status: 201 });

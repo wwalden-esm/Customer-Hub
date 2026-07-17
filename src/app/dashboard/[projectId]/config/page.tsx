@@ -32,6 +32,7 @@ export default async function ProjectConfigPage({ params }: { params: { projectI
             smartsheetConfig: Object.fromEntries(
               Object.entries(project.smartsheetConfig).filter(([, v]) => v !== undefined) as [string, string][]
             ),
+            allowCustomerRaidSubmissions: project.allowCustomerRaidSubmissions,
           }}
         />
       </div>

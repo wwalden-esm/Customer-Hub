@@ -30,6 +30,7 @@ export default async function DashboardLayout({
     <HubToastProvider>
       <div className="min-h-screen bg-esm-grey-light">
         <header className="bg-white border-b border-esm-border sticky top-0 z-30">
+          <div className="h-1 bg-esm-red" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-2">
             <a href="/dashboard" className="flex items-center gap-2 no-underline shrink-0">
               <div className="w-8 h-8 bg-esm-red rounded flex items-center justify-center text-white text-xs font-bold">

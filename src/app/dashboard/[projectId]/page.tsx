@@ -25,6 +25,22 @@ import ExportProjectButton from "@/components/dashboard/ExportProjectButton";
 import { SectionLabel, Card } from "@/components/ui";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 import WorkflowReviewCard from "@/components/dashboard/WorkflowReviewCard";
+import RaidReviewCard from "@/components/dashboard/RaidReviewCard";
+import PreviewCustomerSiteButton from "@/components/dashboard/PreviewCustomerSiteButton";
+
+const ESM_PRODUCT_COLOR_KEYWORDS: [string, string][] = [
+  ["platform", "#ac316c"],
+  ["contract", "#813c76"],
+  ["purchase", "#3c628f"],
+  ["source", "#4e7e8f"],
+  ["supplier", "#5e904d"],
+];
+
+function getProductColor(product: string): string {
+  const lower = product.toLowerCase();
+  const match = ESM_PRODUCT_COLOR_KEYWORDS.find(([kw]) => lower.includes(kw));
+  return match ? match[1] : "#6b7280";
+}
 
 function fmtDate(d: string | null | undefined): string {
   if (!d) return "—";
@@ -104,7 +120,20 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             <div className="grid grid-cols-2 gap-4 text-sm">
               <InfoRow label="Go-Live" value={fmtDate(project.goLiveDate)} />
               <InfoRow label="Phase" value={deriveCurrentPhase(milestones, project.currentPhase)} />
-              <InfoRow label="Products" value={project.products.join(", ") || "—"} />
+              <div className="col-span-2">
+                <span className="text-esm-grey">Products:</span>{" "}
+                <span className="inline-flex flex-wrap gap-1.5 ml-1 align-middle">
+                  {project.products.map((p) => (
+                    <span
+                      key={p}
+                      className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded text-white"
+                      style={{ backgroundColor: getProductColor(p) }}
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </span>
+              </div>
               <InfoRow label="SC" value={`${project.scName} (${project.scEmail})`} />
               <InfoRow label="PM" value={project.pmName || "—"} />
             </div>
@@ -196,6 +225,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
           </Card>
 
           <WorkflowReviewCard projectId={project.id} />
+          <RaidReviewCard projectId={project.id} />
 
           {/* Meeting recap alerts */}
           {meetingsMissingRecap.length > 0 && (
@@ -289,6 +319,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
           </Card>
 
           <div className="space-y-2">
+            <PreviewCustomerSiteButton projectId={project.id} />
             <Link href={`/dashboard/${project.id}/meetings`} className="block w-full text-center bg-esm-black text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
               Manage Meetings
             </Link>

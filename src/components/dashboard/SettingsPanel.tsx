@@ -15,6 +15,7 @@ interface EnvInfo {
 interface SettingsPanelProps {
   envInfo: EnvInfo;
   initialAccentColor: string;
+  initialAllowRaidSubmissions: boolean;
 }
 
 function StatusDot({ configured }: { configured: boolean }) {
@@ -25,13 +26,17 @@ function StatusDot({ configured }: { configured: boolean }) {
   );
 }
 
-export default function SettingsPanel({ envInfo, initialAccentColor }: SettingsPanelProps) {
+export default function SettingsPanel({ envInfo, initialAccentColor, initialAllowRaidSubmissions }: SettingsPanelProps) {
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   const [accentColor, setAccentColor] = useState(initialAccentColor);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const [allowRaid, setAllowRaid] = useState(initialAllowRaidSubmissions);
+  const [raidSaving, setRaidSaving] = useState(false);
+  const [raidSaved, setRaidSaved] = useState(false);
 
   async function handleTestConnection() {
     setTesting(true);
@@ -67,8 +72,46 @@ export default function SettingsPanel({ envInfo, initialAccentColor }: SettingsP
     }
   }
 
+  async function handleSaveRaidSetting(value: boolean) {
+    setAllowRaid(value);
+    setRaidSaving(true);
+    setRaidSaved(false);
+    try {
+      await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ allowCustomerRaidSubmissions: value }),
+      });
+      setRaidSaved(true);
+      setTimeout(() => setRaidSaved(false), 3000);
+    } finally {
+      setRaidSaving(false);
+    }
+  }
+
   return (
     <div className="space-y-6 mt-6">
+      {/* Customer RAID Submissions */}
+      <Card padding="md">
+        <SectionLabel>Customer RAID Submissions</SectionLabel>
+        <p className="text-sm text-esm-grey mt-2 mb-3">
+          Global default for whether customers can submit RAID items from the portal. This can be overridden per project in the project configuration.
+        </p>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={allowRaid}
+              onChange={(e) => handleSaveRaidSetting(e.target.checked)}
+              disabled={raidSaving}
+              className="w-4 h-4 rounded border-esm-border text-esm-red focus:ring-esm-red"
+            />
+            <span className="text-sm font-medium text-esm-black">Allow customers to submit RAID items</span>
+          </label>
+          {raidSaved && <span className="text-sm text-emerald-600">Saved</span>}
+        </div>
+      </Card>
+
       {/* Email Configuration */}
       <Card padding="md">
         <SectionLabel>Email Configuration</SectionLabel>

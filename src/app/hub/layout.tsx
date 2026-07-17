@@ -74,7 +74,8 @@ export default async function HubLayout({ children }: { children: React.ReactNod
         <GoLiveBanner daysToGoLive={daysToGoLive} goLiveDate={project.goLiveDate!} />
       )}
 
-      <header className="bg-[#3D3A3C] text-white" role="banner">
+      <div className="sticky top-0 z-40">
+      <header className="bg-esm-black text-white" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <EsmLogo size={48} variant="white" className="shrink-0" />
@@ -109,6 +110,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
       </header>
 
       <HubNav items={navItems} />
+      </div>
       <Breadcrumbs items={navItems} />
 
       <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">

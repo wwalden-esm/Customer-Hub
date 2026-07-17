@@ -15,6 +15,8 @@ export default async function SettingsPage() {
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultAccentColor = (settings as any).defaultAccentColor || "#1E3A5F";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allowRaid = (settings as any).allowCustomerRaidSubmissions !== false;
 
   return (
     <div>
@@ -23,7 +25,7 @@ export default async function SettingsPage() {
         <h1 className="text-xl font-semibold text-esm-black mb-1">Global Settings</h1>
         <p className="text-sm text-esm-grey mb-6">Configuration that applies to all customer hubs</p>
         <GlobalLinksEditor initialLinks={globalLinks} />
-        <SettingsPanel envInfo={envInfo} initialAccentColor={defaultAccentColor} />
+        <SettingsPanel envInfo={envInfo} initialAccentColor={defaultAccentColor} initialAllowRaidSubmissions={allowRaid} />
       </div>
     </div>
   );

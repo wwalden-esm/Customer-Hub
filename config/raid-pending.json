@@ -1,0 +1,14 @@
+[
+  {
+    "id": "raid-1784310895176-5yg0",
+    "projectId": "rob-smith-consulting",
+    "type": "Risk",
+    "item": "Test risk from customer portal",
+    "notes": "This is a test submission to verify the approval workflow",
+    "priority": "Medium",
+    "assigned": "",
+    "submittedBy": "Rob Smith",
+    "submittedAt": "2026-07-17T17:54:55.176Z",
+    "review_status": "submitted"
+  }
+]
