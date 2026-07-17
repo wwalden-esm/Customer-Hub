@@ -1048,5 +1048,537 @@
     "name": "Rob Smith",
     "page": "/hub/notifications",
     "timestamp": "2026-07-16T14:21:24.530Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub",
+    "timestamp": "2026-07-16T18:13:43.106Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-16T18:18:10.716Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-16T18:19:05.459Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-16T20:35:30.354Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-16T20:42:05.184Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-16T20:43:56.666Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-16T20:46:12.408Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/questions",
+    "timestamp": "2026-07-16T20:48:37.846Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-16T20:48:39.470Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/status-report",
+    "timestamp": "2026-07-16T20:48:45.264Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/resources",
+    "timestamp": "2026-07-16T20:49:11.976Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub",
+    "timestamp": "2026-07-16T20:49:19.046Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T20:49:28.590Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub",
+    "timestamp": "2026-07-16T20:49:56.745Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T20:50:01.188Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T20:51:51.936Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T20:56:25.953Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub",
+    "timestamp": "2026-07-16T20:56:54.904Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/intake",
+    "timestamp": "2026-07-16T20:58:34.920Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T20:58:36.646Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T21:01:06.474Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T21:02:04.291Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-16T21:02:27.977Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-16T21:07:14.214Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-16T21:08:10.643Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/meetings",
+    "timestamp": "2026-07-16T21:08:14.962Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/documents",
+    "timestamp": "2026-07-16T21:08:24.702Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/ask",
+    "timestamp": "2026-07-16T21:08:37.067Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-16T21:08:41.487Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/questions",
+    "timestamp": "2026-07-16T21:08:43.814Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/status-report",
+    "timestamp": "2026-07-16T21:08:48.579Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/resources",
+    "timestamp": "2026-07-16T21:08:53.523Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub",
+    "timestamp": "2026-07-16T21:08:55.788Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/login",
+    "timestamp": "2026-07-17T12:54:04.654Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/login",
+    "timestamp": "2026-07-17T13:07:22.608Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T13:08:16.272Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/login",
+    "timestamp": "2026-07-17T13:09:17.775Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/login",
+    "timestamp": "2026-07-17T13:09:20.841Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "customer@portal",
+    "name": "Customer",
+    "page": "/hub/login",
+    "timestamp": "2026-07-17T13:14:17.936Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T13:14:26.634Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-17T13:26:20.512Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T13:30:19.257Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T14:24:10.552Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T14:27:17.682Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/intake",
+    "timestamp": "2026-07-17T14:32:09.715Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/milestones",
+    "timestamp": "2026-07-17T14:32:52.864Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T14:34:29.756Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/meetings",
+    "timestamp": "2026-07-17T14:37:20.817Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/resources",
+    "timestamp": "2026-07-17T14:47:07.329Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/documents",
+    "timestamp": "2026-07-17T14:47:47.416Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/workflow-builder",
+    "timestamp": "2026-07-17T14:50:20.377Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/questions",
+    "timestamp": "2026-07-17T15:03:27.897Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/ask",
+    "timestamp": "2026-07-17T15:03:33.854Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/questions",
+    "timestamp": "2026-07-17T15:04:17.386Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T15:04:21.472Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/login",
+    "timestamp": "2026-07-17T17:34:18.171Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T17:34:33.620Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T17:36:11.143Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T17:39:59.045Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T17:40:17.856Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T17:40:26.071Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T17:41:23.502Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T17:43:09.546Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T17:54:01.455Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T17:54:55.493Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T17:55:59.846Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T17:57:49.501Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/login",
+    "timestamp": "2026-07-17T18:07:20.739Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T18:09:59.355Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T18:12:30.222Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T18:12:53.660Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "wwalden@esmsolutions.com",
+    "name": "Whitney Walden (Preview)",
+    "page": "/hub",
+    "timestamp": "2026-07-17T18:15:41.480Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "wwalden@esmsolutions.com",
+    "name": "Whitney Walden (Preview)",
+    "page": "/hub",
+    "timestamp": "2026-07-17T18:17:37.829Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub",
+    "timestamp": "2026-07-17T18:31:48.297Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "rob@robsmithconsulting.com",
+    "name": "Rob Smith",
+    "page": "/hub/raid-log",
+    "timestamp": "2026-07-17T18:33:11.960Z"
+  },
+  {
+    "projectId": "rob-smith-consulting",
+    "email": "wwalden@esmsolutions.com",
+    "name": "Whitney Walden (Preview)",
+    "page": "/hub",
+    "timestamp": "2026-07-17T18:44:05.931Z"
   }
 ]

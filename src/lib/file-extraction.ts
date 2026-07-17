@@ -91,6 +91,72 @@ export async function extractTextFromMultipleFiles(filePaths: string[]): Promise
   return texts.join("\n\n");
 }
 
+export async function extractTextFromBuffer(buffer: Buffer, fileName: string): Promise<string> {
+  const ext = path.extname(fileName).toLowerCase();
+
+  switch (ext) {
+    case ".txt":
+    case ".csv":
+      return buffer.toString("utf-8");
+
+    case ".pdf": {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
+      const data = await pdfParse(buffer);
+      return data.text;
+    }
+
+    case ".docx": {
+      const { Uint8Array: U8 } = globalThis;
+      const JSZip = await loadJSZip();
+      const zip = await JSZip.loadAsync(new U8(buffer));
+      const xmlFile = zip.file("word/document.xml");
+      if (!xmlFile) throw new Error("Invalid DOCX: missing word/document.xml");
+      const xml = await xmlFile.async("string");
+      return xml
+        .replace(/<w:tab\/>/g, "\t")
+        .replace(/<w:br[^/]*\/>/g, "\n")
+        .replace(/<\/w:p>/g, "\n")
+        .replace(/<[^>]+>/g, "")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    case ".xlsx":
+    case ".xls": {
+      const workbook = XLSX.read(buffer);
+      const parts: string[] = [];
+      for (const sheetName of workbook.SheetNames) {
+        const sheet = workbook.Sheets[sheetName];
+        const csv = XLSX.utils.sheet_to_csv(sheet);
+        if (csv.trim()) {
+          parts.push(`--- Sheet: ${sheetName} ---\n${csv}`);
+        }
+      }
+      return parts.join("\n\n");
+    }
+
+    default:
+      throw new Error(`Unsupported file type: ${ext}`);
+  }
+}
+
+export async function extractTextFromBuffers(
+  files: { name: string; buffer: Buffer }[],
+): Promise<string> {
+  const texts: string[] = [];
+  for (const file of files) {
+    const text = await extractTextFromBuffer(file.buffer, file.name);
+    texts.push(`=== FILE: ${file.name} ===\n${text}`);
+  }
+  return texts.join("\n\n");
+}
+
 const ACCEPTED_EXTENSIONS = new Set([".pdf", ".docx", ".xlsx", ".xls", ".txt", ".csv"]);
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 

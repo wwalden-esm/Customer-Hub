@@ -123,7 +123,36 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
       return cell?.displayValue ?? cell?.value ?? null;
     };
 
-    // Include rows that are level-1 products, level-2 phases (with children), or milestone-flagged
+    // Build parentId map for walking up the tree
+    const parentIdMap = new Map<number, number | undefined>();
+    for (const row of detailedSheet.rows) {
+      parentIdMap.set(row.id, row.parentId);
+    }
+
+    // Resolve level-1 ancestor (product) for any row
+    const getLevel1Ancestor = (rowId: number): number | null => {
+      let current = rowId;
+      for (let i = 0; i < 20; i++) {
+        const pid = parentIdMap.get(current);
+        if (!pid) return null;
+        if (pid === rootRowId) return current;
+        current = pid;
+      }
+      return null;
+    };
+
+    // Find the first in-progress level-1 product row
+    let activeProductId: number | null = null;
+    for (const row of detailedSheet.rows) {
+      if (row.parentId !== rootRowId || !parentRowIds.has(row.id)) continue;
+      const status = getCellVal(row, statusCol);
+      if (status && String(status).toLowerCase().includes("progress")) {
+        activeProductId = row.id;
+        break;
+      }
+    }
+
+    // Only include rows with the Milestone checkbox checked, under the active product
     const milestoneRows = detailedSheet.rows.filter((r) => {
       if (r.id === rootRowId) return false;
 
@@ -133,10 +162,19 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
       if (status && String(status).toLowerCase() === "cancelled") return false;
 
       const isMilestoneChecked = getCellVal(r, milestoneCol);
-      const isLevel1 = r.parentId === rootRowId && parentRowIds.has(r.id);
-      const isLevel2Parent = r.parentId != null && level1Ids.has(r.parentId) && parentRowIds.has(r.id);
+      if (isMilestoneChecked !== true && isMilestoneChecked !== "True" && isMilestoneChecked !== "true") {
+        return false;
+      }
 
-      return isLevel1 || isLevel2Parent || isMilestoneChecked === true || isMilestoneChecked === "True" || isMilestoneChecked === "true";
+      if (activeProductId) {
+        const isLevel1 = r.parentId === rootRowId;
+        if (!isLevel1) {
+          const ancestor = getLevel1Ancestor(r.id);
+          if (ancestor !== activeProductId) return false;
+        }
+      }
+
+      return true;
     });
 
     const extractMilestone = (row: (typeof detailedSheet.rows)[number]): Milestone => {
@@ -163,6 +201,7 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
         const s = String(status).toLowerCase();
         if (s === "complete" || s === "completed") milestoneStatus = "complete";
         else if (s.includes("progress")) milestoneStatus = "in-progress";
+        else if (s === "not started") milestoneStatus = "upcoming";
         else if (s === "on hold") milestoneStatus = "on-hold";
       }
 
@@ -214,11 +253,10 @@ export async function getProjectMilestones(projectPlanSheetId: string): Promise<
 }
 
 export function deriveCurrentPhase(milestones: Milestone[], fallback: string): string {
-  const phases = milestones.filter((m) => m.level === 1);
-  if (phases.length === 0) return fallback;
-  const inProgress = phases.find((m) => m.status === "in-progress");
+  if (milestones.length === 0) return fallback;
+  const inProgress = milestones.find((m) => m.status === "in-progress");
   if (inProgress) return inProgress.name;
-  const firstIncomplete = phases.find((m) => m.status !== "complete");
+  const firstIncomplete = milestones.find((m) => m.status !== "complete");
   if (firstIncomplete) return firstIncomplete.name;
   return "Complete";
 }

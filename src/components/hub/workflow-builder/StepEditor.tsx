@@ -15,10 +15,10 @@ interface StepEditorProps {
 const OPERATOR_OPTIONS = ["", "NEXT", "AND", "OR"] as const;
 
 const inputClass =
-  "w-full rounded border border-slate-200 px-2 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30 focus:border-[var(--hub-accent)]/50";
+  "w-full rounded border border-slate-200 px-3 py-2 text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30 focus:border-[var(--hub-accent)]/50";
 
 const selectClass =
-  "w-full rounded border border-slate-200 px-2 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30";
+  "w-full rounded border border-slate-200 px-3 py-2 text-[14px] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30";
 
 export default function StepEditor({
   step,
@@ -100,45 +100,45 @@ export default function StepEditor({
         <table className="w-full text-sm border border-slate-200 rounded">
           <thead className="bg-slate-50">
             <tr>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 w-8">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-10">
                 #
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[140px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Workflow Name
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[100px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
                 Fund Code
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[100px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
                 Org Code
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[100px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
                 Other Criteria
               </th>
               {step.has_threshold && (
-                <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[90px]">
+                <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[110px]">
                   Threshold $
                 </th>
               )}
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[140px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Approver 1
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 w-[60px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-[72px]">
                 Op
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[140px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Approver 2
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 w-[60px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-[72px]">
                 Op
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[140px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Approver 3
               </th>
-              <th className="px-2 py-2 text-left text-slate-600 font-medium border-b border-slate-200 min-w-[100px]">
+              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[140px]">
                 Notes
               </th>
-              <th className="w-8 border-b border-slate-200" />
+              <th className="w-10 border-b border-slate-200" />
             </tr>
           </thead>
           <tbody>
@@ -147,8 +147,8 @@ export default function StepEditor({
                 key={rIdx}
                 className="border-b border-slate-100 hover:bg-slate-50/50"
               >
-                <td className="px-2 py-1 text-xs text-esm-muted">{rIdx + 1}</td>
-                <td className="px-1 py-1">
+                <td className="px-2 py-2 text-sm text-esm-muted align-top pt-4">{rIdx + 1}</td>
+                <td className="px-1.5 py-2">
                   <input
                     type="text"
                     className={inputClass}
@@ -159,7 +159,7 @@ export default function StepEditor({
                     placeholder="Rule name"
                   />
                 </td>
-                <td className="px-1 py-1">
+                <td className="px-1.5 py-2">
                   <input
                     type="text"
                     className={inputClass}
@@ -169,7 +169,7 @@ export default function StepEditor({
                     }
                   />
                 </td>
-                <td className="px-1 py-1">
+                <td className="px-1.5 py-2">
                   <input
                     type="text"
                     className={inputClass}
@@ -179,7 +179,7 @@ export default function StepEditor({
                     }
                   />
                 </td>
-                <td className="px-1 py-1">
+                <td className="px-1.5 py-2">
                   <input
                     type="text"
                     className={inputClass}
@@ -190,7 +190,7 @@ export default function StepEditor({
                   />
                 </td>
                 {step.has_threshold && (
-                  <td className="px-1 py-1">
+                  <td className="px-1.5 py-2">
                     <input
                       type="number"
                       className={inputClass}
@@ -208,8 +208,8 @@ export default function StepEditor({
                     />
                   </td>
                 )}
-                <td className="px-1 py-1">
-                  <div className="space-y-0.5">
+                <td className="px-1.5 py-2">
+                  <div className="space-y-1">
                     <input
                       type="text"
                       className={inputClass}
@@ -230,7 +230,7 @@ export default function StepEditor({
                     />
                   </div>
                 </td>
-                <td className="px-1 py-1">
+                <td className="px-1.5 py-2">
                   <select
                     className={selectClass}
                     value={rule.approver_1_2_operator}
@@ -245,8 +245,8 @@ export default function StepEditor({
                     ))}
                   </select>
                 </td>
-                <td className="px-1 py-1">
-                  <div className="space-y-0.5">
+                <td className="px-1.5 py-2">
+                  <div className="space-y-1">
                     <input
                       type="text"
                       className={inputClass}
@@ -267,7 +267,7 @@ export default function StepEditor({
                     />
                   </div>
                 </td>
-                <td className="px-1 py-1">
+                <td className="px-1.5 py-2">
                   <select
                     className={selectClass}
                     value={rule.approver_2_3_operator}
@@ -282,8 +282,8 @@ export default function StepEditor({
                     ))}
                   </select>
                 </td>
-                <td className="px-1 py-1">
-                  <div className="space-y-0.5">
+                <td className="px-1.5 py-2">
+                  <div className="space-y-1">
                     <input
                       type="text"
                       className={inputClass}
@@ -304,7 +304,7 @@ export default function StepEditor({
                     />
                   </div>
                 </td>
-                <td className="px-1 py-1">
+                <td className="px-1.5 py-2">
                   <input
                     type="text"
                     className={inputClass}
@@ -315,12 +315,12 @@ export default function StepEditor({
                     placeholder="Notes"
                   />
                 </td>
-                <td className="px-1 py-1 text-center">
+                <td className="px-1.5 py-2 text-center">
                   <button
                     type="button"
                     onClick={() => removeRule(rIdx)}
                     disabled={rules.length <= 1}
-                    className="text-slate-400 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="text-slate-400 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed text-lg"
                     aria-label="Remove rule"
                     title="Remove rule"
                   >

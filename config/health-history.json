@@ -15,5 +15,22 @@
         "riskLevel": "moderate"
       }
     }
+  },
+  {
+    "date": "2026-07-16",
+    "projects": {
+      "rob-smith-consulting": {
+        "overall": 62,
+        "components": {
+          "milestoneHealth": 70,
+          "actionItemHealth": 0,
+          "raidHealth": 39,
+          "timelinePressure": 95,
+          "completionProgress": 28,
+          "engagementScore": 76
+        },
+        "riskLevel": "moderate"
+      }
+    }
   }
 ]

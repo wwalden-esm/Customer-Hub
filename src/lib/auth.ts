@@ -1,7 +1,7 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcryptjs from "bcryptjs";
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { join } from "path";
 import type { EsmRole } from "@/types/enums";
 
@@ -54,23 +54,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = users.find((u) => u.email.toLowerCase() === email);
         if (!user) return null;
 
-        const isBcrypt = user.password.startsWith("$2");
-        if (isBcrypt) {
-          const match = await bcryptjs.compare(password, user.password);
-          if (!match) return null;
-        } else {
-          // Legacy plain-text password — verify then auto-migrate to bcrypt
-          if (password !== user.password) return null;
-          const hash = bcryptjs.hashSync(password, 10);
-          user.password = hash;
-          const filePath = join(process.cwd(), "config", "esm-users.json");
-          const allUsers = loadUsers();
-          const target = allUsers.find((u) => u.email.toLowerCase() === email);
-          if (target) {
-            target.password = hash;
-            writeFileSync(filePath, JSON.stringify(allUsers, null, 2) + "\n", "utf-8");
-          }
-        }
+        const match = await bcryptjs.compare(password, user.password);
+        if (!match) return null;
 
         return { id: email, email: user.email, name: user.name, role: user.role };
       },

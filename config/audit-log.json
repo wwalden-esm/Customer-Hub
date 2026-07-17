@@ -30,5 +30,68 @@
     "target": "rob-smith-consulting",
     "detail": "Technical issue",
     "category": "question"
+  },
+  {
+    "timestamp": "2026-07-16T21:09:23.222Z",
+    "actor": "wwalden@esmsolutions.com",
+    "action": "send_notification",
+    "target": "all",
+    "detail": "No notifications needed",
+    "category": "notification"
+  },
+  {
+    "timestamp": "2026-07-16T21:11:57.540Z",
+    "actor": "wwalden@esmsolutions.com",
+    "action": "close_question",
+    "target": "rob-smith-consulting",
+    "detail": "Technical issue",
+    "category": "question"
+  },
+  {
+    "timestamp": "2026-07-16T21:12:02.913Z",
+    "actor": "wwalden@esmsolutions.com",
+    "action": "reply_question",
+    "target": "rob-smith-consulting",
+    "detail": "Test",
+    "category": "question"
+  },
+  {
+    "timestamp": "2026-07-16T21:12:03.106Z",
+    "actor": "system",
+    "action": "email_failed",
+    "target": "customer@portal",
+    "detail": "New Communication — Rob's Testing Project",
+    "category": "email"
+  },
+  {
+    "timestamp": "2026-07-16T21:12:04.281Z",
+    "actor": "wwalden@esmsolutions.com",
+    "action": "close_question",
+    "target": "rob-smith-consulting",
+    "detail": "Test",
+    "category": "question"
+  },
+  {
+    "timestamp": "2026-07-16T21:12:05.772Z",
+    "actor": "wwalden@esmsolutions.com",
+    "action": "reopen_question",
+    "target": "rob-smith-consulting",
+    "detail": "Test",
+    "category": "question"
+  },
+  {
+    "timestamp": "2026-07-17T13:03:38.921Z",
+    "actor": "wwalden@esmsolutions.com",
+    "action": "reset_password",
+    "target": "wwalden@esmsolutions.com",
+    "category": "user"
+  },
+  {
+    "timestamp": "2026-07-17T17:54:55.178Z",
+    "actor": "Rob Smith",
+    "action": "submit_raid_item",
+    "target": "rob-smith-consulting",
+    "detail": "Risk: Test risk from customer portal (pending approval)",
+    "category": "project"
   }
 ]

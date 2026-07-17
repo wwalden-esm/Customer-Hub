@@ -11,6 +11,16 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: "Workflow Builder" };
 }
 
+function getHubspotIntakeId(projectId: string): string | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const projects = require("../../../../config/projects.json");
+    return projects[projectId]?.hubspotIntakeId ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function WorkflowBuilderPage() {
   const session = await getCustomerSession();
   if (!session) redirect("/hub/login");
@@ -37,10 +47,27 @@ export default async function WorkflowBuilderPage() {
     workflowData = createEmptyWorkflowData(project.customerName);
   }
 
+  let hubspotGlSystem: string | null = null;
+  const hubspotIntakeId = getHubspotIntakeId(session.projectId);
+  if (hubspotIntakeId) {
+    try {
+      const { getIntakeRecord } = await import("@/lib/hubspot");
+      const record = await getIntakeRecord(hubspotIntakeId);
+      hubspotGlSystem = record.properties.erpfinancial_system || null;
+    } catch {
+      // HubSpot unavailable — fall through to manual entry
+    }
+  }
+
+  if (hubspotGlSystem && !workflowData.gl_system) {
+    workflowData.gl_system = hubspotGlSystem;
+  }
+
   return (
     <WorkflowBuilderClient
       projectId={session.projectId}
       initialData={workflowData}
+      hubspotGlSystem={hubspotGlSystem}
     />
   );
 }

@@ -17,11 +17,13 @@ import FileUploader from "@/components/hub/FileUploader";
 interface WorkflowBuilderClientProps {
   projectId: string;
   initialData: WorkflowData;
+  hubspotGlSystem?: string | null;
 }
 
 export default function WorkflowBuilderClient({
   projectId,
   initialData,
+  hubspotGlSystem,
 }: WorkflowBuilderClientProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -387,16 +389,27 @@ export default function WorkflowBuilderClient({
           <div>
             <label className="block text-xs font-medium text-esm-black mb-1">
               GL System
+              {hubspotGlSystem && (
+                <span className="ml-1.5 font-normal text-esm-muted">
+                  (from HubSpot)
+                </span>
+              )}
             </label>
-            <input
-              type="text"
-              className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30"
-              value={data.gl_system}
-              onChange={(e) =>
-                updateData({ ...data, gl_system: e.target.value })
-              }
-              placeholder="e.g. Banner, PeopleSoft"
-            />
+            {hubspotGlSystem ? (
+              <div className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black bg-slate-50">
+                {data.gl_system}
+              </div>
+            ) : (
+              <input
+                type="text"
+                className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30"
+                value={data.gl_system}
+                onChange={(e) =>
+                  updateData({ ...data, gl_system: e.target.value })
+                }
+                placeholder="e.g. Banner, PeopleSoft"
+              />
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium text-esm-black mb-1">

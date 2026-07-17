@@ -8,7 +8,28 @@
     "senderEmail": "customer@portal",
     "id": "q-1783979054117-eh7e",
     "createdAt": "2026-07-13T21:44:14.117Z",
-    "status": "open"
+    "status": "open",
+    "messages": [
+      {
+        "id": "q-1783979054117-eh7e-msg-0",
+        "text": "Test",
+        "authorName": "Customer",
+        "authorEmail": "customer@portal",
+        "authorType": "customer",
+        "createdAt": "2026-07-13T21:44:14.117Z"
+      },
+      {
+        "text": "Test",
+        "authorName": "Whitney Walden",
+        "authorEmail": "",
+        "authorType": "staff",
+        "id": "q-1783979054117-eh7e-msg-1",
+        "createdAt": "2026-07-16T21:12:02.910Z"
+      }
+    ],
+    "reply": "Test",
+    "repliedBy": "Whitney Walden",
+    "repliedAt": "2026-07-16T21:12:02.910Z"
   },
   {
     "projectId": "rob-smith-consulting",
@@ -19,9 +40,27 @@
     "senderEmail": "customer@portal",
     "id": "q-1784034759062-d7u6",
     "createdAt": "2026-07-14T13:12:39.062Z",
-    "status": "replied",
+    "status": "closed",
     "reply": "Issue Reply Text",
     "repliedBy": "Whitney Walden",
-    "repliedAt": "2026-07-14T13:13:45.325Z"
+    "repliedAt": "2026-07-14T13:13:45.325Z",
+    "messages": [
+      {
+        "id": "q-1784034759062-d7u6-msg-0",
+        "text": "Technical issue question",
+        "authorName": "Customer",
+        "authorEmail": "customer@portal",
+        "authorType": "customer",
+        "createdAt": "2026-07-14T13:12:39.062Z"
+      },
+      {
+        "id": "q-1784034759062-d7u6-msg-1",
+        "text": "Issue Reply Text",
+        "authorName": "Whitney Walden",
+        "authorEmail": "",
+        "authorType": "staff",
+        "createdAt": "2026-07-14T13:13:45.325Z"
+      }
+    ]
   }
 ]
