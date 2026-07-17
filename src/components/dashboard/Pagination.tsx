@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -10,7 +12,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-t border-esm-border">
+    <nav aria-label="Pagination" className="flex items-center justify-between px-4 py-3 border-t border-esm-border">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
@@ -28,6 +30,6 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       >
         Next
       </button>
-    </div>
+    </nav>
   );
 }

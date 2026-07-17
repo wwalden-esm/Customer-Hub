@@ -163,6 +163,7 @@ export default function QuestionThread({
                   onChange={(e) => setReplyText(e.target.value)}
                   rows={3}
                   placeholder="Type your follow-up message..."
+                  aria-label="Reply message"
                   className="w-full text-sm border border-esm-border rounded-card px-3 py-2 focus:outline-none focus:border-esm-black resize-y mb-2"
                 />
                 <div className="flex gap-2 justify-end">

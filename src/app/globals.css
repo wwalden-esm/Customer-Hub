@@ -25,7 +25,7 @@ html.dark .bg-white { background-color: #262626 !important; }
 html.dark .bg-gray-50 { background-color: #2a2a2a !important; }
 html.dark .text-esm-black { color: #e5e5e5 !important; }
 html.dark .text-esm-grey { color: #a1a1a1 !important; }
-html.dark .text-esm-muted { color: #737373 !important; }
+html.dark .text-esm-muted { color: #949494 !important; }
 html.dark .border-esm-border { border-color: #404040 !important; }
 html.dark .border-gray-100 { border-color: #333333 !important; }
 html.dark .bg-slate-50 { background-color: #2a2a2a !important; }
@@ -61,6 +61,15 @@ html.dark .bg-emerald-50 { background-color: #1a2e1a !important; }
 html.dark .bg-blue-50 { background-color: #1a2030 !important; }
 html.dark .bg-amber-50 { background-color: #2e2a1a !important; }
 html.dark .bg-red-50 { background-color: #2e1a1a !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 body {
   color: var(--foreground);

@@ -38,6 +38,7 @@ export default function NotificationBell({ projectId }: { projectId: string }) {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
+        buttonRef.current?.focus();
       }
     }
     document.addEventListener("mousedown", handleClick);

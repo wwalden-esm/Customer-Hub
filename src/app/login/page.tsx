@@ -51,8 +51,9 @@ function LoginForm() {
       <p className="text-sm text-esm-grey mt-1">ESM internal sign-in</p>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-esm-black">Email</label>
+          <label htmlFor="login-email" className="block text-sm font-medium text-esm-black">Email</label>
           <Input
+            id="login-email"
             type="email"
             required
             value={email}
@@ -62,8 +63,9 @@ function LoginForm() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-esm-black">Password</label>
+          <label htmlFor="login-password" className="block text-sm font-medium text-esm-black">Password</label>
           <Input
+            id="login-password"
             type="password"
             required
             value={password}
@@ -72,7 +74,7 @@ function LoginForm() {
             className="mt-1"
           />
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
         <Button
           type="submit"
           variant="primary"

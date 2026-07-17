@@ -19,9 +19,10 @@ const config: Config = {
           grey: "#686468",
           "grey-light": "#F0F0F0",
           blue: "#1F4E79",
+          "red-text": "#C92A34",
           border: "#E2E0E1",
           "border-hover": "#C5C3C4",
-          muted: "#9E9B9E",
+          muted: "#757175",
           gradient: {
             1: "#F4333F",
             2: "#D2353D",

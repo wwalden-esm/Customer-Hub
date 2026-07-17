@@ -558,7 +558,7 @@ export default function MeetingStructure() {
                 )}
                 {seg.execNote && (
                   <div style={{ marginTop: 10, background: EXEC_GOLD_BG, border: `1px solid ${EXEC_GOLD_BORDER}`, borderRadius: 4, padding: "8px 12px", fontSize: 11, color: EXEC_GOLD, display: "flex", gap: 6, alignItems: "flex-start" }}>
-                    <span style={{ fontWeight: 700, flexShrink: 0 }}>★</span>
+                    <span style={{ fontWeight: 700, flexShrink: 0 }} aria-hidden="true">★</span>
                     <span>{seg.execNote}</span>
                   </div>
                 )}

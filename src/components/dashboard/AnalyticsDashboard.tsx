@@ -41,7 +41,7 @@ function ScoreRing({ score, grade, size = 72 }: { score: number; grade: string; 
   const offset = circ * (1 - score / 100);
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`Health score ${score}, grade ${grade}`}>
       <circle
         cx={size / 2} cy={size / 2} r={r}
         fill="none" stroke="#e5e7eb" strokeWidth={6}
@@ -77,7 +77,7 @@ function ScoreRing({ score, grade, size = 72 }: { score: number; grade: string; 
 function MiniBar({ value, max, color }: { value: number; max: number; color: string }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   return (
-    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden" role="img" aria-label={`Bar chart: ${value} of ${max}`}>
       <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
     </div>
   );
@@ -98,7 +98,7 @@ function Sparkline({ components }: { components: HealthScore["components"] }) {
   const points = vals.map((v, i) => `${i * step},${h - (v / 100) * h}`).join(" ");
 
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="inline-block">
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="inline-block" role="img" aria-label="Health component sparkline">
       <polyline
         points={points}
         fill="none"
@@ -151,15 +151,15 @@ function FilterBar({ projects, filters, onFilterChange }: {
   return (
     <div className="flex flex-wrap items-center gap-2 mb-4">
       <span className="text-xs text-esm-muted uppercase tracking-wider font-semibold">Filter:</span>
-      <select value={filters.sc} onChange={(e) => onFilterChange("sc", e.target.value)} className={selectClass}>
+      <select value={filters.sc} onChange={(e) => onFilterChange("sc", e.target.value)} aria-label="Filter by SC" className={selectClass}>
         <option value="">All SCs</option>
         {scs.map(sc => <option key={sc} value={sc}>{sc}</option>)}
       </select>
-      <select value={filters.status} onChange={(e) => onFilterChange("status", e.target.value)} className={selectClass}>
+      <select value={filters.status} onChange={(e) => onFilterChange("status", e.target.value)} aria-label="Filter by status" className={selectClass}>
         <option value="">All Statuses</option>
         {statuses.map(s => <option key={s} value={s}>{s}</option>)}
       </select>
-      <select value={filters.phase} onChange={(e) => onFilterChange("phase", e.target.value)} className={selectClass}>
+      <select value={filters.phase} onChange={(e) => onFilterChange("phase", e.target.value)} aria-label="Filter by phase" className={selectClass}>
         <option value="">All Phases</option>
         {phases.map(p => <option key={p} value={p}>{p}</option>)}
       </select>
@@ -291,7 +291,10 @@ function ProjectHealthTable({ projects, onSelect }: { projects: ProjectAnalytics
                 <tr
                   key={pa.project.id}
                   className="border-b border-esm-border last:border-0 hover:bg-slate-50 cursor-pointer transition-colors"
+                  tabIndex={0}
+                  role="button"
                   onClick={() => onSelect(pa)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(pa); } }}
                 >
                   <td className="py-2.5 px-2">
                     <p className="font-medium text-esm-black truncate max-w-[180px]">{pa.project.customerName}</p>

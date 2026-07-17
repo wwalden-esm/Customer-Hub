@@ -387,7 +387,7 @@ export default function WorkflowBuilderClient({
       <Card padding="md">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
-            <label className="block text-xs font-medium text-esm-black mb-1">
+            <label htmlFor="wf-gl-system" className="block text-xs font-medium text-esm-black mb-1">
               GL System
               {hubspotGlSystem && (
                 <span className="ml-1.5 font-normal text-esm-muted">
@@ -396,11 +396,12 @@ export default function WorkflowBuilderClient({
               )}
             </label>
             {hubspotGlSystem ? (
-              <div className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black bg-slate-50">
+              <div id="wf-gl-system" className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black bg-slate-50">
                 {data.gl_system}
               </div>
             ) : (
               <input
+                id="wf-gl-system"
                 type="text"
                 className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30"
                 value={data.gl_system}
@@ -412,10 +413,11 @@ export default function WorkflowBuilderClient({
             )}
           </div>
           <div>
-            <label className="block text-xs font-medium text-esm-black mb-1">
+            <label htmlFor="wf-fund-codes" className="block text-xs font-medium text-esm-black mb-1">
               Fund Codes
             </label>
             <input
+              id="wf-fund-codes"
               type="text"
               className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30"
               value={data.fund_codes}
@@ -426,10 +428,11 @@ export default function WorkflowBuilderClient({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-esm-black mb-1">
+            <label htmlFor="wf-org-codes" className="block text-xs font-medium text-esm-black mb-1">
               Org Codes
             </label>
             <input
+              id="wf-org-codes"
               type="text"
               className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30"
               value={data.org_codes}
@@ -440,10 +443,11 @@ export default function WorkflowBuilderClient({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-esm-black mb-1">
+            <label htmlFor="wf-notes" className="block text-xs font-medium text-esm-black mb-1">
               Additional Notes
             </label>
             <input
+              id="wf-notes"
               type="text"
               className="w-full text-sm border border-esm-border rounded-card px-3 py-2 text-esm-black focus:outline-none focus:ring-2 focus:ring-[var(--hub-accent)]/30"
               value={data.additional_notes}

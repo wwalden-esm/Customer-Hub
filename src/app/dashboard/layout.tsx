@@ -29,6 +29,9 @@ export default async function DashboardLayout({
   return (
     <HubToastProvider>
       <div className="min-h-screen bg-esm-grey-light">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <header className="bg-white border-b border-esm-border sticky top-0 z-30">
           <div className="h-1 bg-esm-red" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-2">
@@ -41,7 +44,7 @@ export default async function DashboardLayout({
               </span>
             </a>
 
-            <nav className="flex items-center gap-1 overflow-x-auto min-w-0 flex-1 mx-2">
+            <nav className="flex items-center gap-1 overflow-x-auto min-w-0 flex-1 mx-2" aria-label="Main navigation">
               {navLinks.map((link) => (
                 <ActiveNavLink key={link.href} href={link.href} exact={link.exact}>
                   {link.label}
@@ -72,7 +75,7 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
       </div>
     </HubToastProvider>
   );

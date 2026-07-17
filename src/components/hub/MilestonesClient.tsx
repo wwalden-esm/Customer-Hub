@@ -331,6 +331,7 @@ export default function MilestonesClient({
         <select
           value={phaseFilter}
           onChange={(e) => setPhaseFilter(e.target.value)}
+          aria-label="Filter by phase"
           className="text-sm border border-esm-border rounded-card px-3 py-1.5 bg-white text-esm-black focus:outline-none focus:ring-1"
           style={
             {

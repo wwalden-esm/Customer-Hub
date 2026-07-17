@@ -339,6 +339,7 @@ export default function MilestoneLine({ milestones, projectId, initialComments =
                 <select
                   value={selectedAuthor}
                   onChange={(e) => setSelectedAuthor(e.target.value)}
+                  aria-label="Select commenter"
                   className="text-xs border border-esm-border rounded-card px-3 py-1.5 bg-white focus:outline-none focus:border-esm-black w-full sm:w-auto"
                 >
                   <option value="">Select your name...</option>
@@ -355,6 +356,7 @@ export default function MilestoneLine({ milestones, projectId, initialComments =
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !posting && handlePostComment()}
                 placeholder="Add a comment..."
+                aria-label="Add a comment"
                 className="flex-1 text-xs border border-esm-border rounded-card px-3 py-1.5 focus:outline-none focus:border-esm-black"
               />
               <button

@@ -148,8 +148,7 @@ export default function NotificationsClient({
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="text-xs font-medium hover:underline"
-              style={{ color: "var(--hub-accent, #F4333F)" }}
+              className="text-xs font-medium text-esm-red-text hover:underline"
             >
               Mark all as read
             </button>
@@ -192,6 +191,9 @@ export default function NotificationsClient({
                   <p className="text-[11px] text-esm-muted">Receive email alerts for hub activity</p>
                 </div>
                 <button
+                  role="switch"
+                  aria-checked={prefs.emailEnabled}
+                  aria-label="Email Notifications"
                   onClick={() => updatePref("emailEnabled", !prefs.emailEnabled)}
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                     !prefs.emailEnabled ? "bg-gray-200" : ""
@@ -212,6 +214,9 @@ export default function NotificationsClient({
                     <p className="text-[11px] text-esm-muted">When someone replies to your questions</p>
                   </div>
                   <button
+                    role="switch"
+                    aria-checked={prefs.questionReplies && prefs.emailEnabled}
+                    aria-label="Question Replies"
                     onClick={() => updatePref("questionReplies", !prefs.questionReplies)}
                     disabled={!prefs.emailEnabled}
                     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
@@ -232,6 +237,9 @@ export default function NotificationsClient({
                     <p className="text-[11px] text-esm-muted">When project milestones change status</p>
                   </div>
                   <button
+                    role="switch"
+                    aria-checked={prefs.milestoneUpdates && prefs.emailEnabled}
+                    aria-label="Milestone Updates"
                     onClick={() => updatePref("milestoneUpdates", !prefs.milestoneUpdates)}
                     disabled={!prefs.emailEnabled}
                     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
@@ -252,6 +260,9 @@ export default function NotificationsClient({
                     <p className="text-[11px] text-esm-muted">Upcoming meeting notifications</p>
                   </div>
                   <button
+                    role="switch"
+                    aria-checked={prefs.meetingReminders && prefs.emailEnabled}
+                    aria-label="Meeting Reminders"
                     onClick={() => updatePref("meetingReminders", !prefs.meetingReminders)}
                     disabled={!prefs.emailEnabled}
                     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${

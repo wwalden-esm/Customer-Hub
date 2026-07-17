@@ -17,9 +17,10 @@ export default function ActiveNavLink({
   return (
     <a
       href={href}
+      aria-current={isActive ? "page" : undefined}
       className={`text-sm px-2.5 py-1.5 rounded-card transition-colors ${
         isActive
-          ? "text-esm-red font-medium bg-red-50/40"
+          ? "text-esm-red-text font-medium bg-red-50/40"
           : "text-esm-grey hover:text-esm-black hover:bg-slate-50"
       }`}
     >

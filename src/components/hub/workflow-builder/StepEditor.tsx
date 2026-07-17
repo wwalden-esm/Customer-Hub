@@ -100,42 +100,42 @@ export default function StepEditor({
         <table className="w-full text-sm border border-slate-200 rounded">
           <thead className="bg-slate-50">
             <tr>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-10">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-10">
                 #
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Workflow Name
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
                 Fund Code
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
                 Org Code
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[130px]">
                 Other Criteria
               </th>
               {step.has_threshold && (
-                <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[110px]">
+                <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[110px]">
                   Threshold $
                 </th>
               )}
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Approver 1
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-[72px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-[72px]">
                 Op
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Approver 2
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-[72px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 w-[72px]">
                 Op
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[180px]">
                 Approver 3
               </th>
-              <th className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[140px]">
+              <th scope="col" className="px-2 py-2.5 text-left text-[13px] text-slate-600 font-medium border-b border-slate-200 min-w-[140px]">
                 Notes
               </th>
               <th className="w-10 border-b border-slate-200" />
@@ -157,6 +157,7 @@ export default function StepEditor({
                       updateRule(rIdx, "workflow_name", e.target.value)
                     }
                     placeholder="Rule name"
+                    aria-label={`Workflow name, rule ${rIdx + 1}`}
                   />
                 </td>
                 <td className="px-1.5 py-2">
@@ -167,6 +168,7 @@ export default function StepEditor({
                     onChange={(e) =>
                       updateRule(rIdx, "fund_code", e.target.value)
                     }
+                    aria-label={`Fund code, rule ${rIdx + 1}`}
                   />
                 </td>
                 <td className="px-1.5 py-2">
@@ -177,6 +179,7 @@ export default function StepEditor({
                     onChange={(e) =>
                       updateRule(rIdx, "org_code", e.target.value)
                     }
+                    aria-label={`Org code, rule ${rIdx + 1}`}
                   />
                 </td>
                 <td className="px-1.5 py-2">
@@ -187,6 +190,7 @@ export default function StepEditor({
                     onChange={(e) =>
                       updateRule(rIdx, "other_criteria", e.target.value)
                     }
+                    aria-label={`Other criteria, rule ${rIdx + 1}`}
                   />
                 </td>
                 {step.has_threshold && (
@@ -205,6 +209,7 @@ export default function StepEditor({
                       placeholder="0.00"
                       min={0}
                       step="0.01"
+                      aria-label={`Threshold, rule ${rIdx + 1}`}
                     />
                   </td>
                 )}
@@ -218,6 +223,7 @@ export default function StepEditor({
                         updateRule(rIdx, "approver_1_name", e.target.value)
                       }
                       placeholder="Name"
+                      aria-label={`Approver 1 name, rule ${rIdx + 1}`}
                     />
                     <input
                       type="email"
@@ -227,6 +233,7 @@ export default function StepEditor({
                         updateRule(rIdx, "approver_1_email", e.target.value)
                       }
                       placeholder="Email"
+                      aria-label={`Approver 1 email, rule ${rIdx + 1}`}
                     />
                   </div>
                 </td>
@@ -237,6 +244,7 @@ export default function StepEditor({
                     onChange={(e) =>
                       updateRule(rIdx, "approver_1_2_operator", e.target.value)
                     }
+                    aria-label={`Operator 1-2, rule ${rIdx + 1}`}
                   >
                     {OPERATOR_OPTIONS.map((o) => (
                       <option key={o} value={o}>
@@ -255,6 +263,7 @@ export default function StepEditor({
                         updateRule(rIdx, "approver_2_name", e.target.value)
                       }
                       placeholder="Name"
+                      aria-label={`Approver 2 name, rule ${rIdx + 1}`}
                     />
                     <input
                       type="email"
@@ -264,6 +273,7 @@ export default function StepEditor({
                         updateRule(rIdx, "approver_2_email", e.target.value)
                       }
                       placeholder="Email"
+                      aria-label={`Approver 2 email, rule ${rIdx + 1}`}
                     />
                   </div>
                 </td>
@@ -274,6 +284,7 @@ export default function StepEditor({
                     onChange={(e) =>
                       updateRule(rIdx, "approver_2_3_operator", e.target.value)
                     }
+                    aria-label={`Operator 2-3, rule ${rIdx + 1}`}
                   >
                     {OPERATOR_OPTIONS.map((o) => (
                       <option key={o} value={o}>
@@ -292,6 +303,7 @@ export default function StepEditor({
                         updateRule(rIdx, "approver_3_name", e.target.value)
                       }
                       placeholder="Name"
+                      aria-label={`Approver 3 name, rule ${rIdx + 1}`}
                     />
                     <input
                       type="email"
@@ -301,6 +313,7 @@ export default function StepEditor({
                         updateRule(rIdx, "approver_3_email", e.target.value)
                       }
                       placeholder="Email"
+                      aria-label={`Approver 3 email, rule ${rIdx + 1}`}
                     />
                   </div>
                 </td>
@@ -313,6 +326,7 @@ export default function StepEditor({
                       updateRule(rIdx, "notes", e.target.value)
                     }
                     placeholder="Notes"
+                    aria-label={`Notes, rule ${rIdx + 1}`}
                   />
                 </td>
                 <td className="px-1.5 py-2 text-center">

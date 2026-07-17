@@ -93,7 +93,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
               <span className="text-white/80">SC: {project.scName}</span>
             )}
             <span className="text-white/40" aria-hidden="true">|</span>
-            <a href="/hub/search" className="text-white/60 hover:text-white transition-colors" aria-label="Search">
+            <a href="/hub/search" className="text-white/80 hover:text-white transition-colors" aria-label="Search">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>

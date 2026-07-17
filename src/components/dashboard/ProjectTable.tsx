@@ -169,6 +169,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
     const active = sortKey === k;
     return (
       <th
+        scope="col"
         className="px-4 py-3 font-medium cursor-pointer select-none hover:text-esm-black"
         onClick={() => toggleSort(k)}
       >
@@ -190,12 +191,14 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
             placeholder="Search projects..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search projects"
             className="w-full pl-9 pr-3 py-2 text-sm border border-esm-border rounded"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Filter by status"
           className="border border-esm-border rounded px-3 py-2 text-sm text-esm-black"
         >
           <option value="all">All statuses</option>
@@ -237,6 +240,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
                 }
               }}
               disabled={!!bulkAction}
+              aria-label="Set status for selected projects"
               className="text-xs border border-blue-300 rounded px-2 py-1 bg-white text-blue-800 disabled:opacity-50"
               defaultValue=""
             >
@@ -269,7 +273,7 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-left text-esm-grey">
               <tr>
-                <th className="px-4 py-3 w-10">
+                <th scope="col" className="px-4 py-3 w-10">
                   <input
                     type="checkbox"
                     checked={allVisibleSelected}
@@ -280,11 +284,11 @@ export default function ProjectTable({ projects }: { projects: ProjectRow[] }) {
                 </th>
                 <SortHeader label="Customer" k="customerName" />
                 <SortHeader label="SC" k="scName" />
-                <th className="px-4 py-3 font-medium">PM</th>
+                <th scope="col" className="px-4 py-3 font-medium">PM</th>
                 <SortHeader label="Go-Live" k="goLiveDate" />
                 <SortHeader label="Status" k="status" />
                 <SortHeader label="Phase" k="currentPhase" />
-                <th className="px-4 py-3 font-medium">Sheets</th>
+                <th scope="col" className="px-4 py-3 font-medium">Sheets</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
