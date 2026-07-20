@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import DarkModeToggle from "@/components/hub/DarkModeToggle";
 import HubToastProvider from "@/components/hub/HubToastProvider";
 import ActiveNavLink from "@/components/dashboard/ActiveNavLink";
-import { EsmLogo } from "@/components/ui";
+import { EsmLogo, EsmFooter } from "@/components/ui";
 
 export default async function DashboardLayout({
   children,
@@ -29,7 +29,7 @@ export default async function DashboardLayout({
 
   return (
     <HubToastProvider>
-      <div className="min-h-screen bg-esm-grey-light">
+      <div className="min-h-screen bg-esm-grey-light flex flex-col">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
@@ -73,7 +73,8 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        <main id="main-content">{children}</main>
+        <main id="main-content" className="flex-1">{children}</main>
+        <EsmFooter variant="staff" />
       </div>
     </HubToastProvider>
   );

@@ -7,7 +7,7 @@
   --foreground: #2D2826;
   --hub-accent: #F4333F;
   --hub-accent-light: #FEF2F2;
-  --esm-slide-bg: #F0F0F0;
+  --esm-slide-bg: #EFEFF5;
 }
 
 html.dark {
@@ -74,6 +74,15 @@ html.dark .bg-red-50 { background-color: #2e1a1a !important; }
 body {
   color: var(--foreground);
   background: var(--background);
+}
+
+a:not([class]) {
+  color: #F4333F;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+a:not([class]):hover {
+  color: #DF1111;
 }
 
 .hub-nav-link:hover {

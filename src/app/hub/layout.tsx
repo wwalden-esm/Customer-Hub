@@ -15,7 +15,7 @@ import PortalActivityTracker from "@/components/hub/PortalActivityTracker";
 import CustomerLogo from "@/components/hub/CustomerLogo";
 import HubToastProvider from "@/components/hub/HubToastProvider";
 import DarkModeToggle from "@/components/hub/DarkModeToggle";
-import { EsmLogo } from "@/components/ui";
+import { EsmLogo, EsmFooter } from "@/components/ui";
 
 const ALL_NAV_ITEMS = [
   { href: "/hub", label: "Dashboard", key: "dashboard" },
@@ -65,7 +65,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
 
   return (
     <HubToastProvider>
-    <div className="min-h-screen bg-esm-grey-light" style={cssVars}>
+    <div className="min-h-screen bg-esm-grey-light flex flex-col" style={cssVars}>
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -113,9 +113,10 @@ export default async function HubLayout({ children }: { children: React.ReactNod
       </div>
       <Breadcrumbs items={navItems} />
 
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex-1 w-full">
         {children}
       </main>
+      <EsmFooter variant="customer" />
       <SessionGuard />
       <PortalActivityTracker />
     </div>

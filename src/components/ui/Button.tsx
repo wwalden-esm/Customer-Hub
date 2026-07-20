@@ -1,6 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "danger" | "ghost" | "accent";
+type Variant = "primary" | "secondary" | "danger" | "ghost" | "accent" | "outline";
 type Size = "sm" | "md";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -10,11 +10,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const base =
-  "inline-flex items-center justify-center font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none rounded-card";
+  "inline-flex items-center justify-center font-medium transition-all duration-300 ease-in-out disabled:opacity-50 disabled:pointer-events-none rounded-card hover:shadow-[0_15px_25px_-7px_rgba(0,0,0,0.1)]";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-esm-red text-white hover:bg-esm-red-dark",
+    "bg-esm-red text-white hover:bg-[#DF1111]",
   secondary:
     "bg-white text-esm-grey border border-esm-border hover:bg-slate-50 hover:border-esm-border-hover",
   danger:
@@ -23,6 +23,8 @@ const variants: Record<Variant, string> = {
     "text-esm-grey hover:text-esm-black hover:bg-slate-50",
   accent:
     "text-white hover:opacity-90",
+  outline:
+    "bg-white text-esm-red border border-esm-red hover:bg-esm-red hover:text-white",
 };
 
 const sizes: Record<Size, string> = {

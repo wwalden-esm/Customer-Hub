@@ -13,4 +13,6 @@ export { SectionLabel } from "./SectionLabel";
 
 export { EsmLogo } from "./EsmLogo";
 
+export { EsmFooter } from "./EsmFooter";
+
 export { ToastProvider, useToast } from "./Toast";
