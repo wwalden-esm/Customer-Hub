@@ -384,7 +384,7 @@ export default function RaidLogClient({ items, projectId, contactNames = [], esm
       )}
 
       {/* Items list */}
-      <Card padding="sm" className="!p-0 divide-y divide-esm-border">
+      <Card padding="sm" className="!p-0 divide-y divide-esm-border stagger-list">
         {filtered.length === 0 ? (
           <div className="px-5 py-6 text-center text-sm text-slate-500">
             No items match the selected filters.

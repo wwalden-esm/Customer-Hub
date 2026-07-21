@@ -19,6 +19,7 @@ function CustomerLoginForm() {
   const [projectId, setProjectId] = useState(projectParam);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [contacts, setContacts] = useState<ContactOption[] | null>(null);
   const [selectedContact, setSelectedContact] = useState<string>("");
@@ -49,10 +50,11 @@ function CustomerLoginForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!projectId) {
-      setError("Please enter a project ID.");
-      return;
-    }
+    const errs: Record<string, string> = {};
+    if (!projectId.trim()) errs.project = "Project ID is required";
+    if (!password) errs.password = "Password is required";
+    setFieldErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     setLoading(true);
     setError(null);
     try {
@@ -180,11 +182,12 @@ function CustomerLoginForm() {
             type="text"
             required
             value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
+            onChange={(e) => { setProjectId(e.target.value); setFieldErrors((p) => ({ ...p, project: "" })); }}
             placeholder="demo-project"
-            aria-describedby={error ? ids.error : undefined}
-            className="mt-1"
+            aria-describedby={fieldErrors.project ? `${ids.project}-err` : error ? ids.error : undefined}
+            className={`mt-1 ${fieldErrors.project ? "!border-red-500" : ""}`}
           />
+          {fieldErrors.project && <p id={`${ids.project}-err`} className="text-xs text-red-600 mt-1" role="alert">{fieldErrors.project}</p>}
         </div>
         <div>
           <label htmlFor={ids.password} className="block text-sm font-medium text-esm-black">Password</label>
@@ -193,11 +196,12 @@ function CustomerLoginForm() {
             type="password"
             required
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setFieldErrors((p) => ({ ...p, password: "" })); }}
             autoComplete="current-password"
-            aria-describedby={error ? ids.error : undefined}
-            className="mt-1"
+            aria-describedby={fieldErrors.password ? `${ids.password}-err` : error ? ids.error : undefined}
+            className={`mt-1 ${fieldErrors.password ? "!border-red-500" : ""}`}
           />
+          {fieldErrors.password && <p id={`${ids.password}-err`} className="text-xs text-red-600 mt-1" role="alert">{fieldErrors.password}</p>}
         </div>
         {error && (
           <div id={ids.error} role="alert" className="text-sm text-red-600">

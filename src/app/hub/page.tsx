@@ -31,6 +31,8 @@ import RefreshButton from "@/components/hub/RefreshButton";
 import DataTimestamp from "@/components/hub/DataTimestamp";
 import MeetingPrepChecklist from "@/components/hub/MeetingPrepChecklist";
 import CollapsibleSection from "@/components/hub/CollapsibleSection";
+import SatisfactionWidget from "@/components/hub/SatisfactionWidget";
+import OnboardingChecklist from "@/components/hub/OnboardingChecklist";
 import { Badge, Card, SectionLabel } from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
 
@@ -124,6 +126,8 @@ export default async function HubDashboard() {
           <RefreshButton />
         </div>
       </div>
+
+      <OnboardingChecklist projectName={project.projectName} />
 
       {/* ── Licensed Products + Team row ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
@@ -416,6 +420,8 @@ export default async function HubDashboard() {
           )}
         </div>
       </CollapsibleSection>
+
+      <SatisfactionWidget projectId={session.projectId} />
     </>
   );
 }

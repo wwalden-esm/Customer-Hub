@@ -1,6 +1,7 @@
 import { getGlobalLinks, getSettings } from "@/lib/settings";
 import GlobalLinksEditor from "@/components/dashboard/GlobalLinksEditor";
 import SettingsPanel from "@/components/dashboard/SettingsPanel";
+import WeeklyDigestPanel from "@/components/dashboard/WeeklyDigestPanel";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 
 export default async function SettingsPage() {
@@ -26,6 +27,7 @@ export default async function SettingsPage() {
         <p className="text-sm text-esm-grey mb-6">Configuration that applies to all customer hubs</p>
         <GlobalLinksEditor initialLinks={globalLinks} />
         <SettingsPanel envInfo={envInfo} initialAccentColor={defaultAccentColor} initialAllowRaidSubmissions={allowRaid} />
+        <WeeklyDigestPanel />
       </div>
     </div>
   );

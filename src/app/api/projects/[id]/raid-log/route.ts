@@ -7,8 +7,7 @@ import path from "path";
 import { getSheet, columnIdMap, addRows, updateRows } from "@/lib/smartsheet";
 import type { SsCell } from "@/lib/smartsheet";
 import { getRaidLogItems } from "@/lib/smartsheet-data";
-import { addPendingRaidItem, getPendingRaidItems } from "@/lib/raid-pending-store";
-import { addHubNotification } from "@/lib/hub-notification-store";
+import { addPendingRaidItem } from "@/lib/raid-pending-store";
 import { isRaidSubmissionAllowed } from "@/lib/settings";
 
 const configPath = path.join(process.cwd(), "config", "projects.json");

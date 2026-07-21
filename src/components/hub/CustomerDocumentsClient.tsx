@@ -121,7 +121,7 @@ export default function CustomerDocumentsClient({
           <p className="text-sm text-slate-500">No documents match your search.</p>
         </Card>
       ) : (
-        <Card padding="sm" className="!p-0 divide-y divide-esm-border">
+        <Card padding="sm" className="!p-0 divide-y divide-esm-border stagger-list">
           {refreshing && (
             <div className="px-5 py-2 text-xs text-esm-muted text-center" aria-live="polite">Refreshing…</div>
           )}

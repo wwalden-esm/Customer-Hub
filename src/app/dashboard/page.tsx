@@ -51,6 +51,11 @@ export default async function DashboardPage() {
 
   const openQuestionCount = getAllQuestions().filter((q) => q.status === "open").length;
 
+  const totalProjects = projectRows.length;
+  const atRiskCount = projectRows.filter((p) => p.status === "AT_RISK" || p.status === "OFF_TRACK").length;
+  const goLiveSoonCount = projectRows.filter((p) => p.daysToGoLive !== null && p.daysToGoLive >= 0 && p.daysToGoLive <= 30).length;
+  const overdueMilestones = 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
       <ScWelcome
@@ -58,6 +63,24 @@ export default async function DashboardPage() {
         projects={projectRows}
         openQuestionCount={openQuestionCount}
       />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        <div className="bg-white dark:bg-neutral-800 rounded-card px-4 py-3 border border-esm-border dark:border-neutral-700">
+          <p className="text-[10px] font-bold text-esm-grey dark:text-neutral-400 uppercase tracking-wider">Active projects</p>
+          <p className="text-2xl font-bold text-esm-black dark:text-neutral-100 mt-1">{totalProjects}</p>
+        </div>
+        <div className="bg-white dark:bg-neutral-800 rounded-card px-4 py-3 border border-esm-border dark:border-neutral-700">
+          <p className="text-[10px] font-bold text-esm-grey dark:text-neutral-400 uppercase tracking-wider">At risk</p>
+          <p className={`text-2xl font-bold mt-1 ${atRiskCount > 0 ? "text-red-600" : "text-emerald-600 dark:text-emerald-400"}`}>{atRiskCount}</p>
+        </div>
+        <div className="bg-white dark:bg-neutral-800 rounded-card px-4 py-3 border border-esm-border dark:border-neutral-700">
+          <p className="text-[10px] font-bold text-esm-grey dark:text-neutral-400 uppercase tracking-wider">Go-live within 30d</p>
+          <p className={`text-2xl font-bold mt-1 ${goLiveSoonCount > 0 ? "text-amber-600" : "text-esm-black dark:text-neutral-100"}`}>{goLiveSoonCount}</p>
+        </div>
+        <div className="bg-white dark:bg-neutral-800 rounded-card px-4 py-3 border border-esm-border dark:border-neutral-700">
+          <p className="text-[10px] font-bold text-esm-grey dark:text-neutral-400 uppercase tracking-wider">Open questions</p>
+          <p className={`text-2xl font-bold mt-1 ${openQuestionCount > 0 ? "text-blue-600" : "text-esm-black dark:text-neutral-100"}`}>{openQuestionCount}</p>
+        </div>
+      </div>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link

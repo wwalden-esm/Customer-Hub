@@ -2,7 +2,8 @@ import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import DarkModeToggle from "@/components/hub/DarkModeToggle";
 import HubToastProvider from "@/components/hub/HubToastProvider";
-import ActiveNavLink from "@/components/dashboard/ActiveNavLink";
+import DashboardNav from "@/components/dashboard/DashboardNav";
+import KeyboardShortcuts from "@/components/dashboard/KeyboardShortcuts";
 import { EsmLogo, EsmFooter } from "@/components/ui";
 
 export default async function DashboardLayout({
@@ -29,7 +30,7 @@ export default async function DashboardLayout({
 
   return (
     <HubToastProvider>
-      <div className="min-h-screen bg-esm-grey-light flex flex-col">
+      <div className="min-h-screen bg-esm-grey-light dark:bg-neutral-900 flex flex-col">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
@@ -42,13 +43,7 @@ export default async function DashboardLayout({
               </span>
             </a>
 
-            <nav className="flex items-center gap-1 overflow-x-auto min-w-0 flex-1 mx-2" aria-label="Main navigation">
-              {navLinks.map((link) => (
-                <ActiveNavLink key={link.href} href={link.href} exact={link.exact}>
-                  {link.label}
-                </ActiveNavLink>
-              ))}
-            </nav>
+            <DashboardNav links={navLinks} />
 
             <div className="flex items-center gap-2 shrink-0">
               <DarkModeToggle />
@@ -75,6 +70,7 @@ export default async function DashboardLayout({
 
         <main id="main-content" className="flex-1">{children}</main>
         <EsmFooter variant="staff" />
+        <KeyboardShortcuts />
       </div>
     </HubToastProvider>
   );

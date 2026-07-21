@@ -10,9 +10,16 @@ export default function DarkModeToggle() {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === "true") {
-      setDark(true);
-      document.documentElement.classList.add("dark");
+    if (saved !== null) {
+      const isDark = saved === "true";
+      setDark(isDark);
+      document.documentElement.classList.toggle("dark", isDark);
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (prefersDark) {
+        setDark(true);
+        document.documentElement.classList.add("dark");
+      }
     }
     setMounted(true);
   }, []);
