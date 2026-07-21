@@ -19,12 +19,12 @@ export default async function DashboardLayout({
   const userName = session.user.name || userEmail;
 
   const navLinks = [
-    { href: "/dashboard", label: "Projects", exact: true },
-    { href: "/dashboard/analytics", label: "Analytics" },
-    { href: "/dashboard/questions", label: "Questions" },
-    { href: "/dashboard/meeting-guide", label: "Meeting Guide" },
-    { href: "/dashboard/settings", label: "Settings" },
-    { href: "/dashboard/users", label: "Users" },
+    { href: "/dashboard", label: userRole === "SE" ? "Suppliers" : "Projects", exact: true },
+    ...(userRole !== "SE" ? [{ href: "/dashboard/analytics", label: "Analytics" }] : []),
+    ...(userRole !== "SE" ? [{ href: "/dashboard/questions", label: "Questions" }] : []),
+    ...(userRole !== "SE" ? [{ href: "/dashboard/meeting-guide", label: "Meeting Guide" }] : []),
+    ...(userRole === "ADMIN" ? [{ href: "/dashboard/settings", label: "Settings" }] : []),
+    ...(userRole === "ADMIN" ? [{ href: "/dashboard/users", label: "Users" }] : []),
     ...(userRole === "ADMIN" ? [{ href: "/dashboard/audit", label: "Audit" }] : []),
   ];
 

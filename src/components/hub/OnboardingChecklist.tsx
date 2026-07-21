@@ -40,7 +40,7 @@ export default function OnboardingChecklist({ projectName }: Props) {
     setVisited((prev) => {
       const next = new Set(prev);
       next.add(key);
-      localStorage.setItem("esm-hub-onboarding-visited", JSON.stringify([...next]));
+      localStorage.setItem("esm-hub-onboarding-visited", JSON.stringify(Array.from(next)));
       return next;
     });
   }

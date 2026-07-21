@@ -99,6 +99,7 @@ export default async function ProfilePage() {
           {[
             { name: project.scName, email: project.scEmail, role: "Solutions Consultant" },
             ...(project.saName ? [{ name: project.saName, email: project.saEmail, role: "Solutions Architect" }] : []),
+            ...(project.seName ? [{ name: project.seName, email: project.seEmail, role: "Supplier Enablement" }] : []),
           ].map((member) => (
             <div key={member.email || member.name} className="flex items-center justify-between py-3">
               <div className="flex items-center gap-3">

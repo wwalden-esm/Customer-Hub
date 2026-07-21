@@ -27,6 +27,7 @@ const ALL_NAV_ITEMS = [
   { href: "/hub/workflow-builder", label: "Workflow Builder", key: "workflow-builder" },
   { href: "/hub/recordings", label: "Recordings", key: "recordings" },
   { href: "/hub/questions", label: "Questions", key: "questions" },
+  { href: "/hub/suppliers", label: "Suppliers", key: "suppliers" },
   { href: "/hub/go-live", label: "Go-Live Readiness", key: "go-live" },
   { href: "/hub/status-report", label: "Status Report", key: "status-report" },
   { href: "/hub/resources", label: "Resources", key: "resources" },

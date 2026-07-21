@@ -55,7 +55,7 @@ export const SECTION_KEYS: SectionKey[] = [
 
 export type SectionStatus = "NOT_STARTED" | "IN_PROGRESS" | "IN_WORKSHOP" | "COMPLETE";
 
-export type EsmRole = "SC" | "PM" | "ADMIN";
+export type EsmRole = "SC" | "PM" | "SE" | "ADMIN";
 
 export type ActorType = "CUSTOMER" | "ESM" | "SYSTEM";
 

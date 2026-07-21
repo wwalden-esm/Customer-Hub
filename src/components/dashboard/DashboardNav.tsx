@@ -13,10 +13,6 @@ export default function DashboardNav({ links }: { links: NavLink[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const currentLabel = links.find((l) =>
-    l.exact ? pathname === l.href : pathname.startsWith(l.href),
-  )?.label || "Menu";
-
   return (
     <>
       <button

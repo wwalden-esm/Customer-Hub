@@ -326,6 +326,9 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
             <Link href={`/dashboard/${project.id}/documents`} className="block w-full text-center bg-esm-red text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
               Documents
             </Link>
+            <Link href={`/dashboard/${project.id}/suppliers`} className="block w-full text-center bg-emerald-700 text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
+              Supplier Enablement
+            </Link>
             <Link href={`/dashboard/${project.id}/config`} className="block w-full text-center bg-esm-blue text-white text-sm font-medium py-2 rounded hover:opacity-90 transition-opacity">
               Configure Hub
             </Link>

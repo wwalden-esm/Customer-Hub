@@ -23,6 +23,7 @@ export interface SmartsheetConfig {
   questionsSheetId?: string;
   milestoneCommentsSheetId?: string;
   workflowDataSheetId?: string;
+  supplierEnablementSheetId?: string;
 }
 
 export interface Project {
@@ -36,6 +37,8 @@ export interface Project {
   pmEmail?: string;
   saName?: string;
   saEmail?: string;
+  seName?: string;
+  seEmail?: string;
   executiveSponsorName?: string;
   executiveSponsorEmail?: string;
   projectChampionName?: string;
@@ -133,6 +136,34 @@ export interface ProjectLink {
   label: string;
   url: string;
   icon?: "link" | "smartsheet" | "sharepoint" | "document" | "video" | "calendar" | "training";
+}
+
+export type SupplierCatalogType = "punchout" | "hosted" | "level2" | "other";
+
+export type SupplierStatus =
+  | "requested"
+  | "outreach"
+  | "in_progress"
+  | "testing"
+  | "production"
+  | "on_hold"
+  | "cancelled";
+
+export interface Supplier {
+  id: string;
+  projectId: string;
+  supplierName: string;
+  catalogType: SupplierCatalogType;
+  status: SupplierStatus;
+  contactName?: string;
+  contactEmail?: string;
+  seAssignee?: string;
+  notes: string;
+  requestedBy?: string;
+  requestedAt: string;
+  updatedAt: string;
+  targetGoLive?: string;
+  actualGoLive?: string;
 }
 
 export interface CustomerContact {

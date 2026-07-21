@@ -22,5 +22,11 @@
     "name": "Demo Admin",
     "role": "ADMIN",
     "password": "$2b$10$lv5rWzllXPkkCjNKHzBmieNHgvSDLNZ0M75Eb3eNUtfup3JMSKCDW"
+  },
+  {
+    "email": "se@esmsolutions.com",
+    "name": "Demo SE",
+    "role": "SE",
+    "password": "$2b$10$HjV6N3h.H8TlAKy0BTefjuEY90YmVo4gf9cSZ3gpTufwU4oZGN93i"
   }
 ]

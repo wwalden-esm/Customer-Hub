@@ -7,8 +7,8 @@ import DocumentRequestForm from "@/components/hub/DocumentRequestForm";
 interface Doc {
   id: string;
   name: string;
-  fileSize: number;
-  generatedAt: string;
+  fileSize: number | null;
+  generatedAt: string | null;
   linkUrl?: string;
 }
 

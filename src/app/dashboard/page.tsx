@@ -3,11 +3,13 @@ import { auth } from "@/lib/auth";
 import { parseLocalDate } from "@/lib/date-utils";
 import { getProjectList, getSmartsheetConfig, getProjectMilestones, deriveCurrentPhase } from "@/lib/smartsheet-data";
 import { getAllQuestions } from "@/lib/question-store";
+import { getSuppliersByAssignee, getAllActiveSuppliers } from "@/lib/supplier-store";
 import SyncHubSpotButton from "@/components/dashboard/SyncHubSpotButton";
 import SendNotificationsButton from "@/components/dashboard/SendNotificationsButton";
 import SyncStatusBar from "@/components/dashboard/SyncStatusBar";
 import ProjectTable from "@/components/dashboard/ProjectTable";
 import ScWelcome from "@/components/dashboard/ScWelcome";
+import SeWelcome from "@/components/dashboard/SeWelcome";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +24,12 @@ export default async function DashboardPage() {
 
   const projects = userRole === "ADMIN"
     ? allProjects
+    : userRole === "SE"
+    ? allProjects.filter((p) => p.seEmail === userEmail)
     : allProjects.filter((p) => p.scEmail === userEmail || p.pmEmail === userEmail);
+
+  const seSuppliers = userRole === "SE" ? getSuppliersByAssignee(userName) : [];
+  const allActiveSuppliers = userRole === "SE" ? getAllActiveSuppliers() : [];
 
   const now = new Date();
   now.setHours(0, 0, 0, 0);
@@ -54,15 +61,23 @@ export default async function DashboardPage() {
   const totalProjects = projectRows.length;
   const atRiskCount = projectRows.filter((p) => p.status === "AT_RISK" || p.status === "OFF_TRACK").length;
   const goLiveSoonCount = projectRows.filter((p) => p.daysToGoLive !== null && p.daysToGoLive >= 0 && p.daysToGoLive <= 30).length;
-  const overdueMilestones = 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-      <ScWelcome
-        userName={userName}
-        projects={projectRows}
-        openQuestionCount={openQuestionCount}
-      />
+      {userRole === "SE" ? (
+        <SeWelcome
+          userName={userName}
+          mySuppliers={seSuppliers}
+          allActiveSuppliers={allActiveSuppliers}
+          projects={projectRows}
+        />
+      ) : (
+        <ScWelcome
+          userName={userName}
+          projects={projectRows}
+          openQuestionCount={openQuestionCount}
+        />
+      )}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         <div className="bg-white dark:bg-neutral-800 rounded-card px-4 py-3 border border-esm-border dark:border-neutral-700">
           <p className="text-[10px] font-bold text-esm-grey dark:text-neutral-400 uppercase tracking-wider">Active projects</p>
