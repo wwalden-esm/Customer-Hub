@@ -30,6 +30,9 @@ yarn-error.log*
 .env*.local
 cookies.txt
 
+# credential files (use env vars in production)
+config/esm-users.json
+
 # vercel
 .vercel
 

@@ -1,26 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth, loadUsers, saveUsers } from "@/lib/auth";
+import type { EsmRole } from "@/types/enums";
 import { logAudit } from "@/lib/audit-log";
-import { createJsonStore } from "@/lib/data-store";
 import crypto from "crypto";
 import bcryptjs from "bcryptjs";
-
-interface EsmUser {
-  email: string;
-  name: string;
-  role: string;
-  password: string;
-}
-
-const usersStore = createJsonStore<EsmUser[]>("esm-users", []);
-
-function loadUsers(): EsmUser[] {
-  return usersStore.load();
-}
-
-function saveUsers(users: EsmUser[]) {
-  usersStore.save(users);
-}
 
 function generatePassword(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
@@ -70,7 +53,7 @@ export async function POST(req: NextRequest) {
 
   const password = generatePassword();
   const hash = bcryptjs.hashSync(password, 10);
-  users.push({ email, name, role, password: hash });
+  users.push({ email, name, role: role as EsmRole, password: hash });
   saveUsers(users);
   logAudit(session.user.email || "unknown", "create_user", email, "user", `Role: ${role}`);
 
@@ -126,7 +109,7 @@ export async function PATCH(req: NextRequest) {
     if (!["SC", "PM", "ADMIN"].includes(role)) {
       return NextResponse.json({ error: "Role must be SC, PM, or ADMIN" }, { status: 400 });
     }
-    user.role = role;
+    user.role = role as EsmRole;
     saveUsers(users);
     logAudit(session.user.email || "unknown", "change_role", email, "user", `New role: ${role}`);
     return NextResponse.json({ email: user.email, role: user.role });

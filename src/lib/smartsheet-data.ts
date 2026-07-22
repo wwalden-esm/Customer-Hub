@@ -25,6 +25,14 @@ export function getProjectById(id: string): Project | null {
 }
 
 export function getProjectPassword(id: string): string | null {
+  if (process.env.PROJECT_PASSWORDS) {
+    try {
+      const passwords = JSON.parse(process.env.PROJECT_PASSWORDS) as Record<string, string>;
+      if (passwords[id]) return passwords[id];
+    } catch {
+      console.warn("PROJECT_PASSWORDS env var is not valid JSON, falling back to config file");
+    }
+  }
   const cfg = projects[id] as (typeof projects)[string] & { password?: string };
   return cfg?.password ?? null;
 }

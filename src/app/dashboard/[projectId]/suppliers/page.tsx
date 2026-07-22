@@ -1,15 +1,13 @@
 import { notFound } from "next/navigation";
-import { createJsonStore } from "@/lib/data-store";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { getProjectSuppliers } from "@/lib/supplier-store";
+import { loadUsers } from "@/lib/auth";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 import SupplierManagementClient from "@/components/dashboard/SupplierManagementClient";
 
-const esmUsersStore = createJsonStore<{ email: string; name: string; role: string }[]>("esm-users", []);
-
 function getSeUsers(): { email: string; name: string }[] {
   try {
-    const users = esmUsersStore.load();
+    const users = loadUsers();
     return users
       .filter((u) => u.role === "SE" || u.role === "ADMIN")
       .map(({ email, name }) => ({ email, name }));

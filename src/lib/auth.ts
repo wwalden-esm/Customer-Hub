@@ -23,7 +23,7 @@ declare module "@auth/core/jwt" {
   }
 }
 
-interface EsmUserConfig {
+export interface EsmUserConfig {
   email: string;
   name: string;
   role: EsmRole;
@@ -32,8 +32,19 @@ interface EsmUserConfig {
 
 const usersStore = createJsonStore<EsmUserConfig[]>("esm-users", []);
 
-function loadUsers(): EsmUserConfig[] {
+export function loadUsers(): EsmUserConfig[] {
+  if (process.env.ESM_USERS) {
+    try {
+      return JSON.parse(process.env.ESM_USERS);
+    } catch {
+      console.warn("ESM_USERS env var is not valid JSON, falling back to config file");
+    }
+  }
   return usersStore.load();
+}
+
+export function saveUsers(users: EsmUserConfig[]): void {
+  usersStore.save(users);
 }
 
 function buildProviders() {
