@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
+import { createJsonStore } from "@/lib/data-store";
 
-const configPath = path.join(process.cwd(), "config", "projects.json");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projectsStore = createJsonStore<Record<string, any>>("projects", {});
 
 function slugify(name: string): string {
   return name
@@ -34,8 +34,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid customer name" }, { status: 400 });
   }
 
-  const raw = fs.readFileSync(configPath, "utf-8");
-  const projects = JSON.parse(raw);
+  const projects = projectsStore.load();
 
   if (projects[projectId]) {
     return NextResponse.json({ error: "A project with this customer name already exists" }, { status: 409 });
@@ -73,7 +72,7 @@ export async function POST(req: NextRequest) {
     password: body.password,
   };
 
-  fs.writeFileSync(configPath, JSON.stringify(projects, null, 2));
+  projectsStore.save(projects);
 
   return NextResponse.json({ id: projectId, ...projects[projectId] }, { status: 201 });
 }

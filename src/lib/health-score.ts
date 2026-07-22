@@ -560,34 +560,25 @@ export function computePortfolioAnalytics(projectAnalytics: ProjectAnalytics[]):
 
 // --- Historical snapshot management ---
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 
-const HISTORY_FILE = join(process.cwd(), "config", "health-history.json");
+const historyStore = createJsonStore<HealthSnapshot[]>("health-history", []);
 
 export function loadHealthHistory(): HealthSnapshot[] {
-  if (!existsSync(HISTORY_FILE)) return [];
-  try {
-    return JSON.parse(readFileSync(HISTORY_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
+  return historyStore.load();
 }
 
 export function saveHealthSnapshot(analytics: ProjectAnalytics[]): void {
   const history = loadHealthHistory();
   const today = new Date().toISOString().split("T")[0];
 
-  // Don't save more than once per day
   if (history.length > 0 && history[history.length - 1].date === today) {
     history[history.length - 1] = buildSnapshot(today, analytics);
   } else {
     history.push(buildSnapshot(today, analytics));
   }
 
-  // Keep last 52 weeks
-  const trimmed = history.slice(-52);
-  writeFileSync(HISTORY_FILE, JSON.stringify(trimmed, null, 2) + "\n", "utf-8");
+  historyStore.save(history.slice(-52));
 }
 
 function buildSnapshot(date: string, analytics: ProjectAnalytics[]): HealthSnapshot {

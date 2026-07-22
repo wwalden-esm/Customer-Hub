@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 
 export interface HubNotification {
   id: string;
@@ -10,19 +9,14 @@ export interface HubNotification {
   read: boolean;
 }
 
-const JSON_PATH = join(process.cwd(), "config", "hub-notifications.json");
+const store = createJsonStore<HubNotification[]>("hub-notifications", []);
 
 function loadNotifications(): HubNotification[] {
-  if (!existsSync(JSON_PATH)) return [];
-  try {
-    return JSON.parse(readFileSync(JSON_PATH, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
 function saveNotifications(notifications: HubNotification[]): void {
-  writeFileSync(JSON_PATH, JSON.stringify(notifications, null, 2));
+  store.save(notifications);
 }
 
 function generateId(): string {

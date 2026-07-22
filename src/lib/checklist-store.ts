@@ -1,7 +1,4 @@
-import fs from "fs";
-import path from "path";
-
-const STORE_PATH = path.join(process.cwd(), "config", "checklist-confirmations.json");
+import { createJsonStore } from "@/lib/data-store";
 
 export interface ChecklistConfirmation {
   projectId: string;
@@ -11,17 +8,14 @@ export interface ChecklistConfirmation {
   note?: string;
 }
 
+const store = createJsonStore<ChecklistConfirmation[]>("checklist-confirmations", []);
+
 function loadAll(): ChecklistConfirmation[] {
-  try {
-    if (!fs.existsSync(STORE_PATH)) return [];
-    return JSON.parse(fs.readFileSync(STORE_PATH, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
-function saveAll(items: ChecklistConfirmation[]) {
-  fs.writeFileSync(STORE_PATH, JSON.stringify(items, null, 2));
+function saveAll(items: ChecklistConfirmation[]): void {
+  store.save(items);
 }
 
 export function getProjectConfirmations(projectId: string): ChecklistConfirmation[] {

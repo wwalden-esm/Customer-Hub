@@ -1,7 +1,4 @@
-import fs from "fs";
-import path from "path";
-
-const ACTIVITY_PATH = path.join(process.cwd(), "config", "portal-activity.json");
+import { createJsonStore } from "@/lib/data-store";
 
 export interface PortalVisit {
   projectId: string;
@@ -19,17 +16,14 @@ export interface ProjectActivitySummary {
   recentVisitors: Array<{ email: string; name: string | null; lastSeen: string; pageViews: number }>;
 }
 
+const store = createJsonStore<PortalVisit[]>("portal-activity", []);
+
 function readLog(): PortalVisit[] {
-  try {
-    if (!fs.existsSync(ACTIVITY_PATH)) return [];
-    return JSON.parse(fs.readFileSync(ACTIVITY_PATH, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
 function writeLog(visits: PortalVisit[]) {
-  fs.writeFileSync(ACTIVITY_PATH, JSON.stringify(visits, null, 2));
+  store.save(visits);
 }
 
 export function recordVisit(projectId: string, email: string, name: string | null, page: string) {

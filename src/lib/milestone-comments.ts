@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 import {
   getSheet,
   columnIdMap,
@@ -24,19 +23,14 @@ export interface MilestoneComment {
 // JSON fallback
 // ---------------------------------------------------------------------------
 
-const STORE_FILE = join(process.cwd(), "config", "milestone-comments.json");
+const store = createJsonStore<MilestoneComment[]>("milestone-comments", []);
 
 function load(): MilestoneComment[] {
-  if (!existsSync(STORE_FILE)) return [];
-  try {
-    return JSON.parse(readFileSync(STORE_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
 function save(comments: MilestoneComment[]) {
-  writeFileSync(STORE_FILE, JSON.stringify(comments, null, 2) + "\n", "utf-8");
+  store.save(comments);
 }
 
 // ---------------------------------------------------------------------------

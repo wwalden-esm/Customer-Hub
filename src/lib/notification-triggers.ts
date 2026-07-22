@@ -1,14 +1,9 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 import { getProjectList, getSmartsheetConfig, getProjectActionItems, getProjectMilestones } from "./smartsheet-data";
 import { addHubNotification } from "./hub-notification-store";
 import { getAllQuestions } from "./question-store";
 import { logAudit } from "./audit-log";
 import { parseLocalDate } from "./date-utils";
-
-// ---------------------------------------------------------------------------
-// Notification tracker — prevents duplicate notifications
-// ---------------------------------------------------------------------------
 
 interface NotificationTracker {
   overdueNotified: string[];
@@ -16,21 +11,15 @@ interface NotificationTracker {
   unansweredNotified: string[];
 }
 
-const TRACKER_PATH = join(process.cwd(), "config", "notification-tracker.json");
+const DEFAULT_TRACKER: NotificationTracker = { overdueNotified: [], upcomingNotified: [], unansweredNotified: [] };
+const trackerStore = createJsonStore<NotificationTracker>("notification-tracker", DEFAULT_TRACKER);
 
 function loadTracker(): NotificationTracker {
-  if (!existsSync(TRACKER_PATH)) {
-    return { overdueNotified: [], upcomingNotified: [], unansweredNotified: [] };
-  }
-  try {
-    return JSON.parse(readFileSync(TRACKER_PATH, "utf-8"));
-  } catch {
-    return { overdueNotified: [], upcomingNotified: [], unansweredNotified: [] };
-  }
+  return trackerStore.load();
 }
 
 function saveTracker(tracker: NotificationTracker): void {
-  writeFileSync(TRACKER_PATH, JSON.stringify(tracker, null, 2) + "\n", "utf-8");
+  trackerStore.save(tracker);
 }
 
 // ---------------------------------------------------------------------------

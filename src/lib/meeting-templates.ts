@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 
 export interface MeetingTemplateSection {
   title: string;
@@ -13,19 +12,14 @@ export interface MeetingTemplate {
   sections: MeetingTemplateSection[];
 }
 
-const STORE_PATH = join(process.cwd(), "config", "meeting-templates.json");
+const store = createJsonStore<{ templates: MeetingTemplate[] }>("meeting-templates", { templates: [] });
 
 export function loadMeetingTemplates(): MeetingTemplate[] {
-  try {
-    const data = JSON.parse(readFileSync(STORE_PATH, "utf-8"));
-    return data.templates || [];
-  } catch {
-    return [];
-  }
+  return store.load().templates;
 }
 
 export function saveMeetingTemplates(templates: MeetingTemplate[]) {
-  writeFileSync(STORE_PATH, JSON.stringify({ templates }, null, 2) + "\n", "utf-8");
+  store.save({ templates });
 }
 
 export function getMeetingTemplate(id: string): MeetingTemplate | null {

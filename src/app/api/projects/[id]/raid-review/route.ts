@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
 import { logAudit } from "@/lib/audit-log";
-import fs from "fs";
-import path from "path";
+import { createJsonStore } from "@/lib/data-store";
 import { getSheet, columnIdMap, addRows } from "@/lib/smartsheet";
 import type { SsCell } from "@/lib/smartsheet";
 import {
@@ -14,10 +13,11 @@ import {
 } from "@/lib/raid-pending-store";
 import { addHubNotification } from "@/lib/hub-notification-store";
 
-const configPath = path.join(process.cwd(), "config", "projects.json");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projectsStore = createJsonStore<Record<string, any>>("projects", {});
 
 function getProjectConfig(projectId: string) {
-  const projects = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  const projects = projectsStore.load();
   return projects[projectId] ?? null;
 }
 

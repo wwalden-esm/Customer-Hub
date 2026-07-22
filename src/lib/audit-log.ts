@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 
 export interface AuditEntry {
   timestamp: string;
@@ -10,21 +9,15 @@ export interface AuditEntry {
   category: "auth" | "user" | "config" | "notification" | "project" | "question" | "email";
 }
 
-const AUDIT_FILE = join(process.cwd(), "config", "audit-log.json");
+const store = createJsonStore<AuditEntry[]>("audit-log", []);
 const MAX_ENTRIES = 500;
 
 function loadEntries(): AuditEntry[] {
-  if (!existsSync(AUDIT_FILE)) return [];
-  try {
-    return JSON.parse(readFileSync(AUDIT_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
 function saveEntries(entries: AuditEntry[]): void {
-  const trimmed = entries.slice(-MAX_ENTRIES);
-  writeFileSync(AUDIT_FILE, JSON.stringify(trimmed, null, 2) + "\n", "utf-8");
+  store.save(entries.slice(-MAX_ENTRIES));
 }
 
 export function logAudit(

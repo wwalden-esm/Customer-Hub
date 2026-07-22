@@ -8,7 +8,11 @@ import {
   getSheetPermalink,
 } from "@/lib/smartsheet";
 import { parseLocalDate } from "@/lib/date-utils";
+import { createJsonStore } from "@/lib/data-store";
 import projectsJson from "../../config/projects.json";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projectsStore = createJsonStore<Record<string, any>>("projects", {});
 
 const projects = projectsJson as Record<string, Omit<Project, "id"> & { password?: string }>;
 
@@ -44,16 +48,11 @@ export function getSmartsheetConfig(id: string): SmartsheetConfig {
 }
 
 export function saveSmartsheetConfigField(projectId: string, field: string, value: string): void {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const fs = require("fs");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const path = require("path");
-  const configPath = path.join(process.cwd(), "config", "projects.json");
-  const all = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  const all = projectsStore.load();
   if (!all[projectId]) return;
   if (!all[projectId].smartsheetConfig) all[projectId].smartsheetConfig = {};
   all[projectId].smartsheetConfig[field] = value;
-  fs.writeFileSync(configPath, JSON.stringify(all, null, 2) + "\n", "utf-8");
+  projectsStore.save(all);
   // Update in-memory cache
   if (projects[projectId]) {
     (projects[projectId].smartsheetConfig as Record<string, string>)[field] = value;

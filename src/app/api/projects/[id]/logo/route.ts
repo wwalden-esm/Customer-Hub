@@ -12,10 +12,12 @@ import {
 } from "@/lib/smartsheet";
 import fs from "fs";
 import path from "path";
+import { createJsonStore } from "@/lib/data-store";
 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/svg+xml", "image/webp", "image/gif"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
-const configPath = path.join(process.cwd(), "config", "projects.json");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projectsStore = createJsonStore<Record<string, any>>("projects", {});
 const logosDir = path.join(process.cwd(), "public", "logos");
 
 export async function POST(
@@ -101,15 +103,14 @@ export async function POST(
     fs.writeFileSync(path.join(logosDir, `${projectId}.${ext}`), buffer);
 
     // Save the attachment ID in the project config so we can resolve it later
-    const raw = fs.readFileSync(configPath, "utf-8");
-    const projects = JSON.parse(raw);
+    const projects = projectsStore.load();
     if (projects[projectId]) {
       projects[projectId].branding = {
         ...projects[projectId].branding,
         logoAttachmentId: attachment.id,
         logoUrl: `/api/projects/${projectId}/logo`,
       };
-      fs.writeFileSync(configPath, JSON.stringify(projects, null, 2));
+      projectsStore.save(projects);
     }
 
     return NextResponse.json({
@@ -161,8 +162,7 @@ export async function GET(
   }
 
   // Fall back to Smartsheet attachment
-  const raw = fs.readFileSync(configPath, "utf-8");
-  const projects = JSON.parse(raw);
+  const projects = projectsStore.load();
   const branding = projects[projectId]?.branding;
   const attachmentId = branding?.logoAttachmentId;
 
@@ -208,8 +208,7 @@ export async function DELETE(
 
   const { id: projectId } = await params;
 
-  const raw = fs.readFileSync(configPath, "utf-8");
-  const projects = JSON.parse(raw);
+  const projects = projectsStore.load();
   const branding = projects[projectId]?.branding;
   const attachmentId = branding?.logoAttachmentId;
 
@@ -228,7 +227,7 @@ export async function DELETE(
   if (projects[projectId]) {
     delete projects[projectId].branding?.logoAttachmentId;
     delete projects[projectId].branding?.logoUrl;
-    fs.writeFileSync(configPath, JSON.stringify(projects, null, 2));
+    projectsStore.save(projects);
   }
 
   return NextResponse.json({ ok: true });

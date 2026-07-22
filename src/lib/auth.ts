@@ -1,8 +1,7 @@
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth, { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcryptjs from "bcryptjs";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 import type { EsmRole } from "@/types/enums";
 
 declare module "next-auth" {
@@ -31,16 +30,41 @@ interface EsmUserConfig {
   password: string;
 }
 
+const usersStore = createJsonStore<EsmUserConfig[]>("esm-users", []);
+
 function loadUsers(): EsmUserConfig[] {
-  const filePath = join(process.cwd(), "config", "esm-users.json");
-  const raw = readFileSync(filePath, "utf-8");
-  return JSON.parse(raw) as EsmUserConfig[];
+  return usersStore.load();
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
-  pages: { signIn: "/login" },
-  providers: [
+function buildProviders() {
+  const providers: NextAuthConfig["providers"] = [];
+
+  if (process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET && process.env.AZURE_AD_TENANT_ID) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const MicrosoftEntraID = require("next-auth/providers/microsoft-entra-id").default;
+    providers.push(
+      MicrosoftEntraID({
+        clientId: process.env.AZURE_AD_CLIENT_ID,
+        clientSecret: process.env.AZURE_AD_CLIENT_SECRET,
+        tenantId: process.env.AZURE_AD_TENANT_ID,
+        authorization: {
+          params: { scope: "openid profile email User.Read" },
+        },
+        profile(profile: { sub: string; email: string; name: string; preferred_username: string }) {
+          const users = loadUsers();
+          const match = users.find((u) => u.email.toLowerCase() === (profile.email || profile.preferred_username || "").toLowerCase());
+          return {
+            id: profile.sub,
+            email: profile.email || profile.preferred_username,
+            name: profile.name,
+            role: (match?.role || "SC") as EsmRole,
+          };
+        },
+      }),
+    );
+  }
+
+  providers.push(
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
@@ -60,7 +84,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return { id: email, email: user.email, name: user.name, role: user.role };
       },
     }),
-  ],
+  );
+
+  return providers;
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
+  pages: { signIn: "/login" },
+  providers: buildProviders(),
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

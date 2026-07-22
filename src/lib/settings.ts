@@ -1,5 +1,4 @@
-import fs from "fs";
-import path from "path";
+import { createJsonStore } from "@/lib/data-store";
 
 interface LinkItem {
   label: string;
@@ -7,20 +6,21 @@ interface LinkItem {
   icon?: string;
 }
 
-interface Settings {
+export interface Settings {
   globalLinks: LinkItem[];
   allowCustomerRaidSubmissions?: boolean;
+  defaultAccentColor?: string;
+  [key: string]: unknown;
 }
 
-const settingsPath = path.join(process.cwd(), "config", "settings.json");
+const store = createJsonStore<Settings>("settings", { globalLinks: [] } as Settings);
 
 export function getSettings(): Settings {
-  try {
-    const raw = fs.readFileSync(settingsPath, "utf-8");
-    return JSON.parse(raw) as Settings;
-  } catch {
-    return { globalLinks: [] };
-  }
+  return store.load();
+}
+
+export function saveSettings(settings: Settings): void {
+  store.save(settings);
 }
 
 export function getGlobalLinks(): LinkItem[] {

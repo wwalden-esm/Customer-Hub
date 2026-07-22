@@ -1,20 +1,14 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 import type { Supplier, SupplierStatus, SupplierCatalogType } from "@/types/models";
 
-const JSON_PATH = join(process.cwd(), "config", "suppliers.json");
+const store = createJsonStore<Supplier[]>("suppliers", []);
 
 function loadAll(): Supplier[] {
-  if (!existsSync(JSON_PATH)) return [];
-  try {
-    return JSON.parse(readFileSync(JSON_PATH, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
 function saveAll(items: Supplier[]): void {
-  writeFileSync(JSON_PATH, JSON.stringify(items, null, 2));
+  store.save(items);
 }
 
 function generateId(): string {

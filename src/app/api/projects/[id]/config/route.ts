@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
+import { createJsonStore } from "@/lib/data-store";
 
-const configPath = path.join(process.cwd(), "config", "projects.json");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projectsStore = createJsonStore<Record<string, any>>("projects", {});
 
 export async function PUT(req: NextRequest) {
   const session = await auth();
@@ -13,8 +13,7 @@ export async function PUT(req: NextRequest) {
 
   const projectId = req.nextUrl.pathname.split("/")[3];
 
-  const raw = fs.readFileSync(configPath, "utf-8");
-  const projects = JSON.parse(raw);
+  const projects = projectsStore.load();
 
   if (!projects[projectId]) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -47,7 +46,7 @@ export async function PUT(req: NextRequest) {
     projects[projectId].allowCustomerRaidSubmissions = body.allowCustomerRaidSubmissions;
   }
 
-  fs.writeFileSync(configPath, JSON.stringify(projects, null, 2));
+  projectsStore.save(projects);
 
   return NextResponse.json({ ok: true });
 }

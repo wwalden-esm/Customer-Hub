@@ -1,37 +1,11 @@
-import { readFileSync } from "fs";
-import { join } from "path";
+import { loadMeetingTemplates } from "@/lib/meeting-templates";
 import MeetingGuideCards from "./MeetingGuideCards";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 
 export const dynamic = "force-dynamic";
 
-interface MeetingSection {
-  title: string;
-  prompt: string;
-}
-
-interface MeetingTemplate {
-  id: string;
-  name: string;
-  duration: number;
-  sections: MeetingSection[];
-}
-
-function loadTemplates(): MeetingTemplate[] {
-  try {
-    const raw = readFileSync(
-      join(process.cwd(), "config", "meeting-templates.json"),
-      "utf-8",
-    );
-    const data = JSON.parse(raw);
-    return data.templates || [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function MeetingGuidePage() {
-  const templates = loadTemplates();
+  const templates = loadMeetingTemplates();
 
   return (
     <div>

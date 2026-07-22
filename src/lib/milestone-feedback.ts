@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 
 export interface MilestoneFeedback {
   id: string;
@@ -11,19 +10,14 @@ export interface MilestoneFeedback {
   createdAt: string;
 }
 
-const STORE_FILE = join(process.cwd(), "config", "milestone-feedback.json");
+const store = createJsonStore<MilestoneFeedback[]>("milestone-feedback", []);
 
 function load(): MilestoneFeedback[] {
-  if (!existsSync(STORE_FILE)) return [];
-  try {
-    return JSON.parse(readFileSync(STORE_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
 function save(items: MilestoneFeedback[]) {
-  writeFileSync(STORE_FILE, JSON.stringify(items, null, 2) + "\n", "utf-8");
+  store.save(items);
 }
 
 export function addFeedback(

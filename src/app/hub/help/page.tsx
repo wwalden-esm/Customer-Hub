@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 import { getCustomerSession } from "@/lib/magic-link";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { Card, SectionLabel } from "@/components/ui";
@@ -10,10 +9,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: "Help & FAQ" };
 }
 
+const faqsStore = createJsonStore<Record<string, Array<{ q: string; a: string }>>>("faqs", {});
+
 function loadFaqs(projectId: string): Array<{ q: string; a: string }> {
   try {
-    const raw = readFileSync(join(process.cwd(), "config", "faqs.json"), "utf-8");
-    const all = JSON.parse(raw);
+    const all = faqsStore.load();
     return all[projectId] || all.default || [];
   } catch {
     return [];

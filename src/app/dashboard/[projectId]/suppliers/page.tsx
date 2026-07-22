@@ -1,15 +1,15 @@
 import { notFound } from "next/navigation";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 import { getProjectById } from "@/lib/smartsheet-data";
 import { getProjectSuppliers } from "@/lib/supplier-store";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 import SupplierManagementClient from "@/components/dashboard/SupplierManagementClient";
 
+const esmUsersStore = createJsonStore<{ email: string; name: string; role: string }[]>("esm-users", []);
+
 function getSeUsers(): { email: string; name: string }[] {
   try {
-    const raw = readFileSync(join(process.cwd(), "config", "esm-users.json"), "utf-8");
-    const users = JSON.parse(raw) as { email: string; name: string; role: string }[];
+    const users = esmUsersStore.load();
     return users
       .filter((u) => u.role === "SE" || u.role === "ADMIN")
       .map(({ email, name }) => ({ email, name }));

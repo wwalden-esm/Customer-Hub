@@ -1,0 +1,11 @@
+services:
+  hub:
+    build: .
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config
+      - ./public/logos:/app/public/logos
+    restart: unless-stopped

@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getCustomerSession } from "@/lib/magic-link";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
-
-const PREFS_FILE = join(process.cwd(), "config", "notification-prefs.json");
+import { createJsonStore } from "@/lib/data-store";
 
 interface NotificationPrefs {
   emailEnabled: boolean;
@@ -20,17 +17,14 @@ const DEFAULT_PREFS: NotificationPrefs = {
   meetingReminders: true,
 };
 
+const prefsStore = createJsonStore<Record<string, NotificationPrefs>>("notification-prefs", {});
+
 function loadAllPrefs(): Record<string, NotificationPrefs> {
-  if (!existsSync(PREFS_FILE)) return {};
-  try {
-    return JSON.parse(readFileSync(PREFS_FILE, "utf-8"));
-  } catch {
-    return {};
-  }
+  return prefsStore.load();
 }
 
 function saveAllPrefs(prefs: Record<string, NotificationPrefs>): void {
-  writeFileSync(PREFS_FILE, JSON.stringify(prefs, null, 2) + "\n", "utf-8");
+  prefsStore.save(prefs);
 }
 
 function prefsKey(projectId: string, email: string): string {

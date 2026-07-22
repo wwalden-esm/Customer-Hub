@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
 import { auth } from "@/lib/auth";
 import { logAudit } from "@/lib/audit-log";
+import { createJsonStore } from "@/lib/data-store";
 import crypto from "crypto";
 import bcryptjs from "bcryptjs";
 
@@ -13,14 +12,14 @@ interface EsmUser {
   password: string;
 }
 
-const USERS_PATH = join(process.cwd(), "config", "esm-users.json");
+const usersStore = createJsonStore<EsmUser[]>("esm-users", []);
 
 function loadUsers(): EsmUser[] {
-  return JSON.parse(readFileSync(USERS_PATH, "utf-8"));
+  return usersStore.load();
 }
 
 function saveUsers(users: EsmUser[]) {
-  writeFileSync(USERS_PATH, JSON.stringify(users, null, 2) + "\n", "utf-8");
+  usersStore.save(users);
 }
 
 function generatePassword(): string {

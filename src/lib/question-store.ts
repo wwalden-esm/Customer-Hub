@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 import {
   getSheet,
   columnIdMap,
@@ -76,20 +75,18 @@ function migrateQuestion(q: Question): Question {
 // JSON fallback (for projects without Smartsheet)
 // ---------------------------------------------------------------------------
 
-const STORE_FILE = join(process.cwd(), "config", "questions.json");
+const questionStore = createJsonStore<Question[]>("questions", []);
 
 function loadJsonQuestions(): Question[] {
-  if (!existsSync(STORE_FILE)) return [];
   try {
-    const raw: Question[] = JSON.parse(readFileSync(STORE_FILE, "utf-8"));
-    return raw.map(migrateQuestion);
+    return questionStore.load().map(migrateQuestion);
   } catch {
     return [];
   }
 }
 
 function saveJsonQuestions(questions: Question[]): void {
-  writeFileSync(STORE_FILE, JSON.stringify(questions, null, 2) + "\n", "utf-8");
+  questionStore.save(questions);
 }
 
 // ---------------------------------------------------------------------------

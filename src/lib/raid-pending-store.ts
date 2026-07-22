@@ -1,5 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { createJsonStore } from "@/lib/data-store";
 
 export interface PendingRaidItem {
   id: string;
@@ -17,19 +16,14 @@ export interface PendingRaidItem {
   reviewedAt?: string;
 }
 
-const JSON_PATH = join(process.cwd(), "config", "raid-pending.json");
+const store = createJsonStore<PendingRaidItem[]>("raid-pending", []);
 
 function loadAll(): PendingRaidItem[] {
-  if (!existsSync(JSON_PATH)) return [];
-  try {
-    return JSON.parse(readFileSync(JSON_PATH, "utf-8"));
-  } catch {
-    return [];
-  }
+  return store.load();
 }
 
 function saveAll(items: PendingRaidItem[]): void {
-  writeFileSync(JSON_PATH, JSON.stringify(items, null, 2));
+  store.save(items);
 }
 
 function generateId(): string {
