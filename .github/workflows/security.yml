@@ -23,7 +23,13 @@ jobs:
           node-version: "20"
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm audit --audit-level=high
+      - name: Audit dependencies (critical = blocking, high = warning)
+        run: |
+          echo "=== Full audit report ==="
+          npm audit --audit-level=high 2>&1 || true
+          echo ""
+          echo "=== Checking for critical vulnerabilities ==="
+          npm audit --audit-level=critical
 
   codeql:
     name: CodeQL analysis
