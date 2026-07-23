@@ -1,7 +1,6 @@
 import NextAuth, { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcryptjs from "bcryptjs";
-import { createJsonStore } from "@/lib/data-store";
 import type { EsmRole } from "@/types/enums";
 
 declare module "next-auth" {
@@ -30,7 +29,12 @@ export interface EsmUserConfig {
   password: string;
 }
 
-const usersStore = createJsonStore<EsmUserConfig[]>("esm-users", []);
+function getUsersStore() {
+  // Lazy-load to avoid pulling fs/path into Edge Runtime (middleware)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { createJsonStore } = require("@/lib/data-store") as typeof import("@/lib/data-store");
+  return createJsonStore<EsmUserConfig[]>("esm-users", []);
+}
 
 export function loadUsers(): EsmUserConfig[] {
   if (process.env.ESM_USERS) {
@@ -40,11 +44,11 @@ export function loadUsers(): EsmUserConfig[] {
       console.warn("ESM_USERS env var is not valid JSON, falling back to config file");
     }
   }
-  return usersStore.load();
+  return getUsersStore().load();
 }
 
 export function saveUsers(users: EsmUserConfig[]): void {
-  usersStore.save(users);
+  getUsersStore().save(users);
 }
 
 function buildProviders() {

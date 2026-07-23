@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 export default function SessionGuard() {
   const [state, setState] = useState<"ok" | "warning" | "expired">("ok");
   const btnRef = useRef<HTMLButtonElement>(null);
-  const warningTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const warningTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     function scheduleWarning() {

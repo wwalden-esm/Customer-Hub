@@ -3,8 +3,9 @@ import { getProjectById, getProjectPassword, getProjectContacts } from "@/lib/sm
 import ProjectConfigForm from "@/components/dashboard/ProjectConfigForm";
 import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 
-export default async function ProjectConfigPage({ params }: { params: { projectId: string } }) {
-  const project = getProjectById(params.projectId);
+export default async function ProjectConfigPage({ params }: { params: Promise<{ projectId: string }> }) {
+  const { projectId } = await params;
+  const project = getProjectById(projectId);
   if (!project) notFound();
 
   return (

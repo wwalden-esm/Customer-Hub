@@ -16,11 +16,12 @@ function getSeUsers(): { email: string; name: string }[] {
   }
 }
 
-export default async function SuppliersPage({ params }: { params: { projectId: string } }) {
-  const project = getProjectById(params.projectId);
+export default async function SuppliersPage({ params }: { params: Promise<{ projectId: string }> }) {
+  const { projectId } = await params;
+  const project = getProjectById(projectId);
   if (!project) notFound();
 
-  const suppliers = getProjectSuppliers(params.projectId);
+  const suppliers = getProjectSuppliers(projectId);
   const seUsers = getSeUsers();
 
   return (

@@ -6,15 +6,16 @@ import { isSharePointConfigured, listCustomerFolderFiles } from "@/lib/sharepoin
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const staffSession = await auth();
   const customerSession = await getCustomerSession();
-  if (!staffSession?.user && (!customerSession || customerSession.projectId !== params.id)) {
+  if (!staffSession?.user && (!customerSession || customerSession.projectId !== id)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const project = getProjectById(params.id);
+  const project = getProjectById(id);
   if (!project) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

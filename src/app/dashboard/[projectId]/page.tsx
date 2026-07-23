@@ -48,11 +48,12 @@ function fmtDate(d: string | null | undefined): string {
 }
 
 
-export default async function ProjectDetailPage({ params }: { params: { projectId: string } }) {
-  const project = getProjectById(params.projectId);
+export default async function ProjectDetailPage({ params }: { params: Promise<{ projectId: string }> }) {
+  const { projectId } = await params;
+  const project = getProjectById(projectId);
   if (!project) notFound();
 
-  const config = getSmartsheetConfig(params.projectId);
+  const config = getSmartsheetConfig(projectId);
 
   const milestones = config.projectPlanSheetId
     ? await getProjectMilestones(config.projectPlanSheetId)
@@ -68,7 +69,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
     config.raidLogSheetId ? getRaidLogItems(config.raidLogSheetId) : Promise.resolve([]),
     config.meetingTrackerSheetId ? getProjectMeetings(config.meetingTrackerSheetId) : Promise.resolve([]),
     config.documentSheetId ? getProjectDocuments(config.documentSheetId) : Promise.resolve([]),
-    getProjectQuestionsAsync(params.projectId),
+    getProjectQuestionsAsync(projectId),
   ]);
 
   const openItems = actionItems.filter((a) => a.status !== "done");

@@ -6,12 +6,13 @@ import DashboardBreadcrumb from "@/components/dashboard/DashboardBreadcrumb";
 export default async function MeetingsManagementPage({
   params,
 }: {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }) {
-  const project = getProjectById(params.projectId);
+  const { projectId } = await params;
+  const project = getProjectById(projectId);
   if (!project) notFound();
 
-  const config = getSmartsheetConfig(params.projectId);
+  const config = getSmartsheetConfig(projectId);
   const meetings = config.meetingTrackerSheetId
     ? await getProjectMeetings(config.meetingTrackerSheetId)
     : [];
